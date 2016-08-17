@@ -58,6 +58,10 @@
 (defn- process-constraints [parsed-type type-node]
   (-> parsed-type
       (assoc :required (:required type-node true))
+      (assoc :example (:example type-node))
+      (assoc :default (:default type-node))
+      (assoc :examples (:examples type-node))
+      (assoc :title (:title type-node))
       (assoc :minProperties (:minProperties type-node))
       (assoc :maxProperties (:maxProperties type-node))
       (assoc :discriminator (:discriminator type-node))

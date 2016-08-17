@@ -18,6 +18,15 @@
                                                    :discography "(Songs.Song | Songs.Album)[]"}}
                     "Songs.C" {:type "object", :properties {:other "integer"}}
                     "Songs.Constrained" {:type "array" :items "string" :minItems 10}
+                    "Songs.ExemplarSong" {:properties {:title {:type "string"
+                                                                :example "Great"}
+                                                        :length "string"}}
+                    "Songs.ExemplarAlbum" {:properties {:title "string"
+                                                        :songs "Songs.ExemplarSong[]"}
+                                           :examples {
+                                                      :Album1 {:title "Test 1"
+                                                               :songs [{:title "Great"
+                                                                        :length "2"}]}}}
                     })
 
 (deftest expanded-form-nil-test
@@ -144,3 +153,32 @@
             :additionalProperties true
             :required true}
            (expanded-form input {})))))
+
+(deftest expanded-form-doc-nodes
+  (let [input (get types-context "Songs.ExemplarSong")
+        output (expanded-form input types-context)]
+    (is (= output {:properties
+                   {"title" {:type "string", :example "Great", :required true},
+                    "length" {:type "string", :required true}},
+                   :additionalProperties true,
+                   :type "object",
+                   :required true})))
+  (let [input (get types-context "Songs.ExemplarAlbum")
+        output (expanded-form input types-context)]
+    (is (= output {:properties
+                   {"title" {:type "string", :required true},
+                    "songs"
+                    {:type "array",
+                     :items
+                     {:properties
+                      {"title" {:type "string", :example "Great", :required true},
+                       "length" {:type "string", :required true}},
+                      :additionalProperties true,
+                      :type "object",
+                      :required true},
+                     :required true}},
+                   :additionalProperties true,
+                   :type "object",
+                   :examples
+                   {:Album1 {:title "Test 1", :songs [{:title "Great", :length "2"}]}},
+                   :required true}))))
