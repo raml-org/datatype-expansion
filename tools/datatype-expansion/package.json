@@ -1,5 +1,15 @@
 {
-    "name":"datatype-expansion",
-    "version":"0.0.1",
-    "main":"index"
+  "name":"datatype-expansion",
+  "version":"0.0.1",
+  "main":"index",
+  "keywords": [
+    "raml",
+    "expansion",
+    "types"
+  ],
+  "homepage": "https://github.com/raml-org/raml-parser-toolbelt/tree/master/tools/datatype-expansion",
+  "license": "Apache-2.0",
+  "bugs": {
+    "url": "https://github.com/raml-org/raml-parser-toolbelt/issues"
+  }
 }
