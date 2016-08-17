@@ -1,1 +1,5 @@
-.target
+node
+target
+out
+resources
+.lein*
