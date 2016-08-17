@@ -70,7 +70,7 @@
             {"name" {:type "string" :required true}
              "discography" {:type "array"
                             :items {:type "union"
-                                    :of
+                                    :anyOf
                                     [{:type "object"
                                       :properties
                                       {"title"  {:type "string" :required true}

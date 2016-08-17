@@ -28,7 +28,7 @@
       (recur (first type) context)
       (condp = (first type)
         :UNION_TYPE {:type "union"
-                     :of (mapv #(ast->type % context) (rest type))}
+                     :anyOf (mapv #(ast->type % context) (rest type))}
         :SCALAR_TYPE {:type (last type)}
         :ARRAY_TYPE {:type "array"
                      :items (ast->type (last type) context)}
@@ -48,7 +48,7 @@
   (try
     (ast->type (raml-type-grammar-analyser exp) context)
     (catch #?(:clj Exception :cljs js/Error) ex
-      ;(println (str "Cannot parse type expression '" exp "': " ex))
+                                        ;(println (str "Cannot parse type expression '" exp "': " ex))
       nil)))
 
 
@@ -151,7 +151,7 @@
                                                   clear-node)
 
       (= type "union")                        (-> {:type "union"
-                                                   :of   (mapv #(expanded-form % context) (:of type-node))}
+                                                   :anyOf   (mapv #(expanded-form % context) (:anyOf type-node))}
                                                   (process-constraints type-node)
                                                   clear-node)
 
@@ -179,15 +179,15 @@
 
       (and (string? type)
            (re-matches #"^.*\?$" type))       {:type "union"
-                                               :of [{:type (clojure.string/replace type "?" "")}
-                                                    {:type "nil"}]}
+                                               :anyOf [{:type (clojure.string/replace type "?" "")}
+                                                       {:type "nil"}]}
 
       (map? type)                             ;; simple inheritance
-                                              (let [result (expanded-form (assoc type-node :type [type]) context)]
-                                                (-> result
-                                                    (process-properties context)
-                                                    (process-items context)
-                                                    (assoc :type (first (:type result)))))
+      (let [result (expanded-form (assoc type-node :type [type]) context)]
+        (-> result
+            (process-properties context)
+            (process-items context)
+            (assoc :type (first (:type result)))))
 
       :else                                   (let [parsed-type (parse-type-expression type context)]
                                                 (if (some? parsed-type)

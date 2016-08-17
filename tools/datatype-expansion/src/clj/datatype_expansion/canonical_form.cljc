@@ -18,11 +18,11 @@
 (defmulti lt-restriction (fn [restriction super sub] restriction))
 
 (defmethod lt-restriction :minProperties [_ super sub] (if (>= sub super)
-                                                          (max super sub)
-                                                          (error "sub type has a weaker constraint for min-properties than base type")))
+                                                         (max super sub)
+                                                         (error "sub type has a weaker constraint for min-properties than base type")))
 (defmethod lt-restriction :maxProperties [_ super sub] (if (<= sub super)
-                                                          (min super sub)
-                                                          (error "sub type has a weaker constraint for max-properties than base type")))
+                                                         (min super sub)
+                                                         (error "sub type has a weaker constraint for max-properties than base type")))
 (defmethod lt-restriction :required [_ super sub] (if (true? super)
                                                     (if (= super sub)
                                                       (= super sub)
@@ -41,11 +41,11 @@
       1 (first values)
       2 (if (= super sub) super (error (str "Different values for discriminator-value constraint" [ super sub ]))))))
 (defmethod lt-restriction :minLength [_ super sub] (if (>= sub super)
-                                                      (max super sub)
-                                                      (error "sub type has a weaker constraint for min-length than base type")))
+                                                     (max super sub)
+                                                     (error "sub type has a weaker constraint for min-length than base type")))
 (defmethod lt-restriction :maxLength [_ super sub] (if (<= sub super)
-                                                      (min super sub)
-                                                      (error "sub type has a weaker constraint for max-length than base type")))
+                                                     (min super sub)
+                                                     (error "sub type has a weaker constraint for max-length than base type")))
 (defmethod lt-restriction :minimum [_ super sub] (if (>= sub super)
                                                    (max super sub)
                                                    (error "sub type has a weaker constraint for minimum than base type")))
@@ -65,14 +65,14 @@
       1 (first values)
       2 (if (= super sub) super (error (str "Different values for pattern constraint" [ super sub ]))))))
 (defmethod lt-restriction :uniqueItems [_ super sub] (if (or (false? super) (= super sub))
-                                                        (and super sub)
-                                                        (error "sub type has a weaker constraint for unique-items than base type")))
+                                                       (and super sub)
+                                                       (error "sub type has a weaker constraint for unique-items than base type")))
 (defmethod lt-restriction :minItems [_ super sub] (if (>= sub super)
-                                                     (max super sub)
-                                                     (error "sub type has a weaker constraint for min-items than base type")))
+                                                    (max super sub)
+                                                    (error "sub type has a weaker constraint for min-items than base type")))
 (defmethod lt-restriction :maxItems [_ super sub] (if (<= sub sub)
-                                                     (min super sub)
-                                                     (error "sub type has a weaker constraint for max-items than base type")))
+                                                    (min super sub)
+                                                    (error "sub type has a weaker constraint for max-items than base type")))
 (defmethod lt-restriction :enumValues [_ super sub]
   (if (set/subset? sub super)
     (set/intersection (into #{} super) (into #{} sub))
@@ -105,8 +105,8 @@
 
 
 (def consistency-checks {:numProperties (fn [{:keys [minProperties maxProperties]}]
-                                           (check :numProperties minProperties maxProperties
-                                                  (<= minProperties maxProperties)))
+                                          (check :numProperties minProperties maxProperties
+                                                 (<= minProperties maxProperties)))
                          :length         (fn [{:keys [minLength maxLength]}]
                                            (check :length minLength maxLength
                                                   (<= minLength maxLength)))
@@ -115,7 +115,7 @@
                                                   (<= minimum maximum)))
                          :numItems      (fn [{:keys [minItems maxItems] :as input}]
                                           (check :numItems minItems maxItems
-                                                  (<= minItems maxItems)))})
+                                                 (<= minItems maxItems)))})
 (defn consistency-check [merged]
   (doseq [[name check-fn] consistency-checks]
     (check-fn merged))
@@ -140,28 +140,28 @@
                                                                 (assoc sub :type (get super :type)))
                                                consistency-check))
 (defmethod lt ["boolean" "boolean"] [super sub] (->> (lt-restrictions super sub)
-                                               (consistency-check)))
+                                                     (consistency-check)))
 (defmethod lt ["datetime" "datetime"] [super sub] (->> (lt-restrictions super sub)
-                                                 (consistency-check)))
+                                                       (consistency-check)))
 (defmethod lt ["datetime-only" "datetime-only"] [super sub] (->> (lt-restrictions super sub)
-                                                           (consistency-check)))
+                                                                 (consistency-check)))
 (defmethod lt ["number" "number"] [super sub] (->> (lt-restrictions super sub)
-                                             (consistency-check)))
+                                                   (consistency-check)))
 (defmethod lt ["integer" "integer"] [super sub] (->> (lt-restrictions super sub)
                                                      (consistency-check)))
 (defmethod lt ["number" "integer"] [super sub] (->> (lt-restrictions (assoc super :type "integer")
                                                                      (assoc sub :type "integer"))
                                                     (consistency-check)))
 (defmethod lt ["string" "string"] [super sub] (->> (lt-restrictions super sub)
-                                             (consistency-check)))
+                                                   (consistency-check)))
 (defmethod lt ["nil" "nil"] [super sub] (->> (lt-restrictions super sub)
-                                         (consistency-check)))
+                                             (consistency-check)))
 (defmethod lt ["file" "file"] [super sub] (->> (lt-restrictions super sub)
-                                         (consistency-check)))
+                                               (consistency-check)))
 
 (defmethod lt ["array" "array"] [super sub] (let [merged-items (lt (:items super) (:items sub))
-                                                   merged (lt-restrictions (dissoc super :items) (dissoc sub :items))]
-                                        (assoc merged :items merged-items)))
+                                                  merged (lt-restrictions (dissoc super :items) (dissoc sub :items))]
+                                              (assoc merged :items merged-items)))
 
 ;;A sub-type can override properties of its parent type with the following restrictions:
 ;;  1) a required property in the parent type cannot be changed to optional in the sub-type, and
@@ -188,8 +188,8 @@
                                                 (assoc merged :properties merged-properties)))
 
 (defmethod lt ["union" "union"] [super sub]
-  (let [of-super (:of super)
-        of-sub (:of sub)
+  (let [of-super (:anyOf super)
+        of-sub (:anyOf sub)
         of-merged (->> of-sub
                        (map (fn [of-sub-type]
                               (map (fn [of-super-type]
@@ -197,20 +197,20 @@
                                    of-sub-type)))
                        flatten
                        )
-        merged (lt-restrictions (dissoc super :of) (dissoc sub :of))]
-    (assoc merged :of of-merged)))
+        merged (lt-restrictions (dissoc super :anyOf) (dissoc sub :anyOf))]
+    (assoc merged :anyOf of-merged)))
 
 
 (defmethod lt ["union" :other] [super sub]
-  (let [of-super (:of super)
+  (let [of-super (:anyOf super)
         of-merged (map (fn [of-super-type]
                          (lt of-super-type sub))
                        of-super)
-        merged (lt-restrictions (dissoc super :of)
+        merged (lt-restrictions (dissoc super :anyOf)
                                 (-> sub
                                     (dissoc :items)
                                     (dissoc :properties)))]
-    (assoc merged :of of-merged)))
+    (assoc merged :anyOf of-merged)))
 
 
 (defn dispatch-node [input]
@@ -228,8 +228,8 @@
 (defmethod canonical-form "array" [node]
   (let [canonical-items (canonical-form (:items node))]
     (if (union? canonical-items)
-      (let [of (map (fn [value] (assoc node :items (consistency-check value))) (:of canonical-items))]
-        (assoc canonical-items :of of))
+      (let [of (map (fn [value] (assoc node :items (consistency-check value))) (:anyOf canonical-items))]
+        (assoc canonical-items :anyOf of))
       (assoc node :items (consistency-check canonical-items)))))
 
 (defn append-property [accum property-name property-value]
@@ -243,7 +243,7 @@
   (->> accum
        (mapv (fn [type]
                (let [properties (:properties type)
-                     union-values (:of property-value)]
+                     union-values (:anyOf property-value)]
                  (->> union-values
                       (mapv #(assoc properties property-name %))
                       (mapv #(assoc type :properties %))))))
@@ -253,7 +253,7 @@
   (-> node
       (dissoc :properties)
       (assoc :type "union")
-      (assoc :of of-values)))
+      (assoc :anyOf of-values)))
 
 (defmethod canonical-form "object" [node]
   (let [properties (:properties node)
@@ -305,7 +305,7 @@
         sub-type (condp = super-type-class
                    "array" (assoc sub-type :items (get sub-type :items {:type "any"}))
                    "object" (assoc sub-type :properties (get sub-type :properties {}))
-                   "union"   (assoc sub-type :of (get sub-type :of []))
+                   "union"   (assoc sub-type :anyOf (get sub-type :anyOf []))
                    sub-type)
         sub-type (canonical-form sub-type)]
     (consistency-check (lt super-type sub-type))))
@@ -317,7 +317,7 @@
         sub-type (condp = super-type-class
                    "array" (assoc sub-type :items (get sub-type :items {:type "any"}))
                    "object" (assoc sub-type :properties (get sub-type :properties []))
-                   "union"   (assoc sub-type :of (get sub-type :of []))
+                   "union"   (assoc sub-type :anyOf (get sub-type :anyOf []))
                    sub-type)]
     (consistency-check
      (reduce (fn [acc super-type]
@@ -328,12 +328,12 @@
 
 (defmethod canonical-form "union" [node]
   (assoc node
-         :of (->> (:of node)
-                  (map canonical-form)
-                  flatten
-                  (map (fn [canonical-type]
-                         (if (union? canonical-type)
-                           (:of canonical-type)
-                           canonical-type)))
-                  distinct
-                  flatten)))
+         :anyOf (->> (:anyOf node)
+                     (map canonical-form)
+                     flatten
+                     (map (fn [canonical-type]
+                            (if (union? canonical-type)
+                              (:anyOf canonical-type)
+                              canonical-type)))
+                     distinct
+                     flatten)))

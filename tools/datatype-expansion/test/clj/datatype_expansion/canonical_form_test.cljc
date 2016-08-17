@@ -30,7 +30,7 @@
     (is (= {:type "union",
             :additionalProperties true,
             :required true,
-            :of
+            :anyOf
             '({:properties
                {"a" {:type "string", :required true},
                 "b" {:type "number", :required true}},
@@ -49,7 +49,7 @@
     (is (= {:type "union",
             :additionalProperties true,
             :required true,
-            :of
+            :anyOf
             '({:properties
                {"a" {:type "datetime", :required true},
                 "b" {:type "number", :required true}},
@@ -97,19 +97,19 @@
     (is (= {:type "union",
             :additionalProperties true,
             :required true,
-            :of
+            :anyOf
             '({:type "object",
-              :additionalProperties true,
-              :required true,
-              :properties
-              {"pa" {:type "string", :required true},
-               "b" {:type "string", :required true}}}
-             {:type "object",
-              :additionalProperties true,
-              :required true,
-              :properties
-              {"pa" {:type "integer", :required true},
-               "b" {:type "string", :required true}}})}
+               :additionalProperties true,
+               :required true,
+               :properties
+               {"pa" {:type "string", :required true},
+                "b" {:type "string", :required true}}}
+              {:type "object",
+               :additionalProperties true,
+               :required true,
+               :properties
+               {"pa" {:type "integer", :required true},
+                "b" {:type "string", :required true}}})}
            (canonical-form input))))
   (let [input {:type {:type {:items {:properties {:a "string | integer", :b "nil"}}}}
                :items {:properties {:c "number"}}}
@@ -117,7 +117,7 @@
     (is (= {:type "union",
             :additionalProperties true,
             :required true,
-            :of
+            :anyOf
             '({:type "array",
                :required true,
                :items {:type "object",
