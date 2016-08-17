@@ -190,13 +190,17 @@
 (defmethod lt ["union" "union"] [super sub]
   (let [of-super (:anyOf super)
         of-sub (:anyOf sub)
-        of-merged (->> of-sub
-                       (map (fn [of-sub-type]
-                              (map (fn [of-super-type]
-                                     (lt of-super-type of-sub-type))
-                                   of-sub-type)))
-                       flatten
-                       )
+        of-merged (if (empty? of-sub)
+                    of-super
+                    (if (empty? of-super)
+                      of-sub
+                      (->> of-sub
+                           (map (fn [of-sub-type]
+                                  (map (fn [of-super-type]
+                                         (lt of-super-type of-sub-type))
+                                       of-super)))
+                           flatten
+                           )))
         merged (lt-restrictions (dissoc super :anyOf) (dissoc sub :anyOf))]
     (assoc merged :anyOf of-merged)))
 

@@ -2,7 +2,8 @@
   #?(:cljs (:require-macros [cljs.test :refer [deftest is]]))
   (:require #?(:clj [clojure.test :refer :all])
             [datatype-expansion.canonical-form :refer [canonical-form]]
-            [datatype-expansion.expanded-form :refer [expanded-form]]))
+            [datatype-expansion.expanded-form :refer [expanded-form]]
+            [datatype-expansion.test-cases :as test-cases]))
 
 (deftest canonical-form-atomic
   (let [input {:type "string"}]
@@ -162,3 +163,42 @@
   (let [input {:type {:type "array" :items "string", :minItems 10} :minItems 15 :maxItems 5}
         input (expanded-form input {})]
     (is (thrown? #?(:clj Exception :cljs js/Error) (canonical-form input)))))
+
+
+(deftest complex-canonical-form-1
+  (let [input test-cases/complex-example-1
+        parts (->> input
+                   canonical-form
+                   :anyOf
+                   (map (fn [elem]
+                          [[:numberOfSIMCards (some? (-> elem :properties :numberOfSIMCards))]
+                           [:numberOfUSBPorts (some? (-> elem :properties :numberOfUSBPorts))]
+                           [[:phone :numberOfSIMCards] (some? (-> elem :properties :phone :properties :numberOfSIMCards))]
+                           [[:phone :numberOfUSBPorts] (some? (-> elem :properties :phone :properties :numberOfUSBPorts))]
+                           [[:device :numberOfSIMCards] (some? (-> elem :properties :device :properties :numberOfSIMCards))]
+                           [[:device :numberOfUSBPorts] (some? (-> elem :properties :device :properties :numberOfUSBPorts))]])))]
+    (is (= [[[:numberOfSIMCards true]
+             [:numberOfUSBPorts false]
+             [[:phone :numberOfSIMCards] true]
+             [[:phone :numberOfUSBPorts] false]
+             [[:device :numberOfSIMCards] true]
+             [[:device :numberOfUSBPorts] false]]
+            [[:numberOfSIMCards false]
+             [:numberOfUSBPorts true]
+             [[:phone :numberOfSIMCards] true]
+             [[:phone :numberOfUSBPorts] false]
+             [[:device :numberOfSIMCards] true]
+             [[:device :numberOfUSBPorts] false]]
+            [[:numberOfSIMCards true]
+             [:numberOfUSBPorts false]
+             [[:phone :numberOfSIMCards] true]
+             [[:phone :numberOfUSBPorts] false]
+             [[:device :numberOfSIMCards] false]
+             [[:device :numberOfUSBPorts] true]]
+            [[:numberOfSIMCards false]
+             [:numberOfUSBPorts true]
+             [[:phone :numberOfSIMCards] true]
+             [[:phone :numberOfUSBPorts] false]
+             [[:device :numberOfSIMCards] false]
+             [[:device :numberOfUSBPorts] true]]]
+           parts))))
