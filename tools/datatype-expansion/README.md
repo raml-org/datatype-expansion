@@ -1,8 +1,16 @@
 # RAML Data Type Expansion
 
-> Often, tools need the full expansion of RAML data types where there are no references. This module gives you a utility tool to expand a given type and create a canonical form. 
+> Often, tools need the full expansion of RAML data types where there are no references. This module gives you a utility tool to expand a given type and create a canonical form.
 
 ## Installation
+
+### NPM
+
+```
+npm install datatype-expansion
+```
+
+### Developer Environment
 
 To run this project and build the different packages for Java or Javascript, you need to install `leiningen`. You can use [homebrew](http://brew.sh/) for that.
 
