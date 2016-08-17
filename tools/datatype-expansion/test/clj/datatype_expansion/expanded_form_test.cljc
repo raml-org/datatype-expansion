@@ -20,6 +20,10 @@
                     "Songs.Constrained" {:type "array" :items "string" :minItems 10}
                     })
 
+(deftest expanded-form-nil-test
+  (is (thrown? #?(:clj Exception :cljs js/Error)
+               (println (expanded-form nil {})))))
+
 (deftest expanded-form-object-test
   (let [song (get types-context "Songs.Song")]
     (is (= {:type "object"

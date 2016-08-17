@@ -168,7 +168,8 @@
 
       (json-type? type)                       (-> {:type "json", :content type})
 
-      (nil? type)                             (-> {:type "string"} ;; or any depending if we are in the body or not
+      (and (nil? type)
+           (some? type-node))                 (-> {:type "string"} ;; or any depending if we are in the body or not
                                                   (process-constraints type-node)
                                                   clear-node)
 
