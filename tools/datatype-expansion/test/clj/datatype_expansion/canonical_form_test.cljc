@@ -89,6 +89,12 @@
              "b" {:type "string", :required true}}}
            (canonical-form input)))))
 
+(deftest canonical-form-simple-inheritance-error
+  (let [context {:a {:properties {:b "number"}}}
+        input (expanded-form {:type "a", :properties {:b "string"}} context)]
+    (is (thrown? #?(:clj Exception :cljs js/Error) (canonical-form input)))))
+
+
 (deftest canonical-form-simple-inheritance-union
   (let [context {:a "string | integer"}
         input (expanded-form {:type "a", :properties {:b "string"}} context)]
