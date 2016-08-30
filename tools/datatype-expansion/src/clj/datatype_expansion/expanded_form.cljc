@@ -76,7 +76,7 @@
       (assoc :uniqueItems (:uniqueItems type-node))
       (assoc :minItems (:minItems type-node))
       (assoc :maxItems (:maxItems type-node))
-      (assoc :enumValues (let [enum-values (into [] (:enumValues type-node))]
+      (assoc :enum (let [enum-values (into [] (:enum type-node))]
                            (if (empty? enum-values) nil enum-values)))
       (assoc :additionalProperties (:additionalProperties type-node (if (or (= "object" (:type parsed-type))
                                                                             (some? (:properties parsed-type)))

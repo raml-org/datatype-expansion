@@ -73,7 +73,7 @@
 (defmethod lt-restriction :maxItems [_ super sub] (if (<= sub sub)
                                                     (min super sub)
                                                     (error "sub type has a weaker constraint for max-items than base type")))
-(defmethod lt-restriction :enumValues [_ super sub]
+(defmethod lt-restriction :enum [_ super sub]
   (if (set/subset? sub super)
     (set/intersection (into #{} super) (into #{} sub))
     (error "sub type has a weaker constraint for enum-values than base type")))
