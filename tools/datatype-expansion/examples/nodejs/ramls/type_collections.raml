@@ -1,0 +1,75 @@
+#%RAML 1.0 Library
+
+types:
+  Song:
+    properties:
+      title:
+        type: string
+        example: Great
+      length: string
+  Album:
+    properties:
+      title: string
+      songs:
+        description: A list of songs inside an album.
+        type: Song[]
+    examples:
+      Album1:
+        title: Test 1
+        songs:
+          - title: Great
+            length: "2"
+          - title: Awesome
+            length: "3"
+      Album2:
+        title: Test 2
+        songs:
+          - title: Great
+            length: "2"
+          - title: Awesome
+            length: "3"
+  Phone:
+    type: object
+    properties:
+      manufacturer:
+        type: string
+      numberOfSIMCards:
+        type: number
+      kind: string
+  Notebook:
+    type: object
+    properties:
+      manufacturer:
+        type: string
+      numberOfUSBPorts:
+        type: number
+      kind: string
+  Device:
+    type: Phone | Notebook
+  Deprecation:
+    type: nil | string
+  SimpleUnion:
+    properties:
+      a: string
+      b: number | string
+  WithInheritance:
+    type: Device
+    properties:
+      phone: Phone
+      device: Device
+    example: |
+      {
+        "manufacturer": "John",
+        "numberOfSIMCards": 1234,
+        "kind": "Stamp Collecting",
+        "phone": {
+          "manufacturer": "John",
+          "numberOfSIMCards": 1234,
+          "kind": "Stamp Collecting"
+        },
+        "device": {
+          "manufacturer": "John",
+          "numberOfSIMCards": 1234,
+          "kind": "Stamp Collecting"
+        }
+      }
