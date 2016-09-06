@@ -9,8 +9,6 @@
 
 #?(:cljs (enable-console-print!))
 
-(declare expanded-form)
-
 (def raml-grammar "TYPE_EXPRESSION = TYPE_NAME | SCALAR_TYPE | <'('> <BS>  TYPE_EXPRESSION <BS> <')'> | ARRAY_TYPE | UNION_TYPE
                    SCALAR_TYPE = 'string' | 'number' | 'integer' | 'boolean' | 'date-only' | 'time-only' | 'datetime-only' | 'datetime' | 'file' | 'nil'
                    ARRAY_TYPE = TYPE_EXPRESSION <'[]'>
@@ -32,23 +30,15 @@
         :SCALAR_TYPE {:type (last type)}
         :ARRAY_TYPE {:type "array"
                      :items (ast->type (last type) context)}
-        :TYPE_NAME (let [ref-type (->> context
-                                       (filter (fn [[k v]]
-                                                 (let [last-part (last (clojure.string/split k #"\."))]
-                                                   (or (= (name k) (last type))
-                                                       (= last-part (last type))))))
-                                       (mapv last)
-                                       first)]
-                     (if (nil? ref-type)
-                       (error (str "Cannot find type reference " (last type)))
-                       ref-type))
+        :TYPE_NAME (last type)
+
         (error (str "Cannot parse type expression AST " (mapv identity type)))))))
 
 (defn parse-type-expression [exp context]
   (try
     (ast->type (raml-type-grammar-analyser exp) context)
     (catch #?(:clj Exception :cljs js/Error) ex
-                                        ;(println (str "Cannot parse type expression '" exp "': " ex))
+      ;;(println (str "Cannot parse type expression '" exp "': " ex))
       nil)))
 
 
@@ -94,19 +84,32 @@
        (into {})
        (assoc object :properties)))
 
+(defn setup-context [{:keys [path] :as context}]
+  (assoc context :path [] :fixpoints (atom {})))
+
+(defn cycle? [type path]
+  (-> (filter (fn [type-in-path]
+                (= type-in-path type)) path)
+      first
+      some?))
+
+(declare expanded-form-inner)
+
 (defn process-items [node context]
   (if (some? (:items node))
-    (assoc node :items (expanded-form (:items node) context))
+    (do
+      (println "EXPANDING ITEMS " (:items node))
+      (assoc node :items (expanded-form-inner (:items node) context)))
     node))
 
 (defn process-properties [node context]
   (if (some? (:properties node))
     (assoc node :properties (->> (:properties node)
-                                 (map (fn [[k v]] [k (expanded-form v context)]))
+                                 (map (fn [[k v]] [k (expanded-form-inner v context)]))
                                  (into {})))
     node))
 
-(defn expanded-form [type-node context]
+(defn expanded-form-inner [type-node context]
   (let [type-node (if (and (map? type-node)
                            (some? (:properties type-node)))
                     (assoc type-node :properties (->> (:properties type-node)
@@ -121,7 +124,7 @@
 
       ;; Multiple inheritance
       (and (not (map? type))
-           (coll? type))                      (-> (assoc type-node :type (mapv #(expanded-form % context) type))
+           (coll? type))                      (-> (assoc type-node :type (mapv #(expanded-form-inner % context) type))
                                                   (process-properties context)
                                                   (process-items context)
                                                   (process-constraints type-node)
@@ -136,7 +139,7 @@
             (some? (:items type-node)))
        (= type "array"))                      (-> {:type "array"}
                                                   ;;(assoc :items (get type-node :items {:type "string"}))
-                                                  (assoc :items (expanded-form (:items type-node {:type "string"}) context))
+                                                  (assoc :items (expanded-form-inner (:items type-node {:type "string"}) context))
                                                   (process-constraints type-node)
                                                   clear-node)
 
@@ -146,12 +149,12 @@
        (= type "object"))                     (-> {:type "object"}
                                                   (process-constraints type-node)
                                                   (assoc :properties (->> (:properties type-node)
-                                                                          (mapv (fn [[prop-name type]] [(name prop-name) (expanded-form type context)]))
+                                                                          (mapv (fn [[prop-name type]] [(name prop-name) (expanded-form-inner type context)]))
                                                                           (into {})))
                                                   clear-node)
 
       (= type "union")                        (-> {:type "union"
-                                                   :anyOf   (mapv #(expanded-form % context) (:anyOf type-node))}
+                                                   :anyOf   (mapv #(expanded-form-inner % context) (:anyOf type-node))}
                                                   (process-constraints type-node)
                                                   clear-node)
 
@@ -160,13 +163,28 @@
                (keyword? type))
            (or
             (get context (name type))
-            (get context (keyword type))))    (-> (if (map? type-node) type-node {})
-                                                  (assoc :type (expanded-form (or (get context (name type))
-                                                                                  (get context (keyword type))) context))
-                                                  (process-properties context)
-                                                  (process-items context)
-                                                  (process-constraints type-node)
-                                                  clear-node)
+            (get context (keyword type))))    (let [ref-type (or (get context (name type))
+                                                                 (get context (keyword type)))]
+                                                (when (nil? ref-type)
+                                                  (throw #?(:clj (Exception. (str "Cannot find reference " (name type)))
+                                                            :cljs (js/Error. (str "Cannot find reference " (name type))))))
+                                                (if (cycle? (name type) (:path context))
+                                                  (do (swap! (:fixpoints context) (fn [fps] (assoc fps type true)))
+                                                      (-> {:type  :$recur}
+                                                          (process-constraints type-node)
+                                                          clear-node))
+                                                  (let [path (get context :path)
+                                                        context (assoc context :path (conj path (name type)))]
+                                                    (if (string? type-node)
+                                                      (-> (expanded-form-inner ref-type context)
+                                                          (assoc :$ref type))
+                                                      (-> (if (map? type-node) type-node {})
+                                                          (assoc :$ref type)
+                                                          (assoc :type (expanded-form-inner ref-type context))
+                                                          (process-properties context)
+                                                          (process-items context)
+                                                          (process-constraints type-node)
+                                                          clear-node)))))
 
       (xml-type? type)                        (-> {:type "xml", :content type})
 
@@ -183,13 +201,59 @@
                                                        {:type "nil"}]}
 
       (map? type)                             ;; simple inheritance
-      (let [result (expanded-form (assoc type-node :type [type]) context)]
-        (-> result
-            (process-properties context)
-            (process-items context)
-            (assoc :type (first (:type result)))))
+                                              (let [result (expanded-form-inner (assoc type-node :type [type]) context)]
+                                                (-> result
+                                                    (process-properties context)
+                                                    (process-items context)
+                                                    (assoc :type (first (:type result)))))
 
       :else                                   (let [parsed-type (parse-type-expression type context)]
                                                 (if (some? parsed-type)
-                                                  (expanded-form parsed-type context)
-                                                  (error (str "Unknown type " type)))))))
+                                                  (expanded-form-inner parsed-type context)
+                                                  (error (str "Unknown type " type " in " context)))))))
+
+(defn add-fixpoints [t fixpoints num-fixpoints]
+  (cond
+    (and (map? t)
+         (some? (:$ref t))) (let [ref-type (:$ref t)
+                                  t (dissoc t :$ref)
+                                  processed (add-fixpoints t fixpoints num-fixpoints)]
+                              (if (some? (get fixpoints ref-type))
+                                {:type :fixpoint
+                                 :value processed}
+                                processed))
+
+    (and
+     (map? t)
+     (= (:type t) :$recur)) (do (swap! num-fixpoints inc)
+                                t)
+
+    (map? t)                 (->> t
+                                  (map (fn [[k v]]
+                                         [k (add-fixpoints v fixpoints num-fixpoints)]))
+                                  (into {}))
+
+    (coll? t) (mapv #(add-fixpoints % fixpoints num-fixpoints) t)
+
+
+    :else     t))
+
+(defn expanded-form [node context]
+  (let [context (setup-context context)
+        found-context-type (->> context
+                                (filter (fn [[k v]] (= v node)))
+                                ffirst)
+        path (if (some? found-context-type)
+               [found-context-type]
+               [])
+        context (assoc context :path path)
+        expanded (expanded-form-inner node context)
+        expanded(if (some? found-context-type)
+                  (assoc expanded :$ref found-context-type)
+                  expanded)
+        num-fixpoints (atom 0)
+        expanded (add-fixpoints expanded @(:fixpoints context) num-fixpoints)]
+    (if (= @num-fixpoints (count @(:fixpoints context)))
+      expanded
+      {:type :fixpoint
+       :value expanded})))

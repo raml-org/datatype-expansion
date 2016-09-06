@@ -1,7 +1,8 @@
 (ns datatype-expansion.expanded-form-test
   #?(:cljs (:require-macros [cljs.test :refer [deftest is]]))
   (:require #?(:clj [clojure.test :refer :all])
-            [datatype-expansion.expanded-form :refer [expanded-form]]))
+            [datatype-expansion.expanded-form :refer [expanded-form]]
+            [clojure.data :refer [diff]]))
 
 #?(:cljs (enable-console-print!))
 
@@ -27,6 +28,8 @@
                                                       :Album1 {:title "Test 1"
                                                                :songs [{:title "Great"
                                                                         :length "2"}]}}}
+                    "Songs.Cell"  {:properties {:car "any" :cdr "Songs.List | nil"}}
+                    "Songs.List"  {:properties {:cell "Songs.Cell"}}
                     })
 
 (deftest expanded-form-nil-test
@@ -45,7 +48,7 @@
 
 
 (deftest expanded-form-array-test
-  (let [song (get types-context "Songs.Album")]
+  (let [album (get types-context "Songs.Album")]
     (is (= {:type "object"
             :properties
             {"title" {:type "string" :required true}
@@ -59,7 +62,7 @@
                       :required true}}
             :additionalProperties true
             :required true}
-           (expanded-form song types-context)))))
+           (expanded-form album types-context)))))
 
 
 
@@ -101,32 +104,29 @@
   (let [publication (get types-context "Songs.Publication")]
     (is (= {:properties {"date" {:type "string" :required true}},
             :type
-            [{:type {:properties
-                     {"title" {:type "string", :required true},
-                      "songs" {:type "array",
-                               :items {:properties {"title" {:type "string", :required true},
-                                                    "length" {:type "number", :required true}},
-                                       :type "object",
-                                       :additionalProperties true,
-                                       :required true},
-                               :required true}},
+            [{:properties
+              {"title" {:type "string", :required true},
+               "songs" {:type "array",
+                        :items {:properties {"title" {:type "string", :required true},
+                                             "length" {:type "number", :required true}},
+                                :type "object",
+                                :additionalProperties true,
+                                :required true},
+                        :required true}},
+              :type "object",
+              :additionalProperties true,
+              :required true}
+             {:properties {"duration" {:type "string" :required true}},
+              :type {:properties {"title" {:type "string", :required true},
+                                  "length" {:type "number", :required true}},
                      :type "object",
                      :additionalProperties true,
                      :required true},
+              :additionalProperties true,
               :required true}
-             {:type {:properties {"duration" {:type "string" :required true}},
-                     :type {:properties {"title" {:type "string", :required true},
-                                         "length" {:type "number", :required true}},
-                            :type "object",
-                            :additionalProperties true,
-                            :required true},
-                     :additionalProperties true,
-                     :required true},
-              :required true}
-             {:type {:properties {"other" {:type "integer", :required true}},
-                     :type "object",
-                     :additionalProperties true,
-                     :required true},
+             {:properties {"other" {:type "integer", :required true}},
+              :type "object",
+              :additionalProperties true,
               :required true}],
             :additionalProperties true,
             :required true}
@@ -182,3 +182,19 @@
                    :examples
                    {:Album1 {:title "Test 1", :songs [{:title "Great", :length "2"}]}},
                    :required true}))))
+
+(deftest expanded-recursive
+  (let [songs-list (get types-context "Songs.List")]
+    (is (= {:type :fixpoint,
+            :value {:properties {"cell" {:properties {"car" {:type "any", :required true},
+                                                      "cdr" {:anyOf [{:type :$recur, :required true}
+                                                                     {:type "nil", :required true}],
+                                                             :type "union",
+                                                             :required true}},
+                                         :additionalProperties true,
+                                         :type "object",
+                                         :required true}},
+                    :additionalProperties true,
+                    :type "object",
+                    :required true}}
+           (expanded-form songs-list types-context)))))

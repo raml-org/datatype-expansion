@@ -23,7 +23,7 @@ A RAML type form is defined using the following algebraic data types:
 ``` clojure
 (constructor Record [a1:String  f1:RAMLForm, ..., an:String fn:RAMLForm])
 (constructor Seq [a1:RAMLForm, ... an:RAMLForm])
-(constructor Scalar String | Integer | Boolean )
+(constructor Scalar String | Integer | Boolean | $recur | ...)
 (constructor RAMLForm Scalar | Record | Seq)
 
 ```
@@ -33,6 +33,15 @@ Since we are going to expand all type expressions, we need to provide a form rep
 ``` clojure
 (constructor Union [a1:RAMLForm, an:RAMLForm]  (Record "type" "union", "of" (Seq a1 ... an)))
 ```
+
+RAML types can be recursive, at the same time they are anonymous, no identifier for a type exist. To address both problems, we introduce another type form to designate a fixpoint recursion:
+
+``` clojure
+(constructor Fixpoint RAMLForm)
+```
+
+Where the recursion point is marked by the scalar type ```$recur```. Also note that there are not nesting restrictions on fixpoints.
+
 
 It is trivial to create a mapping for a concrete syntax (JSON, XML, RAML) into these data types.
 
@@ -69,6 +78,35 @@ The output of expanding the `Album` type is the following
  "required" true}
 ```
 
+A recursive ```List``` type like:
+
+``` raml
+types:
+  List:
+    cell: Cell
+  Cell:
+    properties:
+      car: any
+      cdr: List | nil
+```
+
+Will be expanded in the following form:
+
+``` clojure
+{:type :fixpoint,
+ :value {:type "object",
+         :properties {"cell" {:properties {"car" {:type "any", :required true},
+                                           "cdr" {:anyOf [{:type :$recur, :required true}
+                                                          {:type "nil", :required true}],
+                                                  :type "union",
+                                                  :required true}},
+                              :additionalProperties true,
+                              :type "object",
+                              :required true}},
+         :additionalProperties true,
+         :required true}}
+```
+
 The pseudo-code for the transformation is the following:
 
 
@@ -82,7 +120,11 @@ The input for the algorithm is:
 1. if `form` is a `String`
   1. if `form` is a RAML built-in data type, we return `(Record "type" form)`
   2. if `form` is a Type Expression, we return the output of calling the algorithm recursively with the parsed type expression and the provided `bindings`
-  3. if `form` is a key in `bindings` we return the output of invoking the algorithm recursively with the value for `form` found in `bindings` and the `bindings` mapping
+  3. if `form` is a key in `bindings`:
+    1. If the type hasn't been traversed yet, we return the output of invoking the algorithm recursively with the value for `form` found in `bindings` and the `bindings` mapping and we add the type to the current traverse path
+    2. If the type has been traversed:
+      1. We mark the value for the current form as a fixpoint recursion: `$recur`
+      2. We find the container form matching the recursion type and we wrap it into a `(fixpoint RAMLForm)` form.
   4. else we return an error
 2. if `form` is a `Record`
   1. we initialize a variable `type`
