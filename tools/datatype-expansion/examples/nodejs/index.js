@@ -16,6 +16,10 @@ type_expander.expandedForm(typesContext["Device"], typesContext, function(err, e
 
   type_expander.canonicalForm(expanded, function(err, canonical) {
     // canonical contains the computed canonical form
+    if(err) {
+      console.log(err);
+      return;
+    }
     console.log(JSON.stringify(canonical, null, 2));
   });
 });

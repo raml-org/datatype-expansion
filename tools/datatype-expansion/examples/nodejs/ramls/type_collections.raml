@@ -73,3 +73,67 @@ types:
           "kind": "Stamp Collecting"
         }
       }
+  InlinedDeclaration:
+    type:
+      type: object
+      properties:
+        stringProperty:
+          type: string
+        numberProperty:
+          type: number
+
+  ValidConstraintsInheritance:
+    minProperties: 2
+    maxProperties: 9
+    properties:
+      name:
+        type: string
+        required: true
+        minLength: 4
+        maxLength: 9
+        enum: ["Jane", "John"]
+      age:
+        type: integer
+        minimum: 19
+        maximum: 98
+      cats:
+        type: array
+        items: string
+        minItems: 2
+        maxItems: 4
+      bio:
+        type: object
+        minProperties: 2
+        maxProperties: 9
+    type:
+      type: object
+      discriminator: name
+      discriminatorValue: "John"
+      additionalProperties: false
+      minProperties: 1
+      maxProperties: 10
+      properties:
+        name:
+          type: string
+          required: false
+          minLength: 3
+          maxLength: 10
+          pattern: foobar
+          enum: ["Jane", "John", "Markus"]
+        age:
+          type: integer
+          minimum: 18
+          maximum: 99
+        dob:
+          type: datetime
+          format: rfc2616
+        cats:
+          type: array
+          items: string
+          uniqueItems: true
+          minItems: 1
+          maxItems: 5
+        bio:
+          type: object
+          minProperties: 1
+          maxProperties: 10
