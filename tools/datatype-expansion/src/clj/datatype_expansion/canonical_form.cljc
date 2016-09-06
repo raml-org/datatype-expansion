@@ -70,11 +70,11 @@
 (defmethod lt-restriction :minItems [_ super sub] (if (>= sub super)
                                                     (max super sub)
                                                     (error "sub type has a weaker constraint for min-items than base type")))
-(defmethod lt-restriction :maxItems [_ super sub] (if (<= sub sub)
+(defmethod lt-restriction :maxItems [_ super sub] (if (<= sub super)
                                                     (min super sub)
                                                     (error "sub type has a weaker constraint for max-items than base type")))
 (defmethod lt-restriction :enum [_ super sub]
-  (if (set/subset? sub super)
+  (if (set/subset? (into #{} sub) (into #{} super))
     (set/intersection (into #{} super) (into #{} sub))
     (error "sub type has a weaker constraint for enum-values than base type")))
 (defmethod lt-restriction :additionalProperties [_ super sub]
@@ -113,7 +113,7 @@
                          :size           (fn [{:keys [minimum maximum]}]
                                            (check :size minimum maximum
                                                   (<= minimum maximum)))
-                         :numItems      (fn [{:keys [minItems maxItems] :as input}]
+                         :numItems      (fn [{:keys [minItems maxItems]}]
                                           (check :numItems minItems maxItems
                                                  (<= minItems maxItems)))})
 (defn consistency-check [merged]
@@ -160,7 +160,8 @@
                                                (consistency-check)))
 
 (defmethod lt ["array" "array"] [super sub] (let [merged-items (lt (:items super) (:items sub))
-                                                  merged (lt-restrictions (dissoc super :items) (dissoc sub :items))]
+                                                  merged (lt-restrictions (dissoc super :items) (dissoc sub :items))
+                                                  merged (consistency-check merged)]
                                               (assoc merged :items merged-items)))
 
 ;;A sub-type can override properties of its parent type with the following restrictions:
@@ -172,6 +173,7 @@
                                                     props-sub-names (into #{} (keys props-sub))
                                                     common-props-names (set/intersection props-super-names props-sub-names)
                                                     merged (lt-restrictions (dissoc super :properties) (dissoc sub :properties))
+                                                    merged (consistency-check merged)
                                                     common-props (->> common-props-names
                                                                       (mapv (fn [prop-name]
                                                                               [prop-name (lt (get props-super prop-name)
@@ -230,11 +232,12 @@
 (defmethod canonical-form :atomic [node] (consistency-check node))
 
 (defmethod canonical-form "array" [node]
-  (let [canonical-items (canonical-form (:items node))]
+  (let [canonical-items (canonical-form (:items node))
+        node (consistency-check node)]
     (if (union? canonical-items)
-      (let [of (map (fn [value] (assoc node :items (consistency-check value))) (:anyOf canonical-items))]
+      (let [of (map (fn [value] (assoc node :items value)) (:anyOf canonical-items))]
         (assoc canonical-items :anyOf of))
-      (assoc node :items (consistency-check canonical-items)))))
+      (assoc node :items canonical-items))))
 
 (defn append-property [accum property-name property-value]
   (map (fn [type]
