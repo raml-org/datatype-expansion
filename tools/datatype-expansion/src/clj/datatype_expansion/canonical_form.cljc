@@ -343,7 +343,7 @@
                    sub-type)]
     (consistency-check
      (reduce (fn [acc super-type]
-               (lt super-type acc))
+               (lt (canonical-form super-type) acc))
              sub-type
              (:type node)))))
 
