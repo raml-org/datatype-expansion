@@ -230,3 +230,18 @@
                       :properties {"age" {:type "number", :required true},
                                    "address" {:type "string", :required true}}})}
            canonical))))
+
+
+(deftest multiple-inheritance-test
+  (let [context {"Animal" {:properties {:age "integer"}}
+                 "Pet" {:properties {:owner "string"}}
+                 "Cat" {:type ["Animal", "Pet"]}}
+        expanded (expanded-form "Cat" context)
+        canonical (canonical-form expanded)]
+
+    (is (= canonical
+           {:additionalProperties true,
+            :type "object",
+            :required true,
+            :properties {"owner" {:type "string", :required true},
+                         "age" {:type "integer", :required true}}}))))
