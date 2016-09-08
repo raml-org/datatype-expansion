@@ -245,3 +245,17 @@
             :required true,
             :properties {"owner" {:type "string", :required true},
                          "age" {:type "integer", :required true}}}))))
+
+(deftest required-inheritance-error
+  (let [input {:properties {:name {:type "string"
+                                   :required true}}
+               :type {:type "object"
+                      :properties {:name {:type "string"
+                                          :required false}}}}
+        expanded (expanded-form input {})
+        canonical (canonical-form expanded)]
+    (is (= {:additionalProperties true,
+            :type "object",
+            :required true,
+            :properties {"name" {:type "string", :required true}}}
+           canonical))))

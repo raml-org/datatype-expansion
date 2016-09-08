@@ -27,7 +27,7 @@
                                                     (if (= super sub)
                                                       (= super sub)
                                                       (error "Error in required property, making optional base class required property"))
-                                                    (and super sub)))
+                                                    (or super sub)))
 (defmethod lt-restriction :discriminator [_ super sub]
   (let [values (filter some? [super sub])]
     (condp (count values) =
