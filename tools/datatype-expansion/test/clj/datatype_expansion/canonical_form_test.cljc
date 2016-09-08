@@ -208,3 +208,25 @@
              [[:device :numberOfSIMCards] false]
              [[:device :numberOfUSBPorts] true]]]
            parts))))
+
+
+(deftest union-inheriting-object
+  (let [context {"AnimalWithAddress" {:properties {:address "string"}}
+                 "Cat" {:type "AnimalWithAddress"
+                        :properties {:age { :type "integer | number" }}}}
+        expanded (expanded-form "Cat" context)
+        canonical (canonical-form expanded)]
+    (is (= {:additionalProperties true,
+            :type "union",
+            :required true,
+            :anyOf '({:additionalProperties true,
+                      :type "object",
+                      :required true,
+                      :properties {"age" {:type "integer", :required true},
+                                   "address" {:type "string", :required true}}}
+                     {:additionalProperties true,
+                      :type "object",
+                      :required true,
+                      :properties {"age" {:type "number", :required true},
+                                   "address" {:type "string", :required true}}})}
+           canonical))))

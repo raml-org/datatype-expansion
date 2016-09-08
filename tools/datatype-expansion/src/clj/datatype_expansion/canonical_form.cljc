@@ -82,12 +82,11 @@
     (and super sub)
     (error "sub type has a weaker constraint for additional-properties than base type")))
 (defmethod lt-restriction :type [_ super sub]
-  (if (or
-       (= super "union")
-       (= super sub))
-    super
-    (error (str "Cannot compute min value of different sub types")))
-  )
+  (cond
+    (or (= super "union")
+        (= sub "union"))    "union"
+    (= super sub)           super
+    :else                   (error (str "Cannot compute min value of different sub types"))))
 
 (defn lt-restrictions [super sub]
   (loop [merged {}
@@ -126,6 +125,7 @@
     (and (any? super) (not (any? sub)))     ["any" :other]
     (and (not (any? super)) (any? sub))     [:other "any"]
     (and (union? super) (not (union? sub))) ["union" :other]
+    (and (not (union? super)) (union? sub)) [:other "union"]
     :else [(:type super) (:type sub)]))
 
 (defmulti lt (fn [super sub] (lt-dispatch-fn super sub)))
@@ -216,6 +216,21 @@
                                 (-> sub
                                     (dissoc :items)
                                     (dissoc :properties)))]
+    (assoc merged :anyOf of-merged)))
+
+(defmethod lt [:other "union"] [super sub]
+  (let [of-sub (:anyOf sub)
+        of-merged (map (fn [of-sub-type]
+                         (lt of-sub-type super))
+                       of-sub)
+        merged (lt-restrictions (-> super
+                                    (dissoc :items)
+                                    (dissoc :properties)
+                                    (dissoc :anyOf))
+                                (-> sub
+                                    (dissoc :items)
+                                    (dissoc :properties)
+                                    (dissoc :anyOf)))]
     (assoc merged :anyOf of-merged)))
 
 
