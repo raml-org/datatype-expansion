@@ -196,9 +196,10 @@
                                                   clear-node)
 
       (and (string? type)
-           (re-matches #"^.*\?$" type))       {:type "union"
-                                               :anyOf [{:type (clojure.string/replace type "?" "")}
-                                                       {:type "nil"}]}
+           (re-matches #"^.*\?$" type))       (-> {:type "union"
+                                                   :anyOf [{:type (clojure.string/replace type "?" "")}
+                                                           {:type "nil"}]}
+                                                  (process-constraints type-node))
 
       (map? type)                             ;; simple inheritance
                                               (let [result (expanded-form-inner (assoc type-node :type [type]) context)]

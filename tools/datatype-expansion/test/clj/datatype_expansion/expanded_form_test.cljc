@@ -198,3 +198,18 @@
                     :type "object",
                     :required true}}
            (expanded-form songs-list types-context)))))
+
+(deftest expansion-optional-properties-constraints
+  (let [input {:properties
+               {:bio {:type "string?"
+                      :minLength 1}}}
+        expanded (expanded-form input {})]
+    (is (= {:properties {"bio" {:anyOf [{:type "string"}
+                                        {:type "nil"}],
+                                :type "union",
+                                :minLength 1,
+                                :required true}},
+            :additionalProperties true,
+            :type "object",
+            :required true}
+           expanded))))
