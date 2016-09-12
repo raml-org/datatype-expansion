@@ -277,3 +277,22 @@
             :additionalProperties true,
             :type "object"}
          canonical))))
+
+
+(deftest xml-attribute-test
+  (let [animal {:type "string"
+                :maxLength 42
+                :xml {:attribute false
+                      :wrapped true
+                      :name "cat"
+                      :prefix "animal"}}
+        cat {:type "Animal"}
+        expanded (expanded-form cat {"Animal" animal "Cat" cat})
+        canonical (canonical-form expanded)]
+    (is (= {:type "string",
+            :maxLength 42,
+            :xml {:attribute false,
+                  :wrapped true,
+                  :name "cat",
+                  :prefix "animal"}}
+         canonical))))
