@@ -259,3 +259,23 @@
             :required true,
             :properties {"name" {:type "string", :required true}}}
            canonical))))
+
+(deftest union-strings-error
+  (let [input {:properties {:name {:type "string | string"
+                                   :required false}}}
+        expanded (expanded-form input {})
+        canonical (canonical-form expanded)]
+    (is (= {:properties {"name"
+                         {:anyOf [{:type "string", :required true}
+                                  {:type "string", :required true}],
+                          :type "union",
+                          :required false}},
+            :additionalProperties true,
+            :type "object",
+            :required true}
+           expanded))
+    (is (= {:properties {"name" {:type "string", :required false}},
+            :additionalProperties true,
+            :type "object",
+            :required true}
+           canonical))))
