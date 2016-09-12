@@ -295,4 +295,20 @@
                   :wrapped true,
                   :name "cat",
                   :prefix "animal"}}
-         canonical))))
+           canonical))))
+
+(deftest expansion-file-type
+  (let [input {:properties {:photo {:type "file"
+                                    :fileTypes ["image/jpeg", "image/png"]
+                                    :minLength 1
+                                    :maxLength 307200}}}
+        expanded (expanded-form input {})
+        canonical (canonical-form expanded)]
+    (is (= {:properties {"photo" {:type "file",
+                                  :minLength 1,
+                                  :fileTypes ["image/jpeg" "image/png"],
+                                  :maxLength 307200,
+                                  :required true}},
+            :additionalProperties true,
+            :type "object"}
+           canonical))))
