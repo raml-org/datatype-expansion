@@ -52,6 +52,7 @@
                          (:required type-node)
                          nil))
       (assoc :xml (:xml type-node))
+      (assoc :fileTypes (:fileTypes type-node))
       (assoc :example (:example type-node))
       (assoc :default (:default type-node))
       (assoc :examples (:examples type-node))
