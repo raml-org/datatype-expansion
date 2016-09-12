@@ -5,6 +5,7 @@
             [clojure.string]
             [datatype-expansion.utils :refer [clear-node error]]
             [instaparse.core :as insta]
+            [clojure.string :as string]
             [clojure.walk :refer [stringify-keys]]))
 
 #?(:cljs (enable-console-print!))
@@ -147,7 +148,15 @@
        (= type "object"))                     (-> {:type "object"}
                                                   (process-constraints type-node)
                                                   (assoc :properties (->> (:properties type-node)
-                                                                          (mapv (fn [[prop-name type]] [(name prop-name) (expanded-form-inner type context)]))
+                                                                          (mapv (fn [[prop-name type]]
+                                                                                  (let [prop-name (name prop-name)
+                                                                                        prop-expanded (expanded-form-inner type context)
+                                                                                        explicit-required (and (map? type) (:required type))
+                                                                                        optional (string/ends-with? prop-name "?")
+                                                                                        prop-expanded (if (and optional (not explicit-required))
+                                                                                                        (assoc prop-expanded :required false)
+                                                                                                        prop-expanded)]
+                                                                                    [prop-name prop-expanded])))
                                                                           (into {})))
                                                   clear-node)
 
