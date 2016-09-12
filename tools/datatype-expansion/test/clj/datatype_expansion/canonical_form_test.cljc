@@ -21,8 +21,7 @@
             {"a" {:type "string", :required true},
              "b" {:type "any", :required true}},
             :type "object",
-            :additionalProperties true,
-            :required true}
+            :additionalProperties true}
            (canonical-form input)))))
 
 
@@ -30,51 +29,43 @@
   (let [input (expanded-form {:type "object" :properties {:a "string" :b "number | string"}} {})]
     (is (= {:type "union",
             :additionalProperties true,
-            :required true,
             :anyOf
             '({:properties
                {"a" {:type "string", :required true},
                 "b" {:type "number", :required true}},
                :type "object",
-               :additionalProperties true,
-               :required true}
+               :additionalProperties true}
               {:properties
                {"a" {:type "string", :required true},
                 "b" {:type "string", :required true}},
                :type "object",
-               :additionalProperties true,
-               :required true})}
+               :additionalProperties true})}
            (canonical-form input))))
 
   (let [input (expanded-form {:type "object" :properties {:a "datetime | integer" :b "number | string"}} {})]
     (is (= {:type "union",
             :additionalProperties true,
-            :required true,
             :anyOf
             '({:properties
                {"a" {:type "datetime", :required true},
                 "b" {:type "number", :required true}},
                :type "object",
-               :additionalProperties true,
-               :required true}
+               :additionalProperties true}
               {:properties
                {"a" {:type "datetime", :required true},
                 "b" {:type "string", :required true}},
                :type "object",
-               :additionalProperties true,
-               :required true}
+               :additionalProperties true}
               {:properties
                {"a" {:type "integer", :required true},
                 "b" {:type "number", :required true}},
                :type "object",
-               :additionalProperties true,
-               :required true}
+               :additionalProperties true}
               {:properties
                {"a" {:type "integer", :required true},
                 "b" {:type "string", :required true}},
                :type "object",
-               :additionalProperties true,
-               :required true})}
+               :additionalProperties true})}
            (canonical-form input)))))
 
 
@@ -83,7 +74,6 @@
         input (expanded-form {:type "a", :properties {:b "string"}} context)]
     (is (= {:type "object",
             :additionalProperties true,
-            :required true,
             :properties
             {"a" {:type "number", :required true},
              "b" {:type "string", :required true}}}
@@ -103,17 +93,14 @@
         input (expanded-form {:type "a" :properties {:b "string"}} context)]
     (is (= {:type "union",
             :additionalProperties true,
-            :required true,
             :anyOf
             '({:type "object",
                :additionalProperties true,
-               :required true,
                :properties
                {"pa" {:type "string", :required true},
                 "b" {:type "string", :required true}}}
               {:type "object",
                :additionalProperties true,
-               :required true,
                :properties
                {"pa" {:type "integer", :required true},
                 "b" {:type "string", :required true}}})}
@@ -123,21 +110,16 @@
         input (expanded-form input {})]
     (is (= {:type "union",
             :additionalProperties true,
-            :required true,
             :anyOf
             '({:type "array",
-               :required true,
                :items {:type "object",
                        :additionalProperties true,
-                       :required true,
                        :properties {"a" {:type "string", :required true},
                                     "b" {:type "nil", :required true},
                                     "c" {:type "number", :required true}}}}
               {:type "array",
-               :required true,
                :items {:type "object",
                        :additionalProperties true,
-                       :required true,
                        :properties {"a" {:type "integer", :required true},
                                     "b" {:type "nil", :required true},
                                     "c" {:type "number", :required true}}}})}
@@ -150,7 +132,6 @@
         input (expanded-form input {})]
     (is (= {:type "object",
             :additionalProperties true,
-            :required true,
             :properties
             {"c" {:type "any", :required true},
              "a" {:type "string", :required true},
@@ -163,8 +144,7 @@
     (is (= {:minItems 15,
             :type "array",
             :maxItems 20,
-            :required true,
-            :items {:type "string", :required true}}
+            :items {:type "string"}}
            (canonical-form input))))
   (let [input {:type {:type "array" :items "string", :minItems 10} :minItems 15 :maxItems 5}
         input (expanded-form input {})]
@@ -218,15 +198,12 @@
         canonical (canonical-form expanded)]
     (is (= {:additionalProperties true,
             :type "union",
-            :required true,
             :anyOf '({:additionalProperties true,
                       :type "object",
-                      :required true,
                       :properties {"age" {:type "integer", :required true},
                                    "address" {:type "string", :required true}}}
                      {:additionalProperties true,
                       :type "object",
-                      :required true,
                       :properties {"age" {:type "number", :required true},
                                    "address" {:type "string", :required true}}})}
            canonical))))
@@ -242,7 +219,6 @@
     (is (= canonical
            {:additionalProperties true,
             :type "object",
-            :required true,
             :properties {"owner" {:type "string", :required true},
                          "age" {:type "integer", :required true}}}))))
 
@@ -256,7 +232,6 @@
         canonical (canonical-form expanded)]
     (is (= {:additionalProperties true,
             :type "object",
-            :required true,
             :properties {"name" {:type "string", :required true}}}
            canonical))))
 
@@ -266,18 +241,16 @@
         expanded (expanded-form input {})
         canonical (canonical-form expanded)]
     (is (= {:properties {"name"
-                         {:anyOf [{:type "string", :required true}
-                                  {:type "string", :required true}],
+                         {:anyOf [{:type "string"}
+                                  {:type "string"}],
                           :type "union",
                           :required false}},
-            :additionalProperties true,
-            :type "object",
-            :required true}
+            :additionalProperties true
+            :type "object"}
            expanded))
     (is (= {:properties {"name" {:type "string", :required false}},
             :additionalProperties true,
-            :type "object",
-            :required true}
+            :type "object"}
            canonical))))
 
 (deftest optional-property-error
@@ -285,14 +258,22 @@
                             "name2?" "string"
                             "name3?" {:type "string" :required false}}
                :additionalProperties true,
-               :type "object"
-               :required true}
+               :type "object"}
         expanded (expanded-form input {})
         canonical (canonical-form expanded)]
     (is (= {:properties {"name1?" {:type "string", :required true},
                          "name2?" {:type "string", :required false},
                          "name3?" {:type "string", :required false}},
             :additionalProperties true,
-            :type "object",
-            :required true}
+            :type "object"}
            canonical))))
+
+(deftest custom-type-property-error
+  (let [cat {:properties {:name {:type "CatName" :required false}}}
+        cat-name "string"
+        expanded (expanded-form cat {"Cat" cat "CatName" cat-name})
+        canonical (canonical-form expanded)]
+    (is (= {:properties {"name" {:type "string", :required false}},
+            :additionalProperties true,
+            :type "object"}
+         canonical))))

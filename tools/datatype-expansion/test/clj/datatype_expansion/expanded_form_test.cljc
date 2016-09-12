@@ -42,8 +42,7 @@
             :properties
             {"title"  {:type "string" :required true}
              "length" {:type "number" :required true}}
-            :additionalProperties true
-            :required true}
+            :additionalProperties true}
            (expanded-form song types-context)))))
 
 
@@ -57,11 +56,9 @@
                               :properties
                               {"title"  {:type "string" :required true}
                                "length" {:type "number" :required true}}
-                              :additionalProperties true
-                              :required true}
+                              :additionalProperties true}
                       :required true}}
-            :additionalProperties true
-            :required true}
+            :additionalProperties true}
            (expanded-form album types-context)))))
 
 
@@ -78,8 +75,7 @@
                                       :properties
                                       {"title"  {:type "string" :required true}
                                        "length" {:type "number" :required true}}
-                                      :additionalProperties true
-                                      :required true}
+                                      :additionalProperties true}
                                      {:type "object"
                                       :properties
                                       {"title" {:type "string" :required true}
@@ -89,56 +85,50 @@
                                                  :properties
                                                  {"title"  {:type "string" :required true}
                                                   "length" {:type "number" :required true}}
-                                                 :additionalProperties true
-                                                 :required true}
+                                                 :additionalProperties true}
                                                 :required true}}
-                                      :additionalProperties true
-                                      :required true}]
-                                    :required true}
+                                      :additionalProperties true}]}
                             :required true}}
-            :additionalProperties true
-            :required true}
+            :additionalProperties true}
            (expanded-form musician types-context)))))
 
 (deftest expanded-form-multiple-inheritance
   (let [publication (get types-context "Songs.Publication")]
-    (is (= {:properties {"date" {:type "string" :required true}},
-            :type
-            [{:properties
+    (is (={:properties {"date" {:type "string", :required true}},
+           :additionalProperties true,
+           :type
+           [{:properties
+             {"title" {:type "string", :required true},
+              "songs"
+              {:type "array",
+               :items
+               {:properties
+                {"title" {:type "string", :required true},
+                 "length" {:type "number", :required true}},
+                :additionalProperties true,
+                :type "object"},
+               :required true}},
+             :additionalProperties true,
+             :type "object"}
+            {:properties {"duration" {:type "string", :required true}},
+             :additionalProperties true,
+             :type
+             {:properties
               {"title" {:type "string", :required true},
-               "songs" {:type "array",
-                        :items {:properties {"title" {:type "string", :required true},
-                                             "length" {:type "number", :required true}},
-                                :type "object",
-                                :additionalProperties true,
-                                :required true},
-                        :required true}},
-              :type "object",
+               "length" {:type "number", :required true}},
               :additionalProperties true,
-              :required true}
-             {:properties {"duration" {:type "string" :required true}},
-              :type {:properties {"title" {:type "string", :required true},
-                                  "length" {:type "number", :required true}},
-                     :type "object",
-                     :additionalProperties true,
-                     :required true},
-              :additionalProperties true,
-              :required true}
-             {:properties {"other" {:type "integer", :required true}},
-              :type "object",
-              :additionalProperties true,
-              :required true}],
-            :additionalProperties true,
-            :required true}
-           (expanded-form publication types-context)))))
+              :type "object"}}
+            {:properties {"other" {:type "integer", :required true}},
+             :additionalProperties true,
+             :type "object"}]}
+          (expanded-form publication types-context)))))
 
 
 (deftest expanded-form-constrained
   (let [constrained (get types-context "Songs.Constrained")]
     (is (= {:minItems 10,
             :type "array",
-            :items {:type "string", :required true},
-            :required true}
+            :items {:type "string"}}
            (expanded-form constrained types-context)))))
 
 
@@ -146,12 +136,10 @@
   (let [input {:type {:type "object", :properties {:a {:type "string" :required true}}}
                :properties {:b "integer"}}]
     (is (= {:properties {"b" {:type "integer" :required true}},
-            :type { :properties {"a" {:type "string", :required true}},
+            :type {:properties {"a" {:type "string", :required true}},
                    :type "object",
-                   :additionalProperties true,
-                   :required true},
-            :additionalProperties true
-            :required true}
+                   :additionalProperties true},
+            :additionalProperties true}
            (expanded-form input {})))))
 
 (deftest expanded-form-doc-nodes
@@ -161,8 +149,7 @@
                    {"title" {:type "string", :example "Great", :required true},
                     "length" {:type "string", :required true}},
                    :additionalProperties true,
-                   :type "object",
-                   :required true})))
+                   :type "object"})))
   (let [input (get types-context "Songs.ExemplarAlbum")
         output (expanded-form input types-context)]
     (is (= output {:properties
@@ -174,29 +161,26 @@
                       {"title" {:type "string", :example "Great", :required true},
                        "length" {:type "string", :required true}},
                       :additionalProperties true,
-                      :type "object",
-                      :required true},
+                      :type "object"}
                      :required true}},
                    :additionalProperties true,
                    :type "object",
                    :examples
-                   {:Album1 {:title "Test 1", :songs [{:title "Great", :length "2"}]}},
-                   :required true}))))
+                   {:Album1 {:title "Test 1", :songs [{:title "Great", :length "2"}]}}}))))
 
 (deftest expanded-recursive
   (let [songs-list (get types-context "Songs.List")]
     (is (= {:type :fixpoint,
             :value {:properties {"cell" {:properties {"car" {:type "any", :required true},
-                                                      "cdr" {:anyOf [{:type :$recur, :required true}
-                                                                     {:type "nil", :required true}],
+                                                      "cdr" {:anyOf [{:type :$recur}
+                                                                     {:type "nil"}],
                                                              :type "union",
                                                              :required true}},
                                          :additionalProperties true,
                                          :type "object",
                                          :required true}},
                     :additionalProperties true,
-                    :type "object",
-                    :required true}}
+                    :type "object"}}
            (expanded-form songs-list types-context)))))
 
 (deftest expansion-optional-properties-constraints
@@ -210,6 +194,5 @@
                                 :minLength 1,
                                 :required true}},
             :additionalProperties true,
-            :type "object",
-            :required true}
+            :type "object"}
            expanded))))
