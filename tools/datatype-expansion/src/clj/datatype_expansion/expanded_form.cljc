@@ -97,9 +97,7 @@
 
 (defn process-items [node context]
   (if (some? (:items node))
-    (do
-      (println "EXPANDING ITEMS " (:items node))
-      (assoc node :items (expanded-form-inner (:items node) context)))
+    (assoc node :items (expanded-form-inner (:items node) context))
     node))
 
 (defn process-properties [node context]
@@ -210,7 +208,8 @@
 
       :else                                   (let [parsed-type (parse-type-expression type context)]
                                                 (if (some? parsed-type)
-                                                  (expanded-form-inner parsed-type context)
+                                                  (-> (expanded-form-inner parsed-type context)
+                                                      (process-constraints type-node))
                                                   (error (str "Unknown type " type " in " context)))))))
 
 (defn add-fixpoints [t fixpoints num-fixpoints]

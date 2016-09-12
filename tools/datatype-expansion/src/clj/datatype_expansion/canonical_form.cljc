@@ -265,8 +265,10 @@
   (->> accum
        (mapv (fn [type]
                (let [properties (:properties type)
+                     required (:required property-value)
                      union-values (:anyOf property-value)]
                  (->> union-values
+                      (mapv #(assoc % :required required))
                       (mapv #(assoc properties property-name %))
                       (mapv #(assoc type :properties %))))))
        flatten))
