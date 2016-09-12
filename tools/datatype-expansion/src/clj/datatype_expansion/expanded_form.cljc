@@ -1,6 +1,6 @@
 (ns datatype-expansion.expanded-form
   #?(:cljs (:require-macros [datatype-expansion.utils-macros :refer [maybe]]))
-  (:require #?(:clj [datatype-expansion.utils :refer [error]])
+  (:require #?(:clj [datatype-expansion.utils :refer [error trace]])
             #?(:clj [datatype-expansion.utils-macros-clj :refer [maybe]])
             [clojure.string]
             [datatype-expansion.utils :refer [clear-node error]]
@@ -48,7 +48,9 @@
 
 (defn- process-constraints [parsed-type type-node]
   (-> parsed-type
-      (assoc :required (:required type-node true))
+      (assoc :required (if (some? (:required type-node))
+                         (:required type-node)
+                         nil))
       (assoc :example (:example type-node))
       (assoc :default (:default type-node))
       (assoc :examples (:examples type-node))
@@ -78,12 +80,6 @@
 
 (defn- json-type? [type] (and (string? type) (clojure.string/starts-with? type "{")))
 
-(defn check-required [{:keys [properties] :as object}]
-  (->> (or properties [])
-       (map (fn [[k v]]
-              [k (assoc v :required (get v :required true))]))
-       (into {})
-       (assoc object :properties)))
 
 (defn setup-context [{:keys [path] :as context}]
   (assoc context :path [] :fixpoints (atom {})))
@@ -104,7 +100,17 @@
 (defn process-properties [node context]
   (if (some? (:properties node))
     (assoc node :properties (->> (:properties node)
-                                 (map (fn [[k v]] [k (expanded-form-inner v context)]))
+                                 (map (fn [[k v]]
+                                        (let [prop-name (name k)
+                                              prop-expanded (expanded-form-inner v context)
+                                              explicit-required (and (map? v) (:required v))
+                                              optional (string/ends-with? prop-name "?")
+                                              prop-expanded (if (and optional (not explicit-required))
+                                                              (assoc prop-expanded :required false)
+                                                              (assoc prop-expanded :required (if (some? (:required v))
+                                                                                               (:required v)
+                                                                                               true)))]
+                                          [prop-name prop-expanded])))
                                  (into {})))
     node))
 
@@ -145,19 +151,10 @@
       (or
        (and (nil? type)
             (some? (:properties type-node)))
-       (= type "object"))                     (-> {:type "object"}
+       (= type "object"))                     (-> {:type "object"
+                                                   :properties (:properties type-node)}
                                                   (process-constraints type-node)
-                                                  (assoc :properties (->> (:properties type-node)
-                                                                          (mapv (fn [[prop-name type]]
-                                                                                  (let [prop-name (name prop-name)
-                                                                                        prop-expanded (expanded-form-inner type context)
-                                                                                        explicit-required (and (map? type) (:required type))
-                                                                                        optional (string/ends-with? prop-name "?")
-                                                                                        prop-expanded (if (and optional (not explicit-required))
-                                                                                                        (assoc prop-expanded :required false)
-                                                                                                        prop-expanded)]
-                                                                                    [prop-name prop-expanded])))
-                                                                          (into {})))
+                                                  (process-properties context)
                                                   clear-node)
 
       (= type "union")                        (-> {:type "union"
