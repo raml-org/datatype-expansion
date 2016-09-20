@@ -123,13 +123,15 @@
    (if (some? (facet-name node))
      (assoc node facet-name (->> (facet-name node)
                                  (map (fn [[k v]]
-                                        (let [prop-name (name k)
-                                              prop-expanded (expanded-form-inner v context)
-                                              explicit-required (and (map? v) (:required v))
-                                              optional (string/ends-with? prop-name "?")
+                                        (let [prop-expanded (expanded-form-inner v context)
+                                              explicit-required (and (map? v) (some? (:required v)))
+                                              optional (string/ends-with? (name k) "?")
+                                              prop-name (if explicit-required
+                                                          (name k)
+                                                          (string/replace (name k) #"\?$" ""))
                                               prop-expanded (if (and optional (not explicit-required))
                                                               (assoc prop-expanded :required false)
-                                                              (assoc prop-expanded :required (if (some? (:required v))
+                                                              (assoc prop-expanded :required (if explicit-required
                                                                                                (:required v)
                                                                                                true)))]
                                           [prop-name prop-expanded])))

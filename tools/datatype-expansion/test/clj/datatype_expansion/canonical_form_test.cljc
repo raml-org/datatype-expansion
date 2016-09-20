@@ -256,14 +256,16 @@
 (deftest optional-property-error
   (let [input {:properties {"name1?" {:type "string" :required true}
                             "name2?" "string"
-                            "name3?" {:type "string" :required false}}
+                            "name3?" {:type "string" :required false}
+                            "name4??" "string"}
                :additionalProperties true,
                :type "object"}
         expanded (expanded-form input {})
         canonical (canonical-form expanded)]
     (is (= {:properties {"name1?" {:type "string", :required true},
-                         "name2?" {:type "string", :required false},
-                         "name3?" {:type "string", :required false}},
+                         "name2"  {:type "string", :required false},
+                         "name3?" {:type "string", :required false}
+                         "name4?" {:type "string", :required false}},
             :additionalProperties true,
             :type "object"}
            canonical))))
