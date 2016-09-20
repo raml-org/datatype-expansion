@@ -46,14 +46,32 @@
 (def atomic-types #{"any" "boolean" "datetime" "datetime-only" "date-only" "time-only"
                     "number" "integer" "string" "nil" "file"})
 
+(defn collect-facets-constraints [node]
+  (let [facets (get node :facets {})
+        facets (or (keys facets) [])]
+    (cond (map? (:type node))  (concat facets (collect-facets-constraints (:type node)))
+          (coll? (:type node)) (concat facets
+                                       (flatten (map collect-facets-constraints (:type node))))
+          :else facets)))
+
+(defn process-user-facets-constraints [parsed-type type-node]
+  (let [facets (collect-facets-constraints type-node)
+        facets-map (->> facets
+                        (map (fn [facet] [facet (facet type-node)]))
+                        (into {}))]
+    (merge parsed-type facets-map)))
+
 (defn- process-constraints [parsed-type type-node]
   (-> parsed-type
+      (process-user-facets-constraints type-node)
       (assoc :required (if (some? (:required type-node))
                          (:required type-node)
                          nil))
       (assoc :xml (:xml type-node))
       (assoc :fileTypes (:fileTypes type-node))
       (assoc :example (:example type-node))
+      (assoc :description (:description type-node))
+      (assoc :displayName (:displayName type-node))
       (assoc :default (:default type-node))
       (assoc :examples (:examples type-node))
       (assoc :title (:title type-node))
@@ -99,9 +117,11 @@
     (assoc node :items (expanded-form-inner (:items node) context))
     node))
 
-(defn process-properties [node context]
-  (if (some? (:properties node))
-    (assoc node :properties (->> (:properties node)
+(defn process-properties
+  ([node context] (process-properties node context :properties))
+  ([node context facet-name]
+   (if (some? (facet-name node))
+     (assoc node facet-name (->> (facet-name node)
                                  (map (fn [[k v]]
                                         (let [prop-name (name k)
                                               prop-expanded (expanded-form-inner v context)
@@ -114,7 +134,18 @@
                                                                                                true)))]
                                           [prop-name prop-expanded])))
                                  (into {})))
-    node))
+     node)))
+
+(defn process-user-facets
+  ([node context]
+   (let [processed (process-properties node context :facets)
+         facets (:facets processed)]
+     (if (nil? facets)
+       processed
+       (assoc processed :facets (->> facets
+                                     (map (fn [[k v]]
+                                            [(keyword k) {:type (:type v)}]))
+                                     (into {})))))))
 
 (defn expanded-form-inner [type-node context]
   (let [type-node (if (and (map? type-node)
@@ -133,20 +164,25 @@
       (and (not (map? type))
            (coll? type))                      (-> (assoc type-node :type (mapv #(expanded-form-inner % context) type))
                                                   (process-properties context)
+                                                  (process-user-facets context)
                                                   (process-items context)
                                                   (process-constraints type-node)
                                                   clear-node)
 
-      (get atomic-types type)                 (-> {:type type}
+      (get atomic-types type)                 (-> {:type type
+                                                   :facets (:facets type-node)}
+                                                  (process-user-facets context)
                                                   (process-constraints type-node)
                                                   clear-node)
 
       (or
        (and (nil? type)
             (some? (:items type-node)))
-       (= type "array"))                      (-> {:type "array"}
+       (= type "array"))                      (-> {:type "array"
+                                                   :facets (:facets type-node)}
                                                   ;;(assoc :items (get type-node :items {:type "string"}))
                                                   (assoc :items (expanded-form-inner (:items type-node {:type "string"}) context))
+                                                  (process-user-facets context)
                                                   (process-constraints type-node)
                                                   clear-node)
 
@@ -154,13 +190,17 @@
        (and (nil? type)
             (some? (:properties type-node)))
        (= type "object"))                     (-> {:type "object"
+                                                   :facets (:facets type-node)
                                                    :properties (:properties type-node)}
                                                   (process-constraints type-node)
                                                   (process-properties context)
+                                                  (process-user-facets context)
                                                   clear-node)
 
       (= type "union")                        (-> {:type "union"
+                                                   :facets (:facets type-node)
                                                    :anyOf   (mapv #(expanded-form-inner % context) (:anyOf type-node))}
+                                                  (process-user-facets context)
                                                   (process-constraints type-node)
                                                   clear-node)
 
@@ -188,29 +228,35 @@
                                                           (assoc :$ref type)
                                                           (assoc :type (expanded-form-inner ref-type context))
                                                           (process-properties context)
+                                                          (process-user-facets context)
                                                           (process-items context)
                                                           (process-constraints type-node)
                                                           clear-node)))))
 
-      (xml-type? type)                        (-> {:type "xml", :content type})
+      (xml-type? type)                        (-> {:type "xml" :content type})
 
-      (json-type? type)                       (-> {:type "json", :content type})
+      (json-type? type)                       (-> {:type "json" :content type})
 
       (and (nil? type)
-           (some? type-node))                 (-> {:type "string"} ;; or any depending if we are in the body or not
+           (some? type-node))                 (-> {:type "string" ;; or any depending if we are in the body or not
+                                                   :facets (:facets type-node)}
+                                                  (process-user-facets context)
                                                   (process-constraints type-node)
                                                   clear-node)
 
       (and (string? type)
            (re-matches #"^.*\?$" type))       (-> {:type "union"
+                                                   :facets (:facets type-node)
                                                    :anyOf [{:type (clojure.string/replace type "?" "")}
                                                            {:type "nil"}]}
+                                                  (process-user-facets context)
                                                   (process-constraints type-node))
 
       (map? type)                             ;; simple inheritance
                                               (let [result (expanded-form-inner (assoc type-node :type [type]) context)]
                                                 (-> result
                                                     (process-properties context)
+                                                    (process-user-facets context)
                                                     (process-items context)
                                                     (assoc :type (first (:type result)))))
 

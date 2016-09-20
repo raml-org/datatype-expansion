@@ -196,3 +196,21 @@
             :additionalProperties true,
             :type "object"}
            expanded))))
+
+(deftest missing-facets-test
+  (let [input {:type "object"
+               :properties {"name" {:description "Cat name"
+                                    :displayName "name"
+                                    :type "string"
+                                    :facets {:amazing "boolean"}
+                                    :amazing true}}}
+        expanded (expanded-form input {})]
+    (is (= expanded
+           {:properties {"name" {:description "Cat name"
+                                 :displayName "name"
+                                 :type "string"
+                                 :amazing true
+                                 :facets {:amazing {:type "boolean"}}
+                                 :required true}}
+            :additionalProperties true
+            :type "object"}))))
