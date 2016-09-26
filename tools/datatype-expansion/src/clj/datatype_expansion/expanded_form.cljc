@@ -252,7 +252,8 @@
                                                    :anyOf [{:type (clojure.string/replace type "?" "")}
                                                            {:type "nil"}]}
                                                   (process-user-facets context)
-                                                  (process-constraints type-node))
+                                                  (process-constraints type-node)
+                                                  clear-node)
 
       (map? type)                             ;; simple inheritance
                                               (let [result (expanded-form-inner (assoc type-node :type [type]) context)]
@@ -260,12 +261,14 @@
                                                     (process-properties context)
                                                     (process-user-facets context)
                                                     (process-items context)
+                                                    clear-node
                                                     (assoc :type (first (:type result)))))
 
       :else                                   (let [parsed-type (parse-type-expression type context)]
                                                 (if (some? parsed-type)
                                                   (-> (expanded-form-inner parsed-type context)
-                                                      (process-constraints type-node))
+                                                      (process-constraints type-node)
+                                                      clear-node)
                                                   (error (str "Unknown type " type " in " context)))))))
 
 (defn add-fixpoints [t fixpoints num-fixpoints]
