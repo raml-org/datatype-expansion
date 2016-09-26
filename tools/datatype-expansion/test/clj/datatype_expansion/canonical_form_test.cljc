@@ -314,3 +314,30 @@
             :additionalProperties true,
             :type "object"}
            canonical))))
+
+(deftest union-canonical-type-unnecessary-fields
+  (let [input {"Phone" {:type "object"
+                        :properties { :manufacturer {:type "string"}
+                                     :numberOfSIMCards {:type "number"}
+                                     :kind "string"}}
+               "Notebook" {:type "object"
+                           :properties {:manufacturer {:type "object"}
+                                        :numberOfUSBPorts {:type "string"}
+                                        :kind "string"}}
+               "Device" {:type  "Phone | Notebook"}}
+        expanded (expanded-form (get input "Device") input)
+        canonical (canonical-form expanded)]
+    (is (= {:anyOf '({:properties {"manufacturer" {:type "string", :required true},
+                                  "numberOfSIMCards" {:type "number", :required true},
+                                  "kind" {:type "string", :required true}},
+                     :additionalProperties true,
+                     :type "object"}
+                    {:properties {"manufacturer" {:additionalProperties true, :type "object",
+                                                  :required true,
+                                                  :properties {}},
+                                  "numberOfUSBPorts" {:type "string", :required true},
+                                  "kind" {:type "string", :required true}},
+                     :additionalProperties true,
+                     :type "object"}),
+            :type "union"}
+           canonical))))
