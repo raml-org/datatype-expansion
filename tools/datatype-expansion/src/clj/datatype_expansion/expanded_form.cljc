@@ -162,6 +162,9 @@
                    (:schema type-node)))]
     (cond
 
+      (and (nil? type)
+           (nil? type-node))                  {:type "string"}
+
       ;; Multiple inheritance
       (and (not (map? type))
            (coll? type))                      (-> (assoc type-node :type (mapv #(expanded-form-inner % context) type))
@@ -298,6 +301,8 @@
     :else     t))
 
 (defn expanded-form [node context]
+  (when (nil? node)
+    (throw #?(:clj (Exception. (str "Cannot expande nil node")))))
   (let [context (setup-context context)
         found-context-type (->> context
                                 (filter (fn [[k v]] (= v node)))
