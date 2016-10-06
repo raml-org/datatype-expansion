@@ -214,3 +214,11 @@
                                  :required true}}
             :additionalProperties true
             :type "object"}))))
+
+(deftest default-property-type
+  (let [input {:properties {:city nil}}
+        expanded (expanded-form input {})]
+    (is (= expanded
+           {:properties {"city" {:type "string", :required true}},
+            :additionalProperties true,
+            :type "object"}))))
