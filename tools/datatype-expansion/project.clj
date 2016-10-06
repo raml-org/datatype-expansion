@@ -1,4 +1,4 @@
-(defproject datatype-expansion "0.0.9"
+(defproject datatype-expansion "0.0.10"
   :description "Utility to expand RAML Data Types into a single canonical form"
   :license {:name "Apache License 2.0"
             :url "http://www.apache.org/licenses/"}
