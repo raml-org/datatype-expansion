@@ -341,3 +341,21 @@
                      :type "object"}),
             :type "union"}
            canonical))))
+
+(deftest union-type-inheritance-problem-test
+  (let [input {"CatWithCity" { :properties { :city "string" }}
+               "CatWithAddress" { :properties { :address "string"}}
+               "Cat" {:type ["CatWithCity" "CatWithAddress"]
+                      :properties { :age "string | number"}}}
+        expanded (expanded-form (get input "Cat") input)
+        canonical (canonical-form expanded)]
+    (is (= canonical
+           {:additionalProperties true, :type "union", :anyOf
+            '({:additionalProperties true, :type "object",
+               :properties {"address" {:type "string", :required true},
+                            "city" {:type "string", :required true},
+                            "age" {:type "string", :required true}}}
+              {:additionalProperties true, :type "object",
+               :properties {"address" {:type "string", :required true},
+                            "city" {:type "string", :required true},
+                            "age" {:type "number", :required true}}})}))))

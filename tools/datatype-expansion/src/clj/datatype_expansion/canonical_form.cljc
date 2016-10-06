@@ -343,11 +343,11 @@
                    "object" (assoc sub-type :properties (get sub-type :properties []))
                    "union"   (assoc sub-type :anyOf (get sub-type :anyOf []))
                    sub-type)]
-    (consistency-check
-     (reduce (fn [acc super-type]
-               (lt (canonical-form super-type) acc))
-             sub-type
-             (:type node)))))
+    (canonical-form (consistency-check
+                     (reduce (fn [acc super-type]
+                               (lt (canonical-form super-type) acc))
+                             sub-type
+                             (:type node))))))
 
 
 (defmethod canonical-form "union" [node]
