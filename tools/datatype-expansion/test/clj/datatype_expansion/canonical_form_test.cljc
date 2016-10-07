@@ -359,3 +359,14 @@
                :properties {"address" {:type "string", :required true},
                             "city" {:type "string", :required true},
                             "age" {:type "number", :required true}}})}))))
+
+(deftest default-value-test
+  (let [input {
+               "Animal" {:default "Animal"
+                         :type "string"}
+               "Cat" {:type "Animal"
+                      :default "MyCat"}
+               }
+        expanded (expanded-form (get input "Cat") input)
+        canonical (canonical-form expanded)]
+    (is (=  canonical {:default "MyCat", :type "string"}))))

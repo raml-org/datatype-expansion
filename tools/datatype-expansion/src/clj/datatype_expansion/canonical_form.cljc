@@ -88,6 +88,9 @@
     (= super sub)           super
     :else                   (error (str "Cannot compute min value of different sub types"))))
 
+(defmethod lt-restriction :default [_ super sub]
+  (or sub super))
+
 (defn lt-restrictions [super sub]
   (loop [merged {}
          properties (into #{} (concat (keys super) (keys sub)))]
