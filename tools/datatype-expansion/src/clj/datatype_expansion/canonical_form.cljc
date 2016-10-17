@@ -78,7 +78,7 @@
     (set/intersection (into #{} super) (into #{} sub))
     (error "sub type has a weaker constraint for enum-values than base type")))
 (defmethod lt-restriction :additionalProperties [_ super sub]
-  (if (or (false? super) (= super sub))
+  (if (or (true? super) (= super sub))
     (and super sub)
     (error "sub type has a weaker constraint for additional-properties than base type")))
 (defmethod lt-restriction :type [_ super sub]

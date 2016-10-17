@@ -370,3 +370,26 @@
         expanded (expanded-form (get input "Cat") input)
         canonical (canonical-form expanded)]
     (is (=  canonical {:default "MyCat", :type "string"}))))
+
+
+(deftest expansion-primitive-types-additional-properties
+  (let [input { :name "obj",
+               :displayName "obj",
+               :type ["object"],
+               :requireed true,
+               :properties { :existing_property {:type "string",
+                                                 :displayName "existing_property",
+                                                 :name "existing_property",
+                                                 :required true}},
+               :additionalProperties false}
+        expanded (expanded-form input {})
+        canonical (canonical-form expanded)]
+    (is (= {:additionalProperties false,
+            :displayName "obj",
+            :name "obj",
+            :requireed true,
+            :type "object",
+            :properties {"existing_property" {:displayName "existing_property",
+                                              :type "string",
+                                              :required true}}}
+           canonical))))
