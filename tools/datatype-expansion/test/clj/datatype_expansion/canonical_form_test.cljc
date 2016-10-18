@@ -393,3 +393,22 @@
                                               :type "string",
                                               :required true}}}
            canonical))))
+
+
+(deftest world-music-1
+  (let [input { "Entry" { :type "array",
+                         :items { :type "object",
+                                 :properties { :title { :type "string" },
+                                              :artist { :type "string" }
+                                              }}}
+               "AnotherEntry" {:type "Entry"
+                               :description "This is just another entry to simulate that you can add facets also on JSON schema defined types. Although you can only add documentation-based facets."}}
+        expanded(expanded-form (get input "AnotherEntry") input)
+        canonical (canonical-form expanded)]
+    (is (= canonical
+           {:description "This is just another entry to simulate that you can add facets also on JSON schema defined types. Although you can only add documentation-based facets.",
+            :type "array",
+            :items {:properties {"title" {:type "string", :required true},
+                                 "artist" {:type "string", :required true}},
+                    :additionalProperties true,
+                    :type "object"}}))))
