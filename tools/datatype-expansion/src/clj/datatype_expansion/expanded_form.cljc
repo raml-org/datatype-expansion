@@ -96,9 +96,13 @@
                                                                       true
                                                                       nil)))))
 
-(defn- xml-type? [type] (and (string? type) (clojure.string/starts-with? type "<?xml")))
+(defn- xml-type? [type] (or
+                         (= type "xml")
+                         (and (string? type) (clojure.string/starts-with? type "<?xml"))))
 
-(defn- json-type? [type] (and (string? type) (clojure.string/starts-with? type "{")))
+(defn- json-type? [type] (or
+                          (= type "json")
+                          (and (string? type) (clojure.string/starts-with? type "{"))))
 
 
 (defn setup-context [{:keys [path] :as context}]
@@ -238,9 +242,13 @@
                                                           (process-constraints type-node)
                                                           clear-node)))))
 
-      (xml-type? type)                        (-> {:type "xml" :content type})
+      (xml-type? type)                        (if (= (:type type-node) "xml")
+                                                type-node
+                                                {:type "xml" :content type})
 
-      (json-type? type)                       (-> {:type "json" :content type})
+      (json-type? type)                       (if (= (:type type-node)"json")
+                                                type-node
+                                                {:type "json" :content type})
 
       (and (nil? type)
            (some? type-node))                 (-> {:type "string" ;; or any depending if we are in the body or not

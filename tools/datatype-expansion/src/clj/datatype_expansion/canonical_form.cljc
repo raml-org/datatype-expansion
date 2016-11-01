@@ -162,6 +162,12 @@
 (defmethod lt ["file" "file"] [super sub] (->> (lt-restrictions super sub)
                                                (consistency-check)))
 
+(defmethod lt ["json" "json"] [super sub] (->> (lt-restrictions super sub)
+                                               (consistency-check)))
+
+(defmethod lt ["xml" "xml"] [super sub] (->> (lt-restrictions super sub)
+                                             (consistency-check)))
+
 (defmethod lt ["array" "array"] [super sub] (let [merged-items (lt (:items super) (:items sub))
                                                   merged (lt-restrictions (dissoc super :items) (dissoc sub :items))
                                                   merged (consistency-check merged)]

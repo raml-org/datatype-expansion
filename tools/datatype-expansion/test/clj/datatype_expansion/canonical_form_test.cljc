@@ -393,3 +393,25 @@
                                               :type "string",
                                               :required true}}}
            canonical))))
+
+(deftest json-types-inheritance
+  (let [input {"Entry" {:name "Entry",
+                        :displayName "Entry"
+                        :type ["{\n  \"type\": \"array\",\n  \"items\": {\n    \"$ref\": \"#/definitions/song\"\n  },\n  \"definitions\": {\n    \"song\": {\n      \"type\": \"object\",\n      \"properties\": {\n        \"title\": {\n          \"type\": \"string\"\n        },\n        \"artist\": {\n          \"type\": \"string\"\n        }\n      }\n    }\n  }\n}\n"]
+                        :required true}
+               "AnotherEntry" {:name "AnotherEntry"
+                               :displayName "AnotherEntry"
+                               :type ["Entry"]
+                               :required true
+                               :description "This is just another entry to simulate that you can add facets also on JSON\nschema defined types. Although you can only add documentation-based facets.\n"}}
+        canonical-entry (-> (get input "Entry") (expanded-form input) canonical-form)
+        modified-input (assoc input "Entry" canonical-entry)
+        expanded (expanded-form (get input "AnotherEntry") modified-input)
+        canonical (canonical-form expanded)]
+    (is (= canonical
+           {:description "This is just another entry to simulate that you can add facets also on JSON\nschema defined types. Although you can only add documentation-based facets.\n",
+            :displayName "AnotherEntry",
+            :content "{\n  \"type\": \"array\",\n  \"items\": {\n    \"$ref\": \"#/definitions/song\"\n  },\n  \"definitions\": {\n    \"song\": {\n      \"type\": \"object\",\n      \"properties\": {\n        \"title\": {\n          \"type\": \"string\"\n        },\n        \"artist\": {\n          \"type\": \"string\"\n        }\n      }\n    }\n  }\n}\n",
+            :name "AnotherEntry",
+            :type "json",
+            :required true}))))
