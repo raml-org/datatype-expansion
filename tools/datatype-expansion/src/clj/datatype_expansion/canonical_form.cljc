@@ -148,6 +148,10 @@
                                                        (consistency-check)))
 (defmethod lt ["datetime-only" "datetime-only"] [super sub] (->> (lt-restrictions super sub)
                                                                  (consistency-check)))
+
+(defmethod lt ["date-only" "date-only"] [super sub] (->> (lt-restrictions super sub)
+                                                         (consistency-check)))
+
 (defmethod lt ["number" "number"] [super sub] (->> (lt-restrictions super sub)
                                                    (consistency-check)))
 (defmethod lt ["integer" "integer"] [super sub] (->> (lt-restrictions super sub)
