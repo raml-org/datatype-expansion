@@ -5,6 +5,8 @@
             [clojure.set :as set]
             [datatype-expansion.utils :refer [error]]))
 
+(declare canonical-form)
+
 (def atomic-types #{"any" "boolean" "datetime" "datetime-only" "date-only" "time-only"
                     "number" "integer" "string" "nil" "file"
                     "xml" "json"})
@@ -172,7 +174,7 @@
 (defmethod lt ["xml" "xml"] [super sub] (->> (lt-restrictions super sub)
                                              (consistency-check)))
 
-(defmethod lt ["array" "array"] [super sub] (let [merged-items (lt (:items super) (:items sub))
+(defmethod lt ["array" "array"] [super sub] (let [merged-items (canonical-form (assoc (:items sub) :type (:items super)))
                                                   merged (lt-restrictions (dissoc super :items) (dissoc sub :items))
                                                   merged (consistency-check merged)]
                                               (assoc merged :items merged-items)))
@@ -246,6 +248,8 @@
                                     (dissoc :anyOf)))]
     (assoc merged :anyOf of-merged)))
 
+(defmethod lt :default [super sub]
+  (throw (Exception. (str "Invalid inheriance " (:type super) " -> " (:type sub)))))
 
 (defn dispatch-node [input]
   (let [{:keys [type]} input]
@@ -356,11 +360,13 @@
                    "object" (assoc sub-type :properties (get sub-type :properties []))
                    "union"   (assoc sub-type :anyOf (get sub-type :anyOf []))
                    sub-type)]
-    (canonical-form (consistency-check
-                     (reduce (fn [acc super-type]
-                               (lt (canonical-form super-type) acc))
-                             sub-type
-                             (:type node))))))
+    (let [final-canonical-form (canonical-form (consistency-check
+                                                (reduce (fn [acc super-type]
+                                                          (let [computed (lt (canonical-form super-type) acc)]
+                                                            computed))
+                                                        sub-type
+                                                        (:type node))))]
+      final-canonical-form)))
 
 
 (defmethod canonical-form "union" [node]

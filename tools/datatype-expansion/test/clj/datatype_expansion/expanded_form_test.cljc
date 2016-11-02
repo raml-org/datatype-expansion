@@ -32,6 +32,7 @@
                     "Songs.List"  {:properties {:cell "Songs.Cell"}}
                     })
 
+
 (deftest expanded-form-nil-test
   (is (thrown? #?(:clj Exception :cljs js/Error)
                (println (expanded-form nil {})))))
@@ -219,6 +220,6 @@
   (let [input {:properties {:city nil}}
         expanded (expanded-form input {})]
     (is (= expanded
-           {:properties {"city" {:type "string", :required true}},
+           {:properties {"city" {:type "any", :required true}},
             :additionalProperties true,
             :type "object"}))))

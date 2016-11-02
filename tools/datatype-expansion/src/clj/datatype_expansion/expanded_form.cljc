@@ -18,6 +18,8 @@
                    BS = #\"\\s*\"
                    ")
 
+(def default-type "any")
+
 (def raml-type-grammar-analyser (insta/parser raml-grammar))
 
 (defn ast->type [ast context]
@@ -167,7 +169,7 @@
     (cond
 
       (and (nil? type)
-           (nil? type-node))                  {:type "string"}
+           (nil? type-node))                  {:type default-type}
 
       ;; Multiple inheritance
       (and (not (map? type))
@@ -189,8 +191,8 @@
             (some? (:items type-node)))
        (= type "array"))                      (-> {:type "array"
                                                    :facets (:facets type-node)}
-                                                  ;;(assoc :items (get type-node :items {:type "string"}))
-                                                  (assoc :items (expanded-form-inner (:items type-node {:type "string"}) context))
+                                                  ;;(assoc :items (get type-node :items {:type default-type}))
+                                                  (assoc :items (expanded-form-inner (:items type-node {:type default-type}) context))
                                                   (process-user-facets context)
                                                   (process-constraints type-node)
                                                   clear-node)
@@ -251,7 +253,7 @@
                                                 {:type "json" :content type})
 
       (and (nil? type)
-           (some? type-node))                 (-> {:type "string" ;; or any depending if we are in the body or not
+           (some? type-node))                 (-> {:type "any" ;; or any depending if we are in the body or not
                                                    :facets (:facets type-node)}
                                                   (process-user-facets context)
                                                   (process-constraints type-node)
@@ -310,7 +312,7 @@
 
 (defn expanded-form [node context]
   (when (nil? node)
-    (throw #?(:clj (Exception. (str "Cannot expande nil node")))))
+    (throw #?(:clj (Exception. (str "Cannot expand nil node")) :cljs (js/Error "Cannot expand nil node"))))
   (let [context (setup-context context)
         found-context-type (->> context
                                 (filter (fn [[k v]] (= v node)))

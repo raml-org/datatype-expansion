@@ -1,0 +1,451 @@
+{
+  "Entry": {
+    "name": "Entry",
+    "displayName": "Entry",
+    "type": [
+      "{\n  \"type\": \"array\",\n  \"items\": {\n    \"$ref\": \"#/definitions/song\"\n  },\n  \"definitions\": {\n    \"song\": {\n      \"type\": \"object\",\n      \"properties\": {\n        \"title\": {\n          \"type\": \"string\"\n        },\n        \"artist\": {\n          \"type\": \"string\"\n        }\n      }\n    }\n  }\n}\n"
+    ],
+    "required": true
+  },
+  "AnotherEntry": {
+    "name": "AnotherEntry",
+    "displayName": "AnotherEntry",
+    "type": [
+      "Entry"
+    ],
+    "required": true,
+    "description": "This is just another entry to simulate that you can add facets also on JSON\nschema defined types. Although you can only add documentation-based facets.\n"
+  },
+  "User": {
+    "name": "User",
+    "displayName": "User",
+    "type": [
+      "object"
+    ],
+    "example": {
+      "firstname": "John"
+    },
+    "required": true,
+    "properties": {
+      "firstname": {
+        "name": "firstname",
+        "displayName": "firstname",
+        "type": [
+          "string"
+        ],
+        "required": true
+      },
+      "lastname": {
+        "name": "lastname",
+        "displayName": "lastname",
+        "type": [
+          "string"
+        ],
+        "example": "Doe",
+        "required": false,
+        "structuredExample": {
+          "value": "Doe",
+          "strict": true,
+          "name": null,
+          "structuredValue": "Doe"
+        }
+      }
+    },
+    "structuredExample": {
+      "value": "{\n  \"firstname\": \"John\"\n}",
+      "strict": true,
+      "name": null,
+      "structuredValue": {
+        "firstname": "John"
+      }
+    }
+  },
+  "ApiLib.RamlDataType": {
+    "name": "RamlDataType",
+    "displayName": "RamlDataType",
+    "type": [
+      "object"
+    ],
+    "required": true,
+    "properties": {
+      "propString": {
+        "name": "propString",
+        "displayName": "propString",
+        "type": [
+          "string"
+        ],
+        "required": true
+      },
+      "propStringArray1": {
+        "name": "propStringArray1",
+        "displayName": "propStringArray1",
+        "type": [
+          "array"
+        ],
+        "required": true,
+        "items": "string"
+      },
+      "ideas": {
+        "name": "ideas",
+        "displayName": "ideas",
+        "type": [
+          "array"
+        ],
+        "required": true,
+        "items": {
+          "name": "items",
+          "displayName": "items",
+          "type": [
+            "object"
+          ],
+          "required": true,
+          "properties": {
+            "comment": {
+              "name": "comment",
+              "displayName": "comment",
+              "type": [
+                "string"
+              ],
+              "required": true
+            }
+          }
+        }
+      },
+      "extIdeas": {
+        "name": "extIdeas",
+        "displayName": "extIdeas",
+        "required": true,
+        "properties": {
+          "createdBy": {
+            "name": "createdBy",
+            "displayName": "createdBy",
+            "type": [
+              "string"
+            ],
+            "required": true
+          }
+        },
+        "type": {
+          "name": "type",
+          "displayName": "type",
+          "type": [
+            "object"
+          ],
+          "required": true,
+          "properties": {
+            "comment": {
+              "name": "comment",
+              "displayName": "comment",
+              "type": [
+                "string"
+              ],
+              "required": true,
+              "__METADATA__": {
+                "primitiveValuesMeta": {
+                  "displayName": {
+                    "calculated": true
+                  },
+                  "required": {
+                    "insertedAsDefault": true
+                  }
+                }
+              }
+            }
+          },
+          "__METADATA__": {
+            "primitiveValuesMeta": {
+              "displayName": {
+                "calculated": true
+              },
+              "type": {
+                "insertedAsDefault": true
+              },
+              "required": {
+                "insertedAsDefault": true
+              }
+            }
+          }
+        }
+      },
+      "feedback": {
+        "name": "feedback",
+        "displayName": "feedback",
+        "type": [
+          "string"
+        ],
+        "default": "very nice",
+        "example": "very well made",
+        "required": true,
+        "pattern": "[a-zA-Z\\s]*",
+        "minLength": 1,
+        "maxLength": 255,
+        "structuredExample": {
+          "value": "very well made",
+          "strict": true,
+          "name": null,
+          "structuredValue": "very well made"
+        }
+      },
+      "propNumber": {
+        "name": "propNumber",
+        "displayName": "propNumber",
+        "type": [
+          "number"
+        ],
+        "required": true,
+        "minimum": 0,
+        "maximum": 32,
+        "format": "int32",
+        "multipleOf": 2,
+        "fixedFacets": {
+          "format": "int32"
+        }
+      },
+      "propInteger": {
+        "name": "propInteger",
+        "displayName": "propInteger",
+        "type": [
+          "integer"
+        ],
+        "required": true,
+        "minimum": 3,
+        "maximum": 5,
+        "format": "int8",
+        "multipleOf": 1,
+        "fixedFacets": {
+          "format": "int8"
+        }
+      },
+      "propBoolean": {
+        "name": "propBoolean",
+        "displayName": "propBoolean",
+        "type": [
+          "boolean"
+        ],
+        "required": true
+      },
+      "propDate": {
+        "name": "propDate",
+        "displayName": "propDate",
+        "type": [
+          "date-only"
+        ],
+        "example": "2015-05-23",
+        "required": true,
+        "structuredExample": {
+          "value": "2015-05-23",
+          "strict": true,
+          "name": null,
+          "structuredValue": "2015-05-23"
+        }
+      },
+      "userPicture": {
+        "name": "userPicture",
+        "displayName": "userPicture",
+        "type": [
+          "file"
+        ],
+        "required": true,
+        "fileTypes": [
+          {},
+          {}
+        ],
+        "maxLength": 307200,
+        "fixedFacets": {
+          "fileTypes": [
+            "image/jpeg",
+            "image/png"
+          ],
+          "maxLength": 307200
+        }
+      },
+      "NilValue": {
+        "name": "NilValue",
+        "displayName": "NilValue",
+        "type": [
+          "object"
+        ],
+        "required": true,
+        "properties": {
+          "name": {
+            "name": "name",
+            "displayName": "name",
+            "type": [
+              "string"
+            ],
+            "required": true
+          },
+          "comment": {
+            "name": "comment",
+            "displayName": "comment",
+            "type": [
+              "string?"
+            ],
+            "required": true
+          }
+        }
+      },
+      "CatOrDog": {
+        "name": "CatOrDog",
+        "displayName": "CatOrDog",
+        "type": [
+          "ApiLib.Cat | ApiLib.Dog"
+        ],
+        "required": true
+      },
+      "CatAndDog": [
+        {
+          "name": "CatAndDog",
+          "displayName": "CatAndDog",
+          "type": [
+            "ApiLib.Cat"
+          ],
+          "required": true
+        },
+        {
+          "name": "CatAndDog",
+          "displayName": "CatAndDog",
+          "type": [
+            "ApiLib.Dog"
+          ],
+          "required": true
+        }
+      ],
+      "PossibleMeetingDate": {
+        "name": "PossibleMeetingDate",
+        "displayName": "PossibleMeetingDate",
+        "type": [
+          "ApiLib.CustomDate"
+        ],
+        "required": true,
+        "fixedFacets": {
+          "noHolidays": true
+        }
+      }
+    }
+  },
+  "ApiLib.Cat": {
+    "name": "Cat",
+    "displayName": "Cat",
+    "type": [
+      "object"
+    ],
+    "required": true,
+    "properties": {
+      "name": {
+        "name": "name",
+        "displayName": "name",
+        "type": [
+          "string"
+        ],
+        "required": true
+      },
+      "color": {
+        "name": "color",
+        "displayName": "color",
+        "type": [
+          "string"
+        ],
+        "required": true
+      }
+    }
+  },
+  "ApiLib.Dog": {
+    "name": "Dog",
+    "displayName": "Dog",
+    "type": [
+      "object"
+    ],
+    "required": true,
+    "properties": {
+      "name": {
+        "name": "name",
+        "displayName": "name",
+        "type": [
+          "string"
+        ],
+        "required": true
+      },
+      "fangs": {
+        "name": "fangs",
+        "displayName": "fangs",
+        "type": [
+          "string"
+        ],
+        "required": true
+      }
+    }
+  },
+  "ApiLib.CustomDate": {
+    "name": "CustomDate",
+    "displayName": "CustomDate",
+    "facets": {
+      "onlyFutureDates": {
+        "name": "onlyFutureDates",
+        "displayName": "onlyFutureDates",
+        "type": [
+          "boolean"
+        ],
+        "required": false
+      },
+      "noHolidays": {
+        "name": "noHolidays",
+        "displayName": "noHolidays",
+        "type": [
+          "boolean"
+        ],
+        "required": true
+      }
+    },
+    "type": [
+      "date-only"
+    ],
+    "required": true
+  },
+  "SongsLib.Song": {
+    "name": "Song",
+    "displayName": "Song",
+    "type": [
+      "object"
+    ],
+    "examples": [
+      {
+        "value": "{\n  \"title\": \"My Song\",\n  \"length\": 12\n}",
+        "strict": false,
+        "name": "song1",
+        "structuredValue": {
+          "title": "My Song",
+          "length": 12
+        }
+      },
+      {
+        "value": "{\n  \"title\": \"Last\",\n  \"length\": 3\n}",
+        "strict": true,
+        "name": "song2",
+        "structuredValue": {
+          "title": "Last",
+          "length": 3
+        }
+      }
+    ],
+    "required": true,
+    "properties": {
+      "title": {
+        "name": "title",
+        "displayName": "title",
+        "type": [
+          "string"
+        ],
+        "required": true
+      },
+      "length": {
+        "name": "length",
+        "displayName": "length",
+        "type": [
+          "number"
+        ],
+        "required": true
+      }
+    }
+  }
+}
