@@ -1,4 +1,4 @@
-(defproject datatype-expansion "0.0.15"
+(defproject datatype-expansion "0.1.0"
   :description "Utility to expand RAML Data Types into a single canonical form"
   :license {:name "Apache License 2.0"
             :url "http://www.apache.org/licenses/"}
@@ -6,6 +6,7 @@
                  [org.clojure/clojurescript "1.9.14"]
                  [org.clojure/core.async "0.2.374"]
                  [instaparse "1.4.2"]
+                 [cheshire "5.6.1"]
                  [com.lucasbradstreet/instaparse-cljs "1.4.1.2"]]
   :plugins [[lein-cljsbuild "1.1.3"]
             [lein-doo "0.1.6"]]
