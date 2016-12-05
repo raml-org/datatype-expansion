@@ -147,6 +147,35 @@ tools.expandedForm(typesContext["Songs.Album"], typesContext, function(err, expa
 });
 ```
 
+### Usage browser
+
+Require the browser build of the library, located in the `browser` directory.
+
+``` html
+<html>
+    <head>
+        <script type="text/javascript" src="./browser/index.js"></script>
+    </head>
+    <body>
+        <script type='text/javascript'>
+         var compose = function(g,f) {
+             return (function(x) { return g(f(x)); });
+         };
+
+         console.log("Starting...");
+
+         var result = compose(
+             datatype_expansion.js.canonicalForm,
+             datatype_expansion.js.expandedForm
+         )("string");
+
+         console.log(result); // you should get {"type": "string"}
+        </script>
+    </body>
+</html>
+
+```
+
 ## Running tests
 
 Tests for the library can be run for the clojure version using leiningen:

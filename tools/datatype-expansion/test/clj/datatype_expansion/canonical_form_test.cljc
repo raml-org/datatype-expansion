@@ -415,3 +415,36 @@
             :name "AnotherEntry",
             :type "json",
             :required true}))))
+
+(deftest expansion-test-1
+  (let [input {"Address" {:type "object"
+                          :properties {:street "string"}}
+               "Person" {:type "object"
+                         :properties {:home_address "Address"
+                                      :work_address {:type "Address"
+                                                     :required false}}}}
+        expanded (expanded-form "Person" input)
+        canonical (canonical-form expanded)]
+    (is (= expanded
+           {:properties {"home_address" {:properties {"street" {:type "string", :required true}}
+                                         :additionalProperties true
+                                         :type "object"
+                                         :required true}
+                         "work_address" {:type {:properties {"street" {:type "string", :required true}}
+                                                :additionalProperties true
+                                                :type "object"}
+                                         :required false}}
+            :additionalProperties true
+            :type "object"}))
+    (is (= canonical
+           {:properties {"home_address" {:properties {"street" {:type "string", :required true}}
+                                         :additionalProperties true
+                                         :type "object"
+                                         :required true}
+                         "work_address" {:additionalProperties true
+                                         :type "object"
+                                         :required false
+                                         :properties {"street" {:type "string", :required true}}}}
+            :additionalProperties true
+            :type "object"}))))
+

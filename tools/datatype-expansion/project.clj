@@ -1,4 +1,4 @@
-(defproject datatype-expansion "0.1.0"
+(defproject datatype-expansion "0.1.1"
   :description "Utility to expand RAML Data Types into a single canonical form"
   :license {:name "Apache License 2.0"
             :url "http://www.apache.org/licenses/"}
@@ -31,6 +31,15 @@
                                             :recompile-dependents false,
                                             :pretty-print true
                                             :target :nodejs}}
+                       :browser {:source-paths ["src/clj"]
+                                 :compiler {:main datatype-expansion.js
+                                            :output-dir "browser"
+                                            :output-to "browser/index.js"
+                                            :optimizations :none,
+                                            :source-map true,
+                                            :source-map-timestamp true,
+                                            :recompile-dependents false,
+                                            :pretty-print true}}
                        :test    {:source-paths ["src/clj" "test/clj"]
                                  :compiler {:output-to "resources/js/main-test.js"
                                             :main datatype-expansion.runner
