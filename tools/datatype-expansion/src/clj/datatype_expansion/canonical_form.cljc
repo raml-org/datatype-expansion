@@ -146,12 +146,17 @@
                                                consistency-check))
 (defmethod lt ["boolean" "boolean"] [super sub] (->> (lt-restrictions super sub)
                                                      (consistency-check)))
+
 (defmethod lt ["datetime" "datetime"] [super sub] (->> (lt-restrictions super sub)
                                                        (consistency-check)))
+
 (defmethod lt ["datetime-only" "datetime-only"] [super sub] (->> (lt-restrictions super sub)
                                                                  (consistency-check)))
 
 (defmethod lt ["date-only" "date-only"] [super sub] (->> (lt-restrictions super sub)
+                                                         (consistency-check)))
+
+(defmethod lt ["time-only" "time-only"] [super sub] (->> (lt-restrictions super sub)
                                                          (consistency-check)))
 
 (defmethod lt ["number" "number"] [super sub] (->> (lt-restrictions super sub)
