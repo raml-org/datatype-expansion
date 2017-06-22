@@ -1,6 +1,9 @@
 var expanded = require('../test/fixtures/expanded_forms')
 var canonical = require('../test/fixtures/canonical_forms')
 
+// NOTE: These mappings will return invalid values and tests will fail if
+// types at ../test/fixtures/types.js will change.
+
 // Map of types JSON to their name
 var typesToNames = {
   '{"properties":{"title":{"type":"string","example":"Great"},"length":"string"}}': 'Song',
