@@ -9,7 +9,8 @@
     "test-spec": "node_modules/mocha/bin/_mocha -R spec --recursive --bail test/unit",
     "test": "npm run lint && npm run test-cov",
     "test-integration": "node_modules/mocha/bin/_mocha -R spec --recursive --bail test/integration",
-    "test-integration-cov": "istanbul --include-all-sources cover node_modules/mocha/bin/_mocha -R spec --recursive --bail test/integration"
+    "test-integration-cov": "istanbul --include-all-sources cover node_modules/mocha/bin/_mocha -R spec --recursive --bail test/integration",
+    "browserify": "browserify src/index.js -o datatype-expansion.js -s datexp"
   },
   "keywords": [
     "raml",
@@ -19,6 +20,7 @@
   "author": "Mulesoft",
   "license": "Apache-2.0",
   "devDependencies": {
+    "browserify": "^14.4.0",
     "chai": "^4.0.2",
     "istanbul": "^0.4.5",
     "mocha": "^3.4.2",

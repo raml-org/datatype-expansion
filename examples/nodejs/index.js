@@ -1,7 +1,14 @@
-var types = require('../../test/fixtures/types')
 var datexp = require('datatype-expansion')
 
-var name = 'Album'
+var types = {
+  'SimpleUnion': {
+    'properties': {
+      'a': 'string',
+      'b': 'number | string'
+    }
+  }
+}
+var name = 'SimpleUnion'
 console.log('Type name:', name)
 
 datexp.expandedForm(types[name], types, function (err, expForm) {
