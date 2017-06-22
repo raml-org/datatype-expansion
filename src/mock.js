@@ -1,3 +1,5 @@
+var expanded = require('../test/fixtures/expanded_forms')
+var canonical = require('../test/fixtures/canonical_forms')
 
 // Map of types JSON to their name
 var typesToNames = {
@@ -25,4 +27,19 @@ var expandedToNames = {
   '{"properties":{"phone":{"properties":{"manufacturer":{"type":"string","required":true},"numberOfSIMCards":{"type":"number","required":true},"kind":{"type":"string","required":true}},"additionalProperties":true,"type":"object","required":true},"device":{"type":"$recur","required":true}},"additionalProperties":true,"type":{"anyOf":[{"properties":{"manufacturer":{"type":"string","required":true},"numberOfSIMCards":{"type":"number","required":true},"kind":{"type":"string","required":true}},"additionalProperties":true,"type":"object"},{"properties":{"manufacturer":{"type":"string","required":true},"numberOfUSBPorts":{"type":"number","required":true},"kind":{"type":"string","required":true}},"additionalProperties":true,"type":"object"}],"type":"union"},"example":"{\\n  \\"manufacturer\\": \\"John\\",\\n  \\"numberOfSIMCards\\": 1234,\\n  \\"kind\\": \\"Stamp Collecting\\",\\n  \\"phone\\": {\\n    \\"manufacturer\\": \\"John\\",\\n    \\"numberOfSIMCards\\": 1234,\\n    \\"kind\\": \\"Stamp Collecting\\"\\n  },\\n  \\"device\\": {\\n    \\"manufacturer\\": \\"John\\",\\n    \\"numberOfSIMCards\\": 1234,\\n    \\"kind\\": \\"Stamp Collecting\\"\\n  }\\n}\\n"}': 'WithInheritance',
   '{"type":{"properties":{"stringProperty":{"type":"string","required":true},"numberProperty":{"type":"number","required":true}},"additionalProperties":true,"type":"object"}}': 'InlinedDeclaration',
   '{"properties":{"name":{"enum":["Jane","John"],"type":"string","minLength":4,"maxLength":9,"required":true},"age":{"maximum":98,"type":"integer","minimum":19,"required":true},"cats":{"type":"array","minItems":2,"items":{"type":"string"},"required":true,"maxItems":4},"bio":{"additionalProperties":true,"maxProperties":9,"type":"object","minProperties":2,"required":true}},"additionalProperties":true,"maxProperties":9,"type":{"discriminatorValue":"John","properties":{"name":{"enum":["Jane","John","Markus"],"type":"string","minLength":3,"maxLength":10,"required":false,"pattern":"foobar"},"age":{"maximum":99,"type":"integer","minimum":18,"required":true},"dob":{"format":"rfc2616","type":"datetime","required":true},"cats":{"uniqueItems":true,"type":"array","minItems":1,"items":{"type":"string"},"maxItems":5,"required":true},"bio":{"additionalProperties":true,"maxProperties":10,"type":"object","minProperties":1,"required":true}},"additionalProperties":false,"maxProperties":10,"type":"object","minProperties":1,"discriminator":"name"},"minProperties":2}': 'ValidConstraintsInheritance'
+}
+
+function getExpandedForm (type) {
+  var typeName = typesToNames[JSON.stringify(type)]
+  return expanded[typeName]
+}
+
+function getCanonicalForm (expForm) {
+  var typeName = expandedToNames[JSON.stringify(expForm)]
+  return canonical[typeName]
+}
+
+module.exports = {
+  getExpandedForm: getExpandedForm,
+  getCanonicalForm: getCanonicalForm
 }

@@ -202,8 +202,7 @@ module.exports = {
       }
     ]
   },
-  // Errors in clj lib
-  // "WithInheritance":null,
+  'WithInheritance': null,
   'InlinedDeclaration': {
     'additionalProperties': true,
     'type': 'object',
@@ -217,7 +216,6 @@ module.exports = {
         'required': true
       }
     }
-  }
-  // Errors in clj lib
-  // "ValidConstraintsInheritance":null
+  },
+  'ValidConstraintsInheritance': null
 }
