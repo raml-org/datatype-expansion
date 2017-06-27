@@ -2,10 +2,10 @@
 
 var _ = require('lodash')
 var expect = require('chai').expect
-var types = require('../fixtures/types')
-var forms = require('../fixtures/canonical_forms')
-var expandedForm = require('../../src/expanded').expandedForm
-var canonicalForm = require('../../src/canonical').canonicalForm
+var types = require('./fixtures/types')
+var forms = require('./fixtures/canonical_forms')
+var expandedForm = require('../src/expanded').expandedForm
+var canonicalForm = require('../src/canonical').canonicalForm
 
 describe('canonicalForm()', function () {
   _.each(types, function (type, name) {

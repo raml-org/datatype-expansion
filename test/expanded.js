@@ -2,9 +2,9 @@
 
 var _ = require('lodash')
 var expect = require('chai').expect
-var types = require('../fixtures/types')
-var forms = require('../fixtures/expanded_forms')
-var expandedForm = require('../../src/expanded').expandedForm
+var types = require('./fixtures/types')
+var forms = require('./fixtures/expanded_forms')
+var expandedForm = require('../src/expanded').expandedForm
 
 describe('expandedForm()', function () {
   _.each(types, function (type, name) {

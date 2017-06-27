@@ -5,11 +5,9 @@
   "main": "src/index.js",
   "scripts": {
     "lint": "standard",
-    "test-cov": "istanbul --include-all-sources cover node_modules/mocha/bin/_mocha -- -R dot --recursive --bail test/unit",
-    "test-spec": "node_modules/mocha/bin/_mocha -R spec --recursive --bail test/unit",
+    "test-cov": "istanbul --include-all-sources cover --root src node_modules/mocha/bin/_mocha -- -R dot --recursive --bail test/",
+    "test-spec": "node_modules/mocha/bin/_mocha -R spec --recursive --bail test/",
     "test": "npm run lint && npm run test-cov",
-    "test-integration": "node_modules/mocha/bin/_mocha -R spec --recursive --bail test/integration",
-    "test-integration-cov": "istanbul --include-all-sources cover node_modules/mocha/bin/_mocha -R spec --recursive --bail test/integration",
     "browserify": "browserify src/index.js -o datatype-expansion.js -s datexp"
   },
   "keywords": [
