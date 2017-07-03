@@ -1,3 +1,5 @@
+'use strict';
+
 /**
  * Accepts an in-memory JSON representation of the type, the types mapping
  * and a callback function. If the invocation succeeds, it will return the

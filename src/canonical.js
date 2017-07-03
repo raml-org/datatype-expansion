@@ -1,3 +1,5 @@
+'use strict';
+
 /*
   Accepts a JSON in-memory representation of an expanded RAML type and a
   callback function. Callback function should accept two arguments: error

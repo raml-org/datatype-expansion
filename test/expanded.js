@@ -1,3 +1,5 @@
+'use strict';
+
 /* global describe, it */
 
 const _ = require('lodash')

@@ -1,3 +1,5 @@
+'use strict';
+
 /*
   Contains map of type names to their expanded forms. Types taken from
   "./types.js"

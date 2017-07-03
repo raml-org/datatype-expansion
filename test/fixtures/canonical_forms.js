@@ -1,3 +1,5 @@
+'use strict';
+
 /*
   Contains map of type names to their canonical forms. Types taken from
   "./types.js"
