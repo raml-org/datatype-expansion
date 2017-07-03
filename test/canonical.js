@@ -1,4 +1,4 @@
-'use strict';
+'use strict'
 
 /* global describe, it */
 
@@ -11,7 +11,7 @@ const canonicalForm = require('../src/canonical').canonicalForm
 
 describe('canonicalForm()', function () {
   _.each(types, function (type, name) {
-    if(name === 'canonical' || name === 'expanded') return;
+    if (name === 'canonical' || name === 'expanded') return
     it('should generate canonical form of type ' + name, function () {
       expandedForm(types[name], types, function (err, expForm) {
         err = null

@@ -1,4 +1,4 @@
-'use strict';
+'use strict'
 
 const expanded = require('./expanded')
 const canonical = require('./canonical')

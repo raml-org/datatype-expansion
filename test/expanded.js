@@ -1,4 +1,4 @@
-'use strict';
+'use strict'
 
 /* global describe, it */
 
@@ -10,7 +10,7 @@ const expandedForm = require('../src/expanded').expandedForm
 
 describe('expandedForm()', function () {
   _.each(types, function (type, name) {
-    if(name === 'canonical' || name === 'expanded') return;
+    if (name === 'canonical' || name === 'expanded') return
     it('should generate expanded form of type ' + name, function () {
       expandedForm(types[name], types, function (err, expForm) {
         expect(err).to.equal(null)

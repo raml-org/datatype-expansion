@@ -1,4 +1,4 @@
-'use strict';
+'use strict'
 
 /**
  * Accepts an in-memory JSON representation of the type, the types mapping
@@ -41,7 +41,7 @@ const types = [
  */
 function expandForm (form, bindings, context, topLevel = 'any') { // *Algorithm*
   console.log({form, context})
-  
+
   /**
    * 1. if `form` is a `String
    */
@@ -52,31 +52,30 @@ function expandForm (form, bindings, context, topLevel = 'any') { // *Algorithm*
     if (types.includes(form)) {
       return {type: form}
     }
-    
+
     /**
      * 1.2. if `form` is a Type Expression, we return the output of calling the algorithm
      * recursively with the parsed type expression and the provided `bindings`
      */
-    {
-      // union
-      if (/^[\w\d]*\s*(?:\|\s*[\w\d]*)+$/.test(form)) {
-        const options = form.split('|').map(s => s.trim())
-        return {
-          anyOf: options.map(o => expandForm(o, bindings, context)),
-          type: 'union'
-        }
-      }
-      
-      // Array
-      if (form.endsWith('[]')) {
-        const match = form.match(/^(.+)\[]$/)[1]
-        return {
-          type: 'array',
-          items: expandForm(match, bindings, context)
-        }
+
+    // union
+    if (/^[\w\d]*\s*(?:\|\s*[\w\d]*)+$/.test(form)) {
+      const options = form.split('|').map(s => s.trim())
+      return {
+        anyOf: options.map(o => expandForm(o, bindings, context)),
+        type: 'union'
       }
     }
-    
+
+    // Array
+    if (form.endsWith('[]')) {
+      const match = form.match(/^(.+)\[]$/)[1]
+      return {
+        type: 'array',
+        items: expandForm(match, bindings, context)
+      }
+    }
+
     /**
      * 1.3. if `form` is a key in `bindings`
      */
@@ -101,19 +100,18 @@ function expandForm (form, bindings, context, topLevel = 'any') { // *Algorithm*
         return expandForm(bindings[form], bindings, context.concat([form]))
       }
     }
-    
+
     /**
      * 1.4. else we return an error
      */
     // TODO: not tested
     throw new Error('could not resolve: ' + form)
-  }
-  /**
-   * 2. if `form` is a `Record`
-   */
-  else if (typeof form === 'object') {
+  } else if (typeof form === 'object') {
+    /**
+     * 2. if `form` is a `Record`
+     */
     form = Object.assign({}, form)
-    
+
     /**
      * 2.1. we initialize a variable `type`
      * 2.1.1. if `type` has a defined value in `form` we initialize `type` with that value
@@ -123,38 +121,36 @@ function expandForm (form, bindings, context, topLevel = 'any') { // *Algorithm*
      */
     form.type = form.type || (form.properties && 'object') || (form.items && 'array') || topLevel
     // TODO: `Seq[RAMLForm]`
-    
+
     /**
      * 2.2. if `type` is a `String` with  value `array`
      */
     if (form.type === 'array') {
       return expandArray(form, bindings, context)
-    }
-    /**
-     * 2.3 if `type` is a `String` with value `object`
-     */
-    else if (form.type === 'object') {
+    } else if (form.type === 'object') {
+      /**
+       * 2.3 if `type` is a `String` with value `object`
+       */
       return expandObject(form, bindings, context)
-    }
-    /**
-     * 2.4. if `type` is a `String` with value `union`
-     */
-    else if (form.type === 'union') {
+    } else if (form.type === 'union') {
+      /**
+       * 2.4. if `type` is a `String` with value `union`
+       */
+
       // TODO: not tested
       return expandUnion(form, bindings, context)
-    }
-    /**
-     * TODO
-     */
-    else if (form.type in bindings) {
+    } else if (form.type in bindings) {
+      /**
+       * TODO
+       */
       form = expandObject(form, bindings, context.concat([form.type]))
       form.type = expandForm(form.type, bindings, context)
       return form
-    }
-    /**
-     * 2.5. if `type` is a `Record`
-     */
-    else if (typeof form.type === 'object') {
+    } else if (typeof form.type === 'object') {
+      /**
+       * 2.5. if `type` is a `Record`
+       */
+
       /**
        * 2.5.1. we return the output of invoking the algorithm on the value of `type` with
        * the current value for `bindings`
@@ -162,17 +158,16 @@ function expandForm (form, bindings, context, topLevel = 'any') { // *Algorithm*
       if (form.properties !== undefined) form = expandObject(form, bindings, context)
       form.type = expandForm(form.type, bindings, context)
       return form
-    }
-    /**
-     * weird stuff
-     */
-    else {
+    } else {
+      /**
+       * weird stuff
+       */
       form = Object.assign(form, expandForm(form.type, bindings, context))
     }
-    
+
     return form
   }
-  
+
   // TODO: not tested
   throw new Error('form can only be a string or an object')
 }
@@ -187,7 +182,7 @@ function expandObject (form, bindings, context) {
   const props = form.properties
   for (let propName in props) {
     if (!props.hasOwnProperty(propName)) continue
-    
+
     let expandedPropVal = expandForm(props[propName], bindings, context)
     // TODO: not tested
     if (propName.endsWith('?')) {

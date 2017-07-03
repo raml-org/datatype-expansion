@@ -1,4 +1,4 @@
-'use strict';
+'use strict'
 
 /*
   Contains map of type names to type JSON.
