@@ -58,3 +58,4 @@ typings/
 .env
 
 datatype-expansion.js
+.idea

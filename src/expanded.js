@@ -1,35 +1,210 @@
-/*
-  Accepts an in-memory JSON representation of the type, the types mapping
-  and a callback function. If the invocation succeeds, it will return the
-  expanded form as an argument to the provided callback function.
-*/
-function expandedForm (type, types, cb) {
-  var expForm = getExpandedForm(type)
-  cb(null, expForm)
+/**
+ * Accepts an in-memory JSON representation of the type, the types mapping
+ * and a callback function. If the invocation succeeds, it will return the
+ * expanded form as an argument to the provided callback function.
+ *
+ * @param {(object|String)} type
+ * @param {Array} types
+ * @param {function} cb
+ */
+module.exports.expandedForm = function expandedForm (type, types, cb) {
+  cb(null, expandForm(type, types, []))
 }
 
-module.exports.expandedForm = expandedForm
+const types = [
+  'string',
+  'number',
+  'integer',
+  'boolean',
+  'date-only',
+  'time-only',
+  'datetime-only',
+  'datetime',
+  'file',
+  'nil'
+]
 
-// Mock
-// NOTE: These mappings will return invalid values and tests will fail if
-// types at ../test/fixtures/types.js will change.
-var expanded = require('../test/fixtures/expanded_forms')
-
-// Map of types JSON to their name
-var typesToNames = {
-  '{"properties":{"title":{"type":"string","example":"Great"},"length":"string"}}': 'Song',
-  '{"properties":{"title":"string","songs":{"description":"A list of songs inside an album.","type":"Song[]"}},"examples":{"Album1":{"title":"Test 1","songs":[{"title":"Great","length":"2"},{"title":"Awesome","length":"3"}]},"Album2":{"title":"Test 2","songs":[{"title":"Great","length":"2"},{"title":"Awesome","length":"3"}]}}}': 'Album',
-  '{"type":"object","properties":{"manufacturer":{"type":"string"},"numberOfSIMCards":{"type":"number"},"kind":"string"}}': 'Phone',
-  '{"type":"object","properties":{"manufacturer":{"type":"string"},"numberOfUSBPorts":{"type":"number"},"kind":"string"}}': 'Notebook',
-  '{"type":"Phone | Notebook"}': 'Device',
-  '{"type":"nil | string"}': 'Deprecation',
-  '{"properties":{"a":"string","b":"number | string"}}': 'SimpleUnion',
-  '{"type":"Device","properties":{"phone":"Phone","device":"Device"},"example":"{\\n  \\"manufacturer\\": \\"John\\",\\n  \\"numberOfSIMCards\\": 1234,\\n  \\"kind\\": \\"Stamp Collecting\\",\\n  \\"phone\\": {\\n    \\"manufacturer\\": \\"John\\",\\n    \\"numberOfSIMCards\\": 1234,\\n    \\"kind\\": \\"Stamp Collecting\\"\\n  },\\n  \\"device\\": {\\n    \\"manufacturer\\": \\"John\\",\\n    \\"numberOfSIMCards\\": 1234,\\n    \\"kind\\": \\"Stamp Collecting\\"\\n  }\\n}\\n"}': 'WithInheritance',
-  '{"type":{"type":"object","properties":{"stringProperty":{"type":"string"},"numberProperty":{"type":"number"}}}}': 'InlinedDeclaration',
-  '{"minProperties":2,"maxProperties":9,"properties":{"name":{"type":"string","required":true,"minLength":4,"maxLength":9,"enum":["Jane","John"]},"age":{"type":"integer","minimum":19,"maximum":98},"cats":{"type":"array","items":"string","minItems":2,"maxItems":4},"bio":{"type":"object","minProperties":2,"maxProperties":9}},"type":{"type":"object","discriminator":"name","discriminatorValue":"John","additionalProperties":false,"minProperties":1,"maxProperties":10,"properties":{"name":{"type":"string","required":false,"minLength":3,"maxLength":10,"pattern":"foobar","enum":["Jane","John","Markus"]},"age":{"type":"integer","minimum":18,"maximum":99},"dob":{"type":"datetime","format":"rfc2616"},"cats":{"type":"array","items":"string","uniqueItems":true,"minItems":1,"maxItems":5},"bio":{"type":"object","minProperties":1,"maxProperties":10}}}}': 'ValidConstraintsInheritance'
+// TODO: topLevel
+/**
+ * https://raw.githubusercontent.com/raml-org/raml-parser-toolbelt/master/tools/datatype-expansion/doc/algorithms.md
+ *
+ * @param form {*} The form being expanded
+ * @param bindings {Array} A `Record` from `String` into `RAMLForm` holding a mapping from user
+ *                   defined RAML type names to RAML type forms.
+ * @param context {Array} Context of already 'visited' types
+ * @param topLevel {String} [topLevel=any] a `String` with the default RAML type whose base type is not
+ *                   explicit and cannot be inferred, it can be `any` or `string`
+ *                   depending if the the type comes from the `body` of RAML service
+ * @returns {object} - expanded form
+ */
+function expandForm (form, bindings, context, topLevel = 'any') { // *Algorithm*
+  console.log({form, context})
+  
+  /**
+   * 1. if `form` is a `String
+   */
+  if (typeof form === 'string') {
+    /**
+     * 1.1. if `form` is a RAML built-in data type, we return `(Record "type" form)`
+     */
+    if (types.includes(form)) {
+      return {type: form}
+    }
+    
+    /**
+     * 1.2. if `form` is a Type Expression, we return the output of calling the algorithm
+     * recursively with the parsed type expression and the provided `bindings`
+     */
+    {
+      // union
+      if (/^[\w\d]*\s*(?:\|\s*[\w\d]*)+$/.test(form)) {
+        const options = form.split('|').map(s => s.trim())
+        return {
+          anyOf: options.map(o => expandForm(o, bindings, context)),
+          type: 'union'
+        }
+      }
+      
+      // Array
+      if (form.endsWith('[]')) {
+        const match = form.match(/^(.+)\[]$/)[1]
+        return {
+          type: 'array',
+          items: expandForm(match, bindings, context)
+        }
+      }
+    }
+    
+    /**
+     * 1.3. if `form` is a key in `bindings`
+     */
+    if (form in bindings) {
+      /**
+       * 1.3.2. If the type has been traversed
+       */
+      if (context.includes(form)) {
+        /**
+         * 1.3.2.1. We mark the value for the current form as a fixpoint recursion:
+         * `$recur`
+         * 1.3.2.2. We find the container form matching the recursion type and we wrap it
+         * into a `(fixpoint RAMLForm)` form. TODO: ??
+         */
+        return {type: '$recur'}
+      } else {
+        /**
+         * 1.3.1. If the type hasn't been traversed yet, we return the output of invoking
+         * the algorithm recursively with the value for `form` found in `bindings` and the
+         * `bindings` mapping and we add the type to the current traverse path
+         */
+        return expandForm(bindings[form], bindings, context.concat([form]))
+      }
+    }
+    
+    /**
+     * 1.4. else we return an error
+     */
+    // TODO: not tested
+    throw new Error('could not resolve: ' + form)
+  }
+  /**
+   * 2. if `form` is a `Record`
+   */
+  else if (typeof form === 'object') {
+    form = Object.assign({}, form)
+    
+    /**
+     * 2.1. we initialize a variable `type`
+     * 2.1.1. if `type` has a defined value in `form` we initialize `type` with that value
+     * 2.1.2. if `form` has a `properties` key defined, we initialize `type` with the value `object`
+     * 2.1.3. if `form` has a `items` key defined, we initialize `type` with the value `object`
+     * 2.1.4. otherwise we initialise `type` with the value passed in `top-level-type`
+     */
+    form.type = form.type || (form.properties && 'object') || (form.items && 'array') || topLevel
+    // TODO: `Seq[RAMLForm]`
+    
+    /**
+     * 2.2. if `type` is a `String` with  value `array`
+     */
+    if (form.type === 'array') {
+      return expandArray(form, bindings, context)
+    }
+    /**
+     * 2.3 if `type` is a `String` with value `object`
+     */
+    else if (form.type === 'object') {
+      return expandObject(form, bindings, context)
+    }
+    /**
+     * 2.4. if `type` is a `String` with value `union`
+     */
+    else if (form.type === 'union') {
+      // TODO: not tested
+      return expandUnion(form, bindings, context)
+    }
+    /**
+     * TODO
+     */
+    else if (form.type in bindings) {
+      form = expandObject(form, bindings, context.concat([form.type]))
+      form.type = expandForm(form.type, bindings, context)
+      return form
+    }
+    /**
+     * 2.5. if `type` is a `Record`
+     */
+    else if (typeof form.type === 'object') {
+      /**
+       * 2.5.1. we return the output of invoking the algorithm on the value of `type` with
+       * the current value for `bindings`
+       */
+      if (form.properties !== undefined) form = expandObject(form, bindings, context)
+      form.type = expandForm(form.type, bindings, context)
+      return form
+    }
+    /**
+     * weird stuff
+     */
+    else {
+      form = Object.assign(form, expandForm(form.type, bindings, context))
+    }
+    
+    return form
+  }
+  
+  // TODO: not tested
+  throw new Error('form can only be a string or an object')
 }
 
-function getExpandedForm (type) {
-  var typeName = typesToNames[JSON.stringify(type)]
-  return expanded[typeName]
+function expandArray (form, bindings, context) {
+  form.items = expandForm(form.items, bindings, context)
+  return form
+}
+
+function expandObject (form, bindings, context) {
+  // console.log('objform', form)
+  const props = form.properties
+  for (let propName in props) {
+    if (!props.hasOwnProperty(propName)) continue
+    
+    let expandedPropVal = expandForm(props[propName], bindings, context)
+    // TODO: not tested
+    if (propName.endsWith('?')) {
+      delete props[propName]
+      propName = propName.slice(0, -1)
+    }
+    if (expandedPropVal.required === undefined) {
+      expandedPropVal.required = true
+    }
+    props[propName] = expandedPropVal
+  }
+  if (form.additionalProperties === undefined) {
+    form.additionalProperties = true
+  }
+  return form
+}
+
+// TODO
+function expandUnion (form, bindings, context) {
+  // TODO: not tested
+  return form
 }

@@ -6,7 +6,7 @@
   "scripts": {
     "lint": "standard",
     "test-cov": "istanbul --include-all-sources cover --root src node_modules/mocha/bin/_mocha -- -R dot --recursive --bail test/",
-    "test-spec": "node_modules/mocha/bin/_mocha -R spec --recursive --bail test/",
+    "test-spec": "_mocha -R spec --recursive --bail test/",
     "test": "npm run lint && npm run test-cov",
     "browserify": "browserify src/index.js -o datatype-expansion.js -s datexp"
   },

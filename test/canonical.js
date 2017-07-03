@@ -1,14 +1,15 @@
 /* global describe, it */
 
-var _ = require('lodash')
-var expect = require('chai').expect
-var types = require('./fixtures/types')
-var forms = require('./fixtures/canonical_forms')
-var expandedForm = require('../src/expanded').expandedForm
-var canonicalForm = require('../src/canonical').canonicalForm
+const _ = require('lodash')
+const expect = require('chai').expect
+const types = require('./fixtures/types')
+const forms = require('./fixtures/canonical_forms')
+const expandedForm = require('../src/expanded').expandedForm
+const canonicalForm = require('../src/canonical').canonicalForm
 
 describe('canonicalForm()', function () {
   _.each(types, function (type, name) {
+    if(name === 'canonical' || name === 'expanded') return;
     it('should generate canonical form of type ' + name, function () {
       expandedForm(types[name], types, function (err, expForm) {
         err = null
