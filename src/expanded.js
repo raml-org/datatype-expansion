@@ -40,7 +40,7 @@ const types = [
  * @returns {object} - expanded form
  */
 function expandForm (form, bindings, context, topLevel = 'any') { // *Algorithm*
-  console.log({form, context})
+  // console.log({form, context})
 
   /**
    * 1. if `form` is a `String
