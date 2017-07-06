@@ -41,7 +41,8 @@ const types = [
  *                   depending if the the type comes from the `body` of RAML service
  * @returns {object} - expanded form
  */
-function expandForm (form, bindings, context, topLevel = 'any') {
+function expandForm (form, bindings, context, topLevel) {
+  topLevel = topLevel || 'any'
   // console.log({form, context})
   form = _.cloneDeep(form)
 
