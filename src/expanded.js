@@ -49,7 +49,7 @@ function expandForm (form, bindings, context, topLevel) {
   // 1. if `form` is a `String
   if (typeof form === 'string') {
     // 1.1. if `form` is a RAML built-in data type, we return `(Record "type" form)`
-    if (types.includes(form)) {
+    if (types.indexOf(form) !== -1) {
       return {type: form}
     }
     // 1.2. if `form` is a Type Expression, we return the output of calling the algorithm
@@ -73,7 +73,7 @@ function expandForm (form, bindings, context, topLevel) {
     // 1.3. if `form` is a key in `bindings`
     if (form in bindings) {
       // 1.3.2. If the type has been traversed
-      if (context.includes(form)) {
+      if (context.indexOf(form) !== -1) {
         // 1.3.2.1. We mark the value for the current form as a fixpoint recursion: `$recur`
         // 1.3.2.2. We find the container form matching the recursion type and we wrap it into a `(fixpoint RAMLForm)` form. TODO: ??
         return {type: '$recur'}
