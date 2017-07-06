@@ -1,5 +1,7 @@
 'use strict'
 
+const _ = require('lodash')
+
 /**
  * Accepts an in-memory JSON representation of the type, the types mapping
  * and a callback function. If the invocation succeeds, it will return the
@@ -39,27 +41,19 @@ const types = [
  *                   depending if the the type comes from the `body` of RAML service
  * @returns {object} - expanded form
  */
-function expandForm (form, bindings, context, topLevel = 'any') { // *Algorithm*
+function expandForm (form, bindings, context, topLevel = 'any') {
   // console.log({form, context})
+  form = _.cloneDeep(form)
 
-  /**
-   * 1. if `form` is a `String
-   */
+  // 1. if `form` is a `String
   if (typeof form === 'string') {
-    /**
-     * 1.1. if `form` is a RAML built-in data type, we return `(Record "type" form)`
-     */
+    // 1.1. if `form` is a RAML built-in data type, we return `(Record "type" form)`
     if (types.includes(form)) {
       return {type: form}
     }
-
-    /**
-     * 1.2. if `form` is a Type Expression, we return the output of calling the algorithm
-     * recursively with the parsed type expression and the provided `bindings`
-     */
-
-    // union
-    if (/^[\w\d]*\s*(?:\|\s*[\w\d]*)+$/.test(form)) {
+    // 1.2. if `form` is a Type Expression, we return the output of calling the algorithm
+    // recursively with the parsed type expression and the provided `bindings`
+    if (/^[\w\d]*\s*(?:\|\s*[\w\d]*)+$/.test(form)) { // union
       const options = form.split('|').map(s => s.trim())
       return {
         anyOf: options.map(o => expandForm(o, bindings, context)),
@@ -67,8 +61,7 @@ function expandForm (form, bindings, context, topLevel = 'any') { // *Algorithm*
       }
     }
 
-    // Array
-    if (form.endsWith('[]')) {
+    if (form.endsWith('[]')) { // Array
       const match = form.match(/^(.+)\[]$/)[1]
       return {
         type: 'array',
@@ -76,92 +69,57 @@ function expandForm (form, bindings, context, topLevel = 'any') { // *Algorithm*
       }
     }
 
-    /**
-     * 1.3. if `form` is a key in `bindings`
-     */
+    // 1.3. if `form` is a key in `bindings`
     if (form in bindings) {
-      /**
-       * 1.3.2. If the type has been traversed
-       */
+      // 1.3.2. If the type has been traversed
       if (context.includes(form)) {
-        /**
-         * 1.3.2.1. We mark the value for the current form as a fixpoint recursion:
-         * `$recur`
-         * 1.3.2.2. We find the container form matching the recursion type and we wrap it
-         * into a `(fixpoint RAMLForm)` form. TODO: ??
-         */
+        // 1.3.2.1. We mark the value for the current form as a fixpoint recursion: `$recur`
+        // 1.3.2.2. We find the container form matching the recursion type and we wrap it into a `(fixpoint RAMLForm)` form. TODO: ??
         return {type: '$recur'}
       } else {
-        /**
-         * 1.3.1. If the type hasn't been traversed yet, we return the output of invoking
-         * the algorithm recursively with the value for `form` found in `bindings` and the
-         * `bindings` mapping and we add the type to the current traverse path
-         */
+        // 1.3.1. If the type hasn't been traversed yet, we return the output of invoking
+        // the algorithm recursively with the value for `form` found in `bindings` and the
+        // `bindings` mapping and we add the type to the current traverse path
         return expandForm(bindings[form], bindings, context.concat([form]))
       }
     }
 
-    /**
-     * 1.4. else we return an error
-     */
+    // 1.4. else we return an error
     // TODO: not tested
     throw new Error('could not resolve: ' + form)
   } else if (typeof form === 'object') {
-    /**
-     * 2. if `form` is a `Record`
-     */
-    form = Object.assign({}, form)
-
-    /**
-     * 2.1. we initialize a variable `type`
-     * 2.1.1. if `type` has a defined value in `form` we initialize `type` with that value
-     * 2.1.2. if `form` has a `properties` key defined, we initialize `type` with the value `object`
-     * 2.1.3. if `form` has a `items` key defined, we initialize `type` with the value `object`
-     * 2.1.4. otherwise we initialise `type` with the value passed in `top-level-type`
-     */
+    // 2. if `form` is a `Record`
+    // 2.1. we initialize a variable `type`
+    // 2.1.1. if `type` has a defined value in `form` we initialize `type` with that value
+    // 2.1.2. if `form` has a `properties` key defined, we initialize `type` with the value `object`
+    // 2.1.3. if `form` has a `items` key defined, we initialize `type` with the value `object`
+    // 2.1.4. otherwise we initialise `type` with the value passed in `top-level-type`
     form.type = form.type || (form.properties && 'object') || (form.items && 'array') || topLevel
     // TODO: `Seq[RAMLForm]`
 
-    /**
-     * 2.2. if `type` is a `String` with  value `array`
-     */
+    // 2.2. if `type` is a `String` with  value `array`
     if (form.type === 'array') {
       return expandArray(form, bindings, context)
     } else if (form.type === 'object') {
-      /**
-       * 2.3 if `type` is a `String` with value `object`
-       */
+      // 2.3 if `type` is a `String` with value `object`
       return expandObject(form, bindings, context)
     } else if (form.type === 'union') {
-      /**
-       * 2.4. if `type` is a `String` with value `union`
-       */
-
+      // 2.4. if `type` is a `String` with value `union`
       // TODO: not tested
       return expandUnion(form, bindings, context)
     } else if (form.type in bindings) {
-      /**
-       * TODO
-       */
+      // TODO: ?
       form = expandObject(form, bindings, context.concat([form.type]))
       form.type = expandForm(form.type, bindings, context)
       return form
     } else if (typeof form.type === 'object') {
-      /**
-       * 2.5. if `type` is a `Record`
-       */
-
-      /**
-       * 2.5.1. we return the output of invoking the algorithm on the value of `type` with
-       * the current value for `bindings`
-       */
+      // 2.5. if `type` is a `Record`
+      // 2.5.1. we return the output of invoking the algorithm on the value of `type` with the current value for `bindings`
       if (form.properties !== undefined) form = expandObject(form, bindings, context)
       form.type = expandForm(form.type, bindings, context)
       return form
     } else {
-      /**
-       * weird stuff
-       */
+      // weird stuff
       form = Object.assign(form, expandForm(form.type, bindings, context))
     }
 
