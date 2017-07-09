@@ -7,11 +7,13 @@ const _ = require('lodash')
   callback function. Callback function should accept two arguments: error
   and canonical form object.
 */
-function canonicalForm (expForm, cb) {
-  cb(null, toCanonical(expForm))
+module.exports.canonicalForm = function canonicalForm (expForm, cb) {
+  try {
+    cb(null, toCanonical(expForm))
+  } catch (e) {
+    cb(e, null)
+  }
 }
-
-module.exports.canonicalForm = canonicalForm
 
 // TODO: is this really correct?
 const types = [
@@ -103,7 +105,6 @@ function toCanonical (form) {
         // 4.4.3.3. we replace `accum` with `new-accum`
         accum = newAccum
       } else {
-        // FIXME
         // 4.4.2. if the property `type` of `tmp` has the value `object`
         // 4.4.2.1. we add the pair `property-name` `tmp` to the `properties` keys in each record in `accum`
         accum = accum.map((elem) => {
@@ -130,18 +131,39 @@ function toCanonical (form) {
   } else if (typeof type === 'object') {
     // 5. & 6. ?
     // TODO: not correct/complete
-    return consistencyCheck(form.type)
-    // if (Array.isArray(type)) {
-    //
-    // } else {
-    //
-    // }
+    if (Array.isArray(type)) {
+      // TODO
+    } else {
+      return consistencyCheck(form.type)
+    }
   }
 
   return form
 }
 
-// TODO: consistency-check
 function consistencyCheck (form) {
+  const err = (name, a, b) => {
+    throw new Error(`Consistency check failure for property ${name} and values [${a} ${b}]`)
+  }
+  if (form.minProperties !== undefined &&
+      form.maxProperties !== undefined &&
+      form.minProperties > form.maxProperties) {
+    err('numProperties', form.minProperties, form.maxProperties)
+  }
+  if (form.minLength !== undefined &&
+      form.maxLength !== undefined &&
+      form.minLength > form.maxLength) {
+    err('length', form.minLength, form.maxLength)
+  }
+  if (form.minimum !== undefined &&
+      form.maximum !== undefined &&
+      form.minimum > form.maximum) {
+    err('size', form.minimum, form.maximum)
+  }
+  if (form.minItems !== undefined &&
+      form.maxItems !== undefined &&
+      form.minItems > form.maxItems) {
+    err('numItems', form.minItems, form.maxItems)
+  }
   return form
 }

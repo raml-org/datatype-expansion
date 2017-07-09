@@ -12,7 +12,11 @@ const _ = require('lodash')
  * @param {function} cb
  */
 module.exports.expandedForm = function expandedForm (type, types, cb) {
-  cb(null, expandForm(type, types, []))
+  try {
+    cb(null, expandForm(type, types, []))
+  } catch (e) {
+    cb(e, null)
+  }
 }
 
 const types = [
