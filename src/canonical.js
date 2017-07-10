@@ -131,14 +131,59 @@ function toCanonical (form) {
   } else if (typeof type === 'object') {
     // 5. & 6. ?
     // TODO: not correct/complete
+    const superTypeName = findClass(form)
     if (Array.isArray(type)) {
       // TODO
     } else {
-      return consistencyCheck(form.type)
+      const superType = toCanonical(type)
+      let subType = _.cloneDeep(form)
+      subType.type = superTypeName
+      switch (superTypeName) {
+        case 'object':
+          subType.properties = subType.properties || {}
+          break
+        case 'array':
+          subType.items = subType.items || {
+            type: 'any'
+          }
+          break
+        case 'union':
+          subType.anyOf = subType.anyOf || []
+          break
+      }
+      subType = toCanonical(subType)
+      return consistencyCheck(lt(superType, subType))
     }
   }
 
   return form
+}
+
+function lt (superForm, sub) {
+  return superForm
+}
+
+function findClass (form) {
+  if (form.properties !== undefined) return 'object'
+  if (form.items !== undefined) return 'array'
+  if (typeof form.type === 'string') return form.type
+  if (typeof form.type === 'object') {
+    if (Array.isArray(form.type)) {
+      const type = form.type.map((node) => {
+        try {
+          return findClass(node)
+        } catch (e) {
+          return null
+        }
+      }).filter(type => type !== null)[0]
+      if (type !== undefined) {
+        return type
+      }
+    } else {
+      return findClass(form.type)
+    }
+  }
+  throw new Error('Cannot find top level class for node, not in expanded form')
 }
 
 function consistencyCheck (form) {
@@ -146,23 +191,23 @@ function consistencyCheck (form) {
     throw new Error(`Consistency check failure for property ${name} and values [${a} ${b}]`)
   }
   if (form.minProperties !== undefined &&
-      form.maxProperties !== undefined &&
-      form.minProperties > form.maxProperties) {
+    form.maxProperties !== undefined &&
+    form.minProperties > form.maxProperties) {
     err('numProperties', form.minProperties, form.maxProperties)
   }
   if (form.minLength !== undefined &&
-      form.maxLength !== undefined &&
-      form.minLength > form.maxLength) {
+    form.maxLength !== undefined &&
+    form.minLength > form.maxLength) {
     err('length', form.minLength, form.maxLength)
   }
   if (form.minimum !== undefined &&
-      form.maximum !== undefined &&
-      form.minimum > form.maximum) {
+    form.maximum !== undefined &&
+    form.minimum > form.maximum) {
     err('size', form.minimum, form.maximum)
   }
   if (form.minItems !== undefined &&
-      form.maxItems !== undefined &&
-      form.minItems > form.maxItems) {
+    form.maxItems !== undefined &&
+    form.minItems > form.maxItems) {
     err('numItems', form.minItems, form.maxItems)
   }
   return form
