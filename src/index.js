@@ -1,5 +1,7 @@
-var expanded = require('./expanded')
-var canonical = require('./canonical')
+'use strict'
+
+const expanded = require('./expanded')
+const canonical = require('./canonical')
 
 module.exports = {
   expandedForm: expanded.expandedForm,

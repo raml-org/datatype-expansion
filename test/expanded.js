@@ -1,10 +1,12 @@
+'use strict'
+
 /* global describe, it */
 
-var _ = require('lodash')
-var expect = require('chai').expect
-var types = require('./fixtures/types')
-var forms = require('./fixtures/expanded_forms')
-var expandedForm = require('../src/expanded').expandedForm
+const _ = require('lodash')
+const expect = require('chai').expect
+const types = require('./fixtures/types')
+const forms = require('./fixtures/expanded_forms')
+const expandedForm = require('..').expandedForm
 
 describe('expandedForm()', function () {
   _.each(types, function (type, name) {
