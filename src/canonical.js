@@ -15,11 +15,14 @@ const types = require('./util').types
  * @param cb {Function} callback
  */
 module.exports.canonicalForm = function canonicalForm (expForm, cb) {
+  let result
   try {
-    cb(null, toCanonical(expForm))
+    result = toCanonical(expForm)
   } catch (e) {
     cb(e, null)
+    return
   }
+  cb(null, result)
 }
 
 function toCanonical (form) {

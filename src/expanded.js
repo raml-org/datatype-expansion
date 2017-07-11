@@ -15,11 +15,14 @@ const types = require('./util').types
  * @param cb {Function} Callback
  */
 module.exports.expandedForm = function expandedForm (type, types, cb) {
+  let result
   try {
-    cb(null, expandForm(type, types, []))
+    result = expandForm(type, types, [])
   } catch (e) {
     cb(e, null)
+    return
   }
+  cb(null, result)
 }
 
 /**

@@ -266,6 +266,7 @@ function minType (sup, sub) {
     return consistencyCheck(sub)
   }
 
+  // 8. if `super-type` is `union` and `sub-type` is any other type
   if (superType === 'union' && subType !== 'union') {
     // 8.1. for each value `i` `elem-super` in the property `of` of `super`
     // 8.1.1. we replace `i` in `of` with the output of applying this algorithm to `elem-super` and `sub`
