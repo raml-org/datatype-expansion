@@ -5,6 +5,18 @@ const _ = require('lodash')
 const types = require('./util').types
 const consistencyCheck = require('./util').consistencyCheck
 
+/**
+ * `min-type` computes a canonical RAML type that will compute the biggest intersection
+ * between the sets defined `super` and `sub`. If such an RAML type is empty, an error
+ * will be thrown.
+ */
+
+/**
+ * See `algorithms.md`
+ *
+ * Compute the narrower version of a constraint.
+ * Throw an error if invalid
+ */
 const restrictions = {
   'minProperties': (sup, sub) => {
     if (sup <= sub) {
@@ -79,6 +91,7 @@ const restrictions = {
     throw new Error(`Different values for discriminator-value constraint [${sup} ${sub}]`)
   },
   'enumValues': (sup, sub) => {
+    // if sub is a subset of super
     if (sub.filter(e => sup.indexOf(e) !== -1).length === 0) {
       return sub
     }
@@ -104,15 +117,16 @@ const restrictions = {
   }
 }
 
-// TODO: test
 /**
- * min-type
+ * `min-type` computes a canonical RAML type that will compute the biggest intersection
+ * between the sets defined `super` and `sub`. If such an RAML type is empty, an error
+ * will be thrown.
  *
- * @param sup
- * @param sub
- * @returns {*}
+ * @param sup - the RAML canonical super-type
+ * @param sub - the RAML canonical sub-type
+ * @returns {Object}
  */
-function lt (sup, sub) {
+function minType (sup, sub) {
   // 1. we initialize the variables `super-type` and `sub-type` with the values of the properties `type` of `super` and `sub` respectively.
   const superType = sup.type
   const subType = sub.type
@@ -171,7 +185,7 @@ function lt (sup, sub) {
   if (superType === 'array' && subType === 'array') {
     // 5.1. we initialize the variable `min-items` with the output of applying this algorithm to the values for the key `items` in `super` and `sub`
     // 5.2. we re-assign the value of the property `items` in `sub` with the value of `min-items`
-    sub.items = lt(sup.items, sub.items)
+    sub.items = minType(sup.items, sub.items)
 
     for (let restriction in restrictions) {
       if (sup[restriction] !== undefined && sub[restriction] !== undefined) {
@@ -196,7 +210,7 @@ function lt (sup, sub) {
     superProps.filter(p => p in sub).forEach((p) => {
       // 6.2.1. we initialize the variable `tmp` with the output of applying the algorithm to the value for the common property in `super` and in `sub`
       // 6.2.2. we assign the computed value using the name of the common property as the key in the `common-props` record
-      commonProps[p] = lt(sup.properties[p], sub.properties[p])
+      commonProps[p] = minType(sup.properties[p], sub.properties[p])
     })
 
     // 6.3. for each pair `property-name` `property-value` only in either `super` or `sub` we add it to the record `common-props`
@@ -232,7 +246,7 @@ function lt (sup, sub) {
       // 7.2.1. for each value `elem-sub` in the property `of` of `sub`
       for (let elemSub in sub.anyOf) {
         // 7.2.1.1. we add to `accum` the output of applying this algorithm to `elem-super` and `elem-sub`
-        accum.push(lt(elemSuper, elemSub))
+        accum.push(minType(elemSuper, elemSub))
       }
     }
 
@@ -255,7 +269,7 @@ function lt (sup, sub) {
   if (superType === 'union' && subType !== 'union') {
     // 8.1. for each value `i` `elem-super` in the property `of` of `super`
     // 8.1.1. we replace `i` in `of` with the output of applying this algorithm to `elem-super` and `sub`
-    sup.anyOf = sup.anyOf.map(elem => lt(elem, sub))
+    sup.anyOf = sup.anyOf.map(elem => minType(elem, sub))
 
     for (let restriction in restrictions) {
       if (sup[restriction] !== undefined && sub[restriction] !== undefined) {
@@ -274,4 +288,4 @@ function lt (sup, sub) {
   return sup
 }
 
-module.exports = lt
+module.exports = minType

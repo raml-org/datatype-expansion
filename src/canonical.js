@@ -6,11 +6,14 @@ const minType = require('./minType')
 const consistencyCheck = require('./util').consistencyCheck
 const types = require('./util').types
 
-/*
-  Accepts a JSON in-memory representation of an expanded RAML type and a
-  callback function. Callback function should accept two arguments: error
-  and canonical form object.
-*/
+/**
+ * Accepts a JSON in-memory representation of an expanded RAML type and a
+ * callback function. Callback function should accept two arguments: error
+ * and canonical form object.
+ *
+ * @param expForm {object} the (previously) expanded form
+ * @param cb {Function} callback
+ */
 module.exports.canonicalForm = function canonicalForm (expForm, cb) {
   try {
     cb(null, toCanonical(expForm))
@@ -19,10 +22,6 @@ module.exports.canonicalForm = function canonicalForm (expForm, cb) {
   }
 }
 
-/**
- * @param form - the (previously) expanded form
- * @returns {*}
- */
 function toCanonical (form) {
   form = _.cloneDeep(form) // just to be on the safe side
 
@@ -41,14 +40,14 @@ function toCanonical (form) {
     // 3.2. we initialize the variable `items-type` with the value of the `type` property of the `items` variable
     const itemsType = items.type
     // 3.3. if `items-type` has a value `array`
-    if (itemsType === 'array') { // TODO: double-check
+    if (itemsType === 'array') {
       // 3.3.1. we replace the property `items` in `form` with the value of `items` variable
       node.items = items
       // 3.3.2. we return the output of applying the `consistency-check` algorithm to the new value of `form`
       return consistencyCheck(node)
     }
     // 3.4. if `items-type` has a value `union`
-    if (itemsType === 'union') { // TODO: double-check
+    if (itemsType === 'union') {
       // 3.4.1. for each value `elem` in position `i` of the property `of` in `items-type`
       // 3.4.1.3. we replace the element `i` in the property `of` in `items-type` with the modified value in `union-array`
       items.anyOf = items.anyOf.map((elem) => {

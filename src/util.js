@@ -1,6 +1,6 @@
 'use strict'
 
-// TODO: is this correct?
+// is this correct?
 module.exports.types = [
   'any',
   'boolean',
@@ -16,6 +16,13 @@ module.exports.types = [
   'json'
 ]
 
+/**
+ * Iterates through all the possible restriction constraints defined in the RAML specification and checks that the constraints hold for the provided type using custom logic.
+ * If any of the restrictions involved in the check are not defined, it automatically succeeds.
+ *
+ * @param form - the Form to check
+ * @returns {Object}
+ */
 module.exports.consistencyCheck = function consistencyCheck (form) {
   const err = (name, a, b) => {
     throw new Error(`Consistency check failure for property ${name} and values [${a} ${b}]`)

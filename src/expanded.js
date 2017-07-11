@@ -9,9 +9,10 @@ const types = require('./util').types
  * and a callback function. If the invocation succeeds, it will return the
  * expanded form as an argument to the provided callback function.
  *
- * @param {(object|String)} type
- * @param {Array} types
- * @param {function} cb
+ * @param type {(Object|String)} The form being expanded
+ * @param types {Array} A `Record` from `String` into `RAMLForm` holding a mapping from
+ *                      user defined RAML type names to RAML type forms.
+ * @param cb {Function} Callback
  */
 module.exports.expandedForm = function expandedForm (type, types, cb) {
   try {
@@ -21,10 +22,7 @@ module.exports.expandedForm = function expandedForm (type, types, cb) {
   }
 }
 
-// TODO: topLevel
 /**
- * https://raw.githubusercontent.com/raml-org/raml-parser-toolbelt/master/tools/datatype-expansion/doc/algorithms.md
- *
  * @param form {*} The form being expanded
  * @param bindings {Array} A `Record` from `String` into `RAMLForm` holding a mapping from user
  *                   defined RAML type names to RAML type forms.
@@ -36,7 +34,6 @@ module.exports.expandedForm = function expandedForm (type, types, cb) {
  */
 function expandForm (form, bindings, context, topLevel) {
   topLevel = topLevel || 'any'
-  // console.log({form, context})
   form = _.cloneDeep(form)
 
   // 1. if `form` is a `String
@@ -68,7 +65,8 @@ function expandForm (form, bindings, context, topLevel) {
       // 1.3.2. If the type has been traversed
       if (context.indexOf(form) !== -1) {
         // 1.3.2.1. We mark the value for the current form as a fixpoint recursion: `$recur`
-        // 1.3.2.2. We find the container form matching the recursion type and we wrap it into a `(fixpoint RAMLForm)` form. TODO?
+        // 1.3.2.2. We find the container form matching the recursion type and we wrap it into a `(fixpoint RAMLForm)` form.
+        // not sure what that means
         return {type: '$recur'}
       } else {
         // 1.3.1. If the type hasn't been traversed yet, we return the output of invoking
@@ -79,7 +77,6 @@ function expandForm (form, bindings, context, topLevel) {
     }
 
     // 1.4. else we return an error
-    // TODO: not tested
     throw new Error('could not resolve: ' + form)
   } else if (typeof form === 'object') {
     // 2. if `form` is a `Record`
@@ -89,7 +86,6 @@ function expandForm (form, bindings, context, topLevel) {
     // 2.1.3. if `form` has a `items` key defined, we initialize `type` with the value `object`
     // 2.1.4. otherwise we initialise `type` with the value passed in `top-level-type`
     form.type = form.type || (form.properties && 'object') || (form.items && 'array') || topLevel
-    // TODO: `Seq[RAMLForm]`
 
     // 2.2. if `type` is a `String` with  value `array`
     if (form.type === 'array') {
@@ -99,10 +95,8 @@ function expandForm (form, bindings, context, topLevel) {
       return expandObject(form, bindings, context)
     } else if (form.type === 'union') {
       // 2.4. if `type` is a `String` with value `union`
-      // TODO: not tested
       return expandUnion(form, bindings, context)
     } else if (form.type in bindings) {
-      // TODO: ?
       form = expandObject(form, bindings, context.concat([form.type]))
       form.type = expandForm(form.type, bindings, context)
       return form
@@ -113,14 +107,12 @@ function expandForm (form, bindings, context, topLevel) {
       form.type = expandForm(form.type, bindings, context)
       return form
     } else {
-      // weird stuff
       form = Object.assign(form, expandForm(form.type, bindings, context))
     }
 
     return form
   }
 
-  // TODO: not tested
   throw new Error('form can only be a string or an object')
 }
 
@@ -130,13 +122,11 @@ function expandArray (form, bindings, context) {
 }
 
 function expandObject (form, bindings, context) {
-  // console.log('objform', form)
   const props = form.properties
   for (let propName in props) {
     if (!props.hasOwnProperty(propName)) continue
 
     let expandedPropVal = expandForm(props[propName], bindings, context)
-    // TODO: not tested
     if (propName.endsWith('?')) {
       delete props[propName]
       propName = propName.slice(0, -1)
@@ -152,7 +142,6 @@ function expandObject (form, bindings, context) {
   return form
 }
 
-// TODO: not tested
 function expandUnion (form, bindings, context) {
   form.anyOf = form.anyOf.map(elem => expandForm(elem, bindings, context))
   return form
