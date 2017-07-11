@@ -2,6 +2,10 @@
 
 const _ = require('lodash')
 
+const minType = require('./minType')
+const consistencyCheck = require('./util').consistencyCheck
+const types = require('./util').types
+
 /*
   Accepts a JSON in-memory representation of an expanded RAML type and a
   callback function. Callback function should accept two arguments: error
@@ -14,22 +18,6 @@ module.exports.canonicalForm = function canonicalForm (expForm, cb) {
     cb(e, null)
   }
 }
-
-// TODO: is this really correct?
-const types = [
-  'any',
-  'boolean',
-  'datetime',
-  'datetime-only',
-  'time-only',
-  'number',
-  'integer',
-  'string',
-  'nil',
-  'file',
-  'xml',
-  'json'
-]
 
 /**
  * @param form - the (previously) expanded form
@@ -129,38 +117,38 @@ function toCanonical (form) {
       return consistencyCheck(form)
     }
   } else if (typeof type === 'object') {
-    // 5. & 6. ?
-    // TODO: not correct/complete
+    // 5. & 6.
+    // 1. we initialize the variable `super-type-name` to the first value of type string in the chain of nested records for the value `type` starting with the one assigned to `type` in `form`
     const superTypeName = findClass(form)
+    let subType = _.cloneDeep(form)
+    subType.type = superTypeName
+
+    switch (superTypeName) {
+      case 'object':
+        // 1.2. if `super-type-name` has a value `object` we transform `form` adding the property `properties` with the empty record `(Record)`
+        subType.properties = subType.properties || {}
+        break
+      case 'array':
+        // 1.1. if `super-type-name` has a value `array` we transform `form` adding the property `items` pointing a record `(Record "type" "any")`
+        subType.items = subType.items || {type: 'any'}
+        break
+      case 'union':
+        // 1.3. if `super-type-name` has a value `union` we transform `form` adding the property `of` with the empty sequence `(Seq)`
+        subType.anyOf = subType.anyOf || []
+        break
+    }
+
     if (Array.isArray(type)) {
-      // TODO
+      const superTypes = _.cloneDeep(type)
+      subType = superTypes.reduce((acc, val) => minType(val, acc), subType)
+      return consistencyCheck(subType)
     } else {
-      const superType = toCanonical(type)
-      let subType = _.cloneDeep(form)
-      subType.type = superTypeName
-      switch (superTypeName) {
-        case 'object':
-          subType.properties = subType.properties || {}
-          break
-        case 'array':
-          subType.items = subType.items || {
-            type: 'any'
-          }
-          break
-        case 'union':
-          subType.anyOf = subType.anyOf || []
-          break
-      }
-      subType = toCanonical(subType)
-      return consistencyCheck(lt(superType, subType))
+      const superType = _.cloneDeep(form.type)
+      return consistencyCheck(minType(superType, subType))
     }
   }
 
   return form
-}
-
-function lt (superForm, sub) {
-  return superForm
 }
 
 function findClass (form) {
@@ -184,31 +172,4 @@ function findClass (form) {
     }
   }
   throw new Error('Cannot find top level class for node, not in expanded form')
-}
-
-function consistencyCheck (form) {
-  const err = (name, a, b) => {
-    throw new Error(`Consistency check failure for property ${name} and values [${a} ${b}]`)
-  }
-  if (form.minProperties !== undefined &&
-    form.maxProperties !== undefined &&
-    form.minProperties > form.maxProperties) {
-    err('numProperties', form.minProperties, form.maxProperties)
-  }
-  if (form.minLength !== undefined &&
-    form.maxLength !== undefined &&
-    form.minLength > form.maxLength) {
-    err('length', form.minLength, form.maxLength)
-  }
-  if (form.minimum !== undefined &&
-    form.maximum !== undefined &&
-    form.minimum > form.maximum) {
-    err('size', form.minimum, form.maximum)
-  }
-  if (form.minItems !== undefined &&
-    form.maxItems !== undefined &&
-    form.minItems > form.maxItems) {
-    err('numItems', form.minItems, form.maxItems)
-  }
-  return form
 }

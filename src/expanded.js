@@ -2,6 +2,8 @@
 
 const _ = require('lodash')
 
+const types = require('./util').types
+
 /**
  * Accepts an in-memory JSON representation of the type, the types mapping
  * and a callback function. If the invocation succeeds, it will return the
@@ -19,19 +21,6 @@ module.exports.expandedForm = function expandedForm (type, types, cb) {
   }
 }
 
-const types = [
-  'string',
-  'number',
-  'integer',
-  'boolean',
-  'date-only',
-  'time-only',
-  'datetime-only',
-  'datetime',
-  'file',
-  'nil'
-]
-
 // TODO: topLevel
 /**
  * https://raw.githubusercontent.com/raml-org/raml-parser-toolbelt/master/tools/datatype-expansion/doc/algorithms.md
@@ -40,7 +29,7 @@ const types = [
  * @param bindings {Array} A `Record` from `String` into `RAMLForm` holding a mapping from user
  *                   defined RAML type names to RAML type forms.
  * @param context {Array} Context of already 'visited' types
- * @param topLevel {String} [topLevel=any] a `String` with the default RAML type whose base type is not
+ * @param topLevel {String=} a `String` with the default RAML type whose base type is not
  *                   explicit and cannot be inferred, it can be `any` or `string`
  *                   depending if the the type comes from the `body` of RAML service
  * @returns {object} - expanded form
@@ -79,7 +68,7 @@ function expandForm (form, bindings, context, topLevel) {
       // 1.3.2. If the type has been traversed
       if (context.indexOf(form) !== -1) {
         // 1.3.2.1. We mark the value for the current form as a fixpoint recursion: `$recur`
-        // 1.3.2.2. We find the container form matching the recursion type and we wrap it into a `(fixpoint RAMLForm)` form. TODO: ??
+        // 1.3.2.2. We find the container form matching the recursion type and we wrap it into a `(fixpoint RAMLForm)` form. TODO?
         return {type: '$recur'}
       } else {
         // 1.3.1. If the type hasn't been traversed yet, we return the output of invoking
@@ -163,8 +152,8 @@ function expandObject (form, bindings, context) {
   return form
 }
 
-// TODO
+// TODO: not tested
 function expandUnion (form, bindings, context) {
-  // TODO: not tested
+  form.anyOf = form.anyOf.map(elem => expandForm(elem, bindings, context))
   return form
 }
