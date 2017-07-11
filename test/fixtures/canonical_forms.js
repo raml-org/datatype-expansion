@@ -218,6 +218,6 @@ module.exports = {
         required: true
       }
     }
-  }
+  },
   ValidConstraintsInheritance: null
 }

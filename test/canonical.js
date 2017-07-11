@@ -13,7 +13,7 @@ describe('canonicalForm()', function () {
   _.each(types, function (type, name) {
     // These two types give error in cljs library
     if (name === 'WithInheritance' || name === 'ValidConstraintsInheritance') {
-        return
+      return
     }
     it('should generate canonical form of type ' + name, function () {
       expandedForm(types[name], types, function (err, expForm) {

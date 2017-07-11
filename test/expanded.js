@@ -10,10 +10,6 @@ const expandedForm = require('..').expandedForm
 
 describe('expandedForm()', function () {
   _.each(types, function (type, name) {
-    // These two types give error in cljs library
-    if (name === 'WithInheritance' || name === 'ValidConstraintsInheritance') {
-        return
-    }
     it('should generate expanded form of type ' + name, function () {
       expandedForm(types[name], types, function (err, expForm) {
         expect(err).to.equal(null)
