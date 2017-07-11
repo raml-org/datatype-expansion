@@ -1,3 +1,5 @@
+'use strict'
+
 const _ = require('lodash')
 
 const types = require('./util').types

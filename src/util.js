@@ -1,3 +1,5 @@
+'use strict'
+
 // TODO: is this correct?
 module.exports.types = [
   'any',
