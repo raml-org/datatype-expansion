@@ -7,7 +7,7 @@
   as of commit eaf25cccd7991fe8d6f700aa615bdfbe91a6ced2
 */
 
-module.exports.types = {
+module.exports = {
   Song: {
     properties: {
       title: {
