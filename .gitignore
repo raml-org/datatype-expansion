@@ -57,5 +57,9 @@ typings/
 # dotenv environment variables file
 .env
 
+# browser build
 datatype-expansion.js
+
+# ide
 .idea
+.vscode
