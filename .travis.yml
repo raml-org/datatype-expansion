@@ -4,3 +4,7 @@ node_js:
   - "4"
   - "6"
   - "8"
+install:
+  - npm install -g codecov
+after_script:
+  - codecov
