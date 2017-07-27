@@ -15,9 +15,11 @@ const types = require('./util').types
  * @param cb {Function} Callback
  */
 module.exports.expandedForm = function expandedForm (type, types, cb) {
+  const keys = Object.keys(types)
+  const typename = keys[keys.map(t => types[t]).indexOf(type)]
   let result
   try {
-    result = expandForm(type, types, [])
+    result = expandForm(type, types, typename ? [typename] : [])
   } catch (e) {
     cb(e, null)
     return
@@ -39,8 +41,16 @@ function expandForm (form, bindings, context, topLevel) {
   topLevel = topLevel || 'any'
   form = _.cloneDeep(form)
 
+  if (form === null) {
+    form = 'any'
+  }
+
   // 1. if `form` is a `String
   if (typeof form === 'string') {
+    if (/^\(.+\)$/.test(form)) {
+      form = form.match(/^\((.+)\)$/)[1]
+    }
+
     // 1.1. if `form` is a RAML built-in data type, we return `(Record "type" form)`
     if (types.indexOf(form) !== -1) {
       return {type: form}
@@ -56,6 +66,15 @@ function expandForm (form, bindings, context, topLevel) {
         }
       }
     }
+
+    if (form.endsWith('[]')) { // Array
+      const match = form.match(/^(.+)\[]$/)[1]
+      return {
+        type: 'array',
+        items: expandForm(match, bindings, context)
+      }
+    }
+
     // 1.2. if `form` is a Type Expression, we return the output of calling the algorithm
     // recursively with the parsed type expression and the provided `bindings`
     if (/^[^\s|]*(?:\s*\|\s*[^\s|]*)+$/.test(form)) { // union
@@ -63,14 +82,6 @@ function expandForm (form, bindings, context, topLevel) {
       return {
         anyOf: options.map(o => expandForm(o, bindings, context)),
         type: 'union'
-      }
-    }
-
-    if (form.endsWith('[]')) { // Array
-      const match = form.match(/^(.+)\[]$/)[1]
-      return {
-        type: 'array',
-        items: expandForm(match, bindings, context)
       }
     }
 
@@ -113,15 +124,22 @@ function expandForm (form, bindings, context, topLevel) {
     } else if (form.type in bindings) {
       form = expandObject(form, bindings, context.concat([form.type]))
       form.type = expandForm(form.type, bindings, context)
-      return form
+    } else if (Array.isArray(form.type)) {
+      form.type = form.type.map(t => expandForm(t, bindings, context))
+      if (form.properties !== undefined) form = expandObject(form, bindings, context)
     } else if (typeof form.type === 'object') {
       // 2.5. if `type` is a `Record`
       // 2.5.1. we return the output of invoking the algorithm on the value of `type` with the current value for `bindings`
       if (form.properties !== undefined) form = expandObject(form, bindings, context)
       form.type = expandForm(form.type, bindings, context)
-      return form
     } else {
       form = Object.assign(form, expandForm(form.type, bindings, context))
+    }
+
+    if (form.facets != null) {
+      _.each(form.facets, (propValue, propName) => {
+        form.facets[propName] = expandForm(propValue, bindings, context)
+      })
     }
 
     return form

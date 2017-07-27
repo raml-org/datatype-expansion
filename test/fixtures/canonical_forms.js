@@ -407,5 +407,429 @@ module.exports = {
       }
     },
     additionalProperties: true
+  },
+  'Songs.Song': {
+    properties: {
+      title: {
+        type: 'string',
+        required: true
+      },
+      length: {
+        type: 'number',
+        required: true
+      }
+    },
+    type: 'object',
+    additionalProperties: true
+  },
+  'Songs.Album': {
+    properties: {
+      title: {
+        type: 'string',
+        required: true
+      },
+      songs: {
+        type: 'array',
+        items: {
+          properties: {
+            title: {
+              type: 'string',
+              required: true
+            },
+            length: {
+              type: 'number',
+              required: true
+            }
+          },
+          type: 'object',
+          additionalProperties: true
+        },
+        required: true
+      }
+    },
+    type: 'object',
+    additionalProperties: true
+  },
+  'Songs.LP': {
+    type: 'object',
+    properties: {
+      title: {
+        type: 'string',
+        required: true
+      },
+      length: {
+        type: 'number',
+        required: true
+      },
+      duration: {
+        type: 'string',
+        required: true
+      }
+    },
+    additionalProperties: true
+  },
+  'Songs.Publication': {
+    type: 'object',
+    properties: {
+      other: {
+        type: 'integer',
+        required: true
+      },
+      title: {
+        type: 'string',
+        required: true
+      },
+      length: {
+        type: 'number',
+        required: true
+      },
+      duration: {
+        type: 'string',
+        required: true
+      },
+      songs: {
+        type: 'array',
+        items: {
+          properties: {
+            title: {
+              type: 'string',
+              required: true
+            },
+            length: {
+              type: 'number',
+              required: true
+            }
+          },
+          type: 'object',
+          additionalProperties: true
+        },
+        required: true
+      },
+      date: {
+        type: 'string',
+        required: true
+      }
+    },
+    additionalProperties: true
+  },
+  'Songs.Musician': {
+    type: 'union',
+    additionalProperties: true,
+    anyOf: [
+      {
+        properties: {
+          name: {
+            type: 'string',
+            required: true
+          },
+          discography: {
+            type: 'array',
+            items: {
+              properties: {
+                title: {
+                  type: 'string',
+                  required: true
+                },
+                length: {
+                  type: 'number',
+                  required: true
+                }
+              },
+              type: 'object',
+              additionalProperties: true
+            },
+            required: true
+          }
+        },
+        type: 'object',
+        additionalProperties: true
+      },
+      {
+        properties: {
+          name: {
+            type: 'string',
+            required: true
+          },
+          discography: {
+            type: 'array',
+            items: {
+              properties: {
+                title: {
+                  type: 'string',
+                  required: true
+                },
+                songs: {
+                  type: 'array',
+                  items: {
+                    properties: {
+                      title: {
+                        type: 'string',
+                        required: true
+                      },
+                      length: {
+                        type: 'number',
+                        required: true
+                      }
+                    },
+                    type: 'object',
+                    additionalProperties: true
+                  },
+                  required: true
+                }
+              },
+              type: 'object',
+              additionalProperties: true
+            },
+            required: true
+          }
+        },
+        type: 'object',
+        additionalProperties: true
+      }
+    ]
+  },
+  'Songs.C': {
+    type: 'object',
+    properties: {
+      other: {
+        type: 'integer',
+        required: true
+      }
+    },
+    additionalProperties: true
+  },
+  'Songs.Constrained': {
+    type: 'array',
+    items: {
+      type: 'string'
+    },
+    minItems: 10
+  },
+  'Songs.ExemplarSong': {
+    properties: {
+      title: {
+        type: 'string',
+        example: 'Great',
+        required: true
+      },
+      length: {
+        type: 'string',
+        required: true
+      }
+    },
+    type: 'object',
+    additionalProperties: true
+  },
+  'Songs.ExemplarAlbum': {
+    properties: {
+      title: {
+        type: 'string',
+        required: true
+      },
+      songs: {
+        type: 'array',
+        items: {
+          properties: {
+            title: {
+              type: 'string',
+              example: 'Great',
+              required: true
+            },
+            length: {
+              type: 'string',
+              required: true
+            }
+          },
+          type: 'object',
+          additionalProperties: true
+        },
+        required: true
+      }
+    },
+    examples: {
+      Album1: {
+        title: 'Test 1',
+        songs: [
+          {
+            title: 'Great',
+            length: '2'
+          }
+        ]
+      }
+    },
+    type: 'object',
+    additionalProperties: true
+  },
+  'Songs.Cell': {
+    type: 'union',
+    additionalProperties: true,
+    anyOf: [
+      {
+        properties: {
+          car: {
+            type: 'any',
+            required: true
+          },
+          cdr: {
+            properties: {
+              cell: {
+                type: '$recur',
+                required: true
+              }
+            },
+            type: 'object',
+            additionalProperties: true,
+            required: true
+          }
+        },
+        type: 'object',
+        additionalProperties: true
+      },
+      {
+        properties: {
+          car: {
+            type: 'any',
+            required: true
+          },
+          cdr: {
+            type: 'nil',
+            required: true
+          }
+        },
+        type: 'object',
+        additionalProperties: true
+      }
+    ]
+  },
+  'Songs.List': {
+    type: 'union',
+    additionalProperties: true,
+    anyOf: [
+      {
+        properties: {
+          cell: {
+            properties: {
+              car: {
+                type: 'any',
+                required: true
+              },
+              cdr: {
+                type: '$recur',
+                required: true
+              }
+            },
+            type: 'object',
+            additionalProperties: true,
+            required: true
+          }
+        },
+        type: 'object',
+        additionalProperties: true
+      },
+      {
+        properties: {
+          cell: {
+            properties: {
+              car: {
+                type: 'any',
+                required: true
+              },
+              cdr: {
+                type: 'nil',
+                required: true
+              }
+            },
+            type: 'object',
+            additionalProperties: true,
+            required: true
+          }
+        },
+        type: 'object',
+        additionalProperties: true
+      }
+    ]
+  },
+  missingFacets: {
+    type: 'object',
+    additionalProperties: true,
+    properties: {
+      name: {
+        description: 'Cat name',
+        displayName: 'name',
+        type: 'string',
+        facets: {
+          amazing: {
+            type: 'boolean'
+          }
+        },
+        required: true,
+        amazing: true
+      }
+    }
+  },
+  defaultPropertyType: {
+    properties: {
+      city: {
+        type: 'any',
+        required: true
+      }
+    },
+    type: 'object',
+    additionalProperties: true
+  },
+  atomic: {
+    type: 'string'
+  },
+  constraints: {
+    type: 'array',
+    minItems: 15,
+    maxItems: 20,
+    items: {
+      type: 'string'
+    }
+  },
+  Cat: {
+    type: 'union',
+    additionalProperties: true,
+    anyOf: [
+      {
+        type: 'object',
+        properties: {
+          address: {
+            type: 'string',
+            required: true
+          },
+          age: {
+            type: 'integer',
+            required: true
+          }
+        },
+        additionalProperties: true
+      },
+      {
+        type: 'object',
+        properties: {
+          address: {
+            type: 'string',
+            required: true
+          },
+          age: {
+            type: 'number',
+            required: true
+          }
+        },
+        additionalProperties: true
+      }
+    ]
+  },
+  AnimalWithAddress: {
+    properties: {
+      address: {
+        type: 'string',
+        required: true
+      }
+    },
+    type: 'object',
+    additionalProperties: true
   }
 }

@@ -273,5 +273,103 @@ module.exports = {
       'address?': 'string',
       'value?': 'string'
     }
+  },
+  'Songs.Song': {
+    properties: {
+      title: 'string',
+      length: 'number'
+    }
+  },
+  'Songs.Album': {
+    properties: {
+      title: 'string',
+      songs: 'Songs.Song[]'
+    }
+  },
+  'Songs.LP': {
+    type: 'Songs.Song',
+    properties: {duration: 'string'}
+  },
+  'Songs.Publication': {
+    type: ['Songs.Album', 'Songs.LP', 'Songs.C'],
+    properties: {date: 'string'}
+  },
+  'Songs.Musician': {
+    properties: {
+      name: 'string',
+      discography: '(Songs.Song | Songs.Album)[]'
+    }
+  },
+  'Songs.C': {type: 'object', properties: {other: 'integer'}},
+  'Songs.Constrained': {type: 'array', items: 'string', minItems: 10},
+  'Songs.ExemplarSong': {
+    properties: {
+      title: {
+        type: 'string',
+        example: 'Great'
+      },
+      length: 'string'
+    }
+  },
+  'Songs.ExemplarAlbum': {
+    properties: {
+      title: 'string',
+      songs: 'Songs.ExemplarSong[]'
+    },
+    examples: {
+      Album1: {
+        title: 'Test 1',
+        songs: [
+          {
+            title: 'Great',
+            length: '2'
+          }
+        ]
+      }
+    }
+  },
+  'Songs.Cell': {properties: {car: 'any', cdr: 'Songs.List | nil'}},
+  'Songs.List': {properties: {cell: 'Songs.Cell'}},
+  missingFacets: {
+    type: 'object',
+    properties: {
+      name: {
+        description: 'Cat name',
+        displayName: 'name',
+        type: 'string',
+        facets: {amazing: 'boolean'},
+        amazing: true
+      }
+    }
+  },
+  defaultPropertyType: {
+    properties: {
+      city: null
+    }
+  },
+  atomic: {
+    type: 'string'
+  },
+  constraints: {
+    type: {
+      type: 'array',
+      items: 'string',
+      minItems: 10
+    },
+    minItems: 15,
+    maxItems: 20
+  },
+  Cat: {
+    type: 'AnimalWithAddress',
+    properties: {
+      age: {
+        type: 'integer | number'
+      }
+    }
+  },
+  AnimalWithAddress: {
+    properties: {
+      address: 'string'
+    }
   }
 }

@@ -61,6 +61,7 @@ function toCanonical (form) {
         // 3.4.1.4. we return the output of applying the `consistency-check` algorithm to `items-type`
         return unionArray
       })
+      items.required = form.required
       return items
     }
   } else if (type === 'object') {
@@ -141,12 +142,13 @@ function toCanonical (form) {
     }
 
     if (Array.isArray(type)) {
-      const superTypes = _.cloneDeep(type)
+      const superTypes = _.cloneDeep(type).map(t => toCanonical(t))
       subType = superTypes.reduce((acc, val) => minType(val, acc), subType)
       return consistencyCheck(subType)
     } else {
       const superType = _.cloneDeep(form.type)
-      return consistencyCheck(minType(superType, subType))
+      const res = consistencyCheck(minType(superType, subType))
+      return toCanonical(res)
     }
   }
 
