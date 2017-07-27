@@ -254,7 +254,8 @@
     (assoc merged :anyOf of-merged)))
 
 (defmethod lt :default [super sub]
-  (throw (Exception. (str "Invalid inheriance " (:type super) " -> " (:type sub)))))
+  (let [msg (str "Invalid inheriance " (:type super) " -> " (:type sub))]
+    (throw #?(:clj (Exception. msg) :cljs (js/Error msg)))))
 
 (defn dispatch-node [input]
   (let [{:keys [type]} input]
