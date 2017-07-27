@@ -35,11 +35,8 @@
                                  :compiler {:main datatype-expansion.js
                                             :output-dir "browser"
                                             :output-to "browser/index.js"
-                                            :optimizations :none,
-                                            :source-map true,
-                                            :source-map-timestamp true,
-                                            :recompile-dependents false,
-                                            :pretty-print true}}
+                                            :optimizations :advanced,
+                                            :recompile-dependents true}}
                        :test    {:source-paths ["src/clj" "test/clj"]
                                  :compiler {:output-to "resources/js/main-test.js"
                                             :main datatype-expansion.runner
