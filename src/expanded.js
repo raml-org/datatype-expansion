@@ -45,9 +45,20 @@ function expandForm (form, bindings, context, topLevel) {
     if (types.indexOf(form) !== -1) {
       return {type: form}
     }
+    if (form.endsWith('?')) {
+      if (types.indexOf(form.replace('?', '')) !== -1) {
+        return {
+          type: 'union',
+          anyOf: [
+            {type: form.replace('?', '')},
+            {type: 'nil'}
+          ]
+        }
+      }
+    }
     // 1.2. if `form` is a Type Expression, we return the output of calling the algorithm
     // recursively with the parsed type expression and the provided `bindings`
-    if (/^[\w\d]*\s*(?:\|\s*[\w\d]*)+$/.test(form)) { // union
+    if (/^[^\s|]*(?:\s*\|\s*[^\s|]*)+$/.test(form)) { // union
       const options = form.split('|').map(s => s.trim())
       return {
         anyOf: options.map(o => expandForm(o, bindings, context)),
@@ -133,6 +144,7 @@ function expandObject (form, bindings, context) {
     if (propName.endsWith('?')) {
       delete props[propName]
       propName = propName.slice(0, -1)
+      expandedPropVal.required = false
     }
     if (expandedPropVal.required === undefined) {
       expandedPropVal.required = true

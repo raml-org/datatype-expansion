@@ -96,7 +96,7 @@ module.exports = {
       phone: 'Phone',
       device: 'Device'
     },
-    'example': '{\n  "manufacturer": "John",\n  "numberOfSIMCards": 1234,\n  "kind": "Stamp Collecting",\n  "phone": {\n    "manufacturer": "John",\n    "numberOfSIMCards": 1234,\n    "kind": "Stamp Collecting"\n  },\n  "device": {\n    "manufacturer": "John",\n    "numberOfSIMCards": 1234,\n    "kind": "Stamp Collecting"\n  }\n}\n'
+    example: '{\n  "manufacturer": "John",\n  "numberOfSIMCards": 1234,\n  "kind": "Stamp Collecting",\n  "phone": {\n    "manufacturer": "John",\n    "numberOfSIMCards": 1234,\n    "kind": "Stamp Collecting"\n  },\n  "device": {\n    "manufacturer": "John",\n    "numberOfSIMCards": 1234,\n    "kind": "Stamp Collecting"\n  }\n}\n'
   },
   InlinedDeclaration: {
     type: {
@@ -184,6 +184,94 @@ module.exports = {
           maxProperties: 10
         }
       }
+    }
+  },
+  DataEntry: {
+    description: 'A single data entry(row) with any number of field-name, field-value pairs',
+    type: 'object',
+    properties: {
+      '//': {
+        type: 'Integer | Float | Location | Timestamp | String'
+      }
+    },
+    example: '{\n "temp": 20.5,\n "time": 12565\n}\n'
+  },
+  Integer: {
+    description: '8-byte signed integer',
+    type: 'integer',
+    format: 'int64'
+  },
+  Float: {
+    description: '8-byte double precision floating-point',
+    type: 'number',
+    format: 'double'
+  },
+  Location: {
+    description: 'Signed degrees format Signed degrees format (DDD.dddd)\nA latitude or longitude with 8 decimal places pinpoints a location to within 1 millimeter,( 1/16 inch).\nPrecede South latitudes and West longitudes with a minus sign. Latitudes range from -90 to 90. Longitudes range from -180 to 180.\n41.25,-120.9762 -31.96,115.84 90,0 (North Pole)',
+    type: 'string',
+    pattern: '^[-+]?([1-8]?\\d(\\.\\d+)?|90(\\.0+)?),\\s*[-+]?(180(\\.0+)?|((1[0-7]\\d)|([1-9]?\\d))(\\.\\d+)?)$'
+  },
+  Timestamp: {
+    description: 'UNIX timestamp in milliseconds since 1970. (8 bytes)',
+    type: 'integer',
+    format: 'int64'
+  },
+  String: {
+    description: 'At least one and up to 160 characters',
+    type: 'string',
+    minLength: 1,
+    maxLength: 160
+  },
+  Pet: {
+    properties: {
+      id: {
+        type: 'integer',
+        format: 'int64',
+        required: false
+      },
+      name: {
+        type: 'string',
+        example: 'doggie'
+      },
+      photoUrls: {
+        type: 'array',
+        items: {
+          type: 'string'
+        }
+      },
+      tags: {
+        type: 'array',
+        items: {
+          type: 'Tag'
+        },
+        required: false
+      },
+      status: {
+        type: 'string',
+        description: 'pet status in the store',
+        required: false
+      }
+    }
+  },
+  Tag: {
+    properties: {
+      id: {
+        type: 'integer',
+        format: 'int64',
+        required: false
+      },
+      name: {
+        type: 'string',
+        required: false
+      }
+    }
+  },
+  Org: {
+    type: 'object',
+    properties: {
+      name: 'string',
+      'address?': 'string',
+      'value?': 'string'
     }
   }
 }

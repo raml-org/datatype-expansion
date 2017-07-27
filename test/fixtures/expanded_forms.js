@@ -366,5 +366,154 @@ module.exports = {
       discriminator: 'name'
     },
     minProperties: 2
+  },
+  DataEntry: {
+    description: 'A single data entry(row) with any number of field-name, field-value pairs',
+    type: 'object',
+    properties: {
+      '//': {
+        type: 'union',
+        anyOf: [
+          {
+            description: '8-byte signed integer',
+            type: 'integer',
+            format: 'int64'
+          },
+          {
+            description: '8-byte double precision floating-point',
+            type: 'number',
+            format: 'double'
+          },
+          {
+            description: 'Signed degrees format Signed degrees format (DDD.dddd)\nA latitude or longitude with 8 decimal places pinpoints a location to within 1 millimeter,( 1/16 inch).\nPrecede South latitudes and West longitudes with a minus sign. Latitudes range from -90 to 90. Longitudes range from -180 to 180.\n41.25,-120.9762 -31.96,115.84 90,0 (North Pole)',
+            type: 'string',
+            pattern: '^[-+]?([1-8]?\\d(\\.\\d+)?|90(\\.0+)?),\\s*[-+]?(180(\\.0+)?|((1[0-7]\\d)|([1-9]?\\d))(\\.\\d+)?)$'
+          },
+          {
+            description: 'UNIX timestamp in milliseconds since 1970. (8 bytes)',
+            type: 'integer',
+            format: 'int64'
+          },
+          {
+            description: 'At least one and up to 160 characters',
+            type: 'string',
+            minLength: 1,
+            maxLength: 160
+          }
+        ],
+        required: true
+      }
+    },
+    example: '{\n "temp": 20.5,\n "time": 12565\n}\n',
+    additionalProperties: true
+  },
+  Integer: {
+    description: '8-byte signed integer',
+    type: 'integer',
+    format: 'int64'
+  },
+  Float: {
+    description: '8-byte double precision floating-point',
+    type: 'number',
+    format: 'double'
+  },
+  Location: {
+    description: 'Signed degrees format Signed degrees format (DDD.dddd)\nA latitude or longitude with 8 decimal places pinpoints a location to within 1 millimeter,( 1/16 inch).\nPrecede South latitudes and West longitudes with a minus sign. Latitudes range from -90 to 90. Longitudes range from -180 to 180.\n41.25,-120.9762 -31.96,115.84 90,0 (North Pole)',
+    type: 'string',
+    pattern: '^[-+]?([1-8]?\\d(\\.\\d+)?|90(\\.0+)?),\\s*[-+]?(180(\\.0+)?|((1[0-7]\\d)|([1-9]?\\d))(\\.\\d+)?)$'
+  },
+  Timestamp: {
+    description: 'UNIX timestamp in milliseconds since 1970. (8 bytes)',
+    type: 'integer',
+    format: 'int64'
+  },
+  String: {
+    description: 'At least one and up to 160 characters',
+    type: 'string',
+    minLength: 1,
+    maxLength: 160
+  },
+  Pet: {
+    properties: {
+      id: {
+        type: 'integer',
+        format: 'int64',
+        required: false
+      },
+      name: {
+        type: 'string',
+        example: 'doggie',
+        required: true
+      },
+      photoUrls: {
+        type: 'array',
+        items: {
+          type: 'string'
+        },
+        required: true
+      },
+      tags: {
+        type: 'array',
+        items: {
+          type: {
+            properties: {
+              id: {
+                type: 'integer',
+                format: 'int64',
+                required: false
+              },
+              name: {
+                type: 'string',
+                required: false
+              }
+            },
+            type: 'object',
+            additionalProperties: true
+          },
+          additionalProperties: true
+        },
+        required: false
+      },
+      status: {
+        type: 'string',
+        description: 'pet status in the store',
+        required: false
+      }
+    },
+    type: 'object',
+    additionalProperties: true
+  },
+  Tag: {
+    properties: {
+      id: {
+        type: 'integer',
+        format: 'int64',
+        required: false
+      },
+      name: {
+        type: 'string',
+        required: false
+      }
+    },
+    type: 'object',
+    additionalProperties: true
+  },
+  Org: {
+    type: 'object',
+    properties: {
+      name: {
+        type: 'string',
+        required: true
+      },
+      address: {
+        type: 'string',
+        required: false
+      },
+      value: {
+        type: 'string',
+        required: false
+      }
+    },
+    additionalProperties: true
   }
 }
