@@ -41,8 +41,15 @@ function expandForm (form, bindings, context, topLevel) {
   topLevel = topLevel || 'any'
   form = _.cloneDeep(form)
 
-  if (form === null) {
-    form = 'any'
+  // apparently they want this
+  if (typeof form === 'string') {
+    try {
+      JSON.parse(form)
+      form = {
+        type: 'json',
+        content: form
+      }
+    } catch (e) {}
   }
 
   // 1. if `form` is a `String
@@ -55,6 +62,7 @@ function expandForm (form, bindings, context, topLevel) {
     if (types.indexOf(form) !== -1) {
       return {type: form}
     }
+
     if (form.endsWith('?')) {
       if (types.indexOf(form.replace('?', '')) !== -1) {
         return {
@@ -112,18 +120,22 @@ function expandForm (form, bindings, context, topLevel) {
     // 2.1.4. otherwise we initialise `type` with the value passed in `top-level-type`
     form.type = form.type || (form.properties && 'object') || (form.items && 'array') || topLevel
 
-    // 2.2. if `type` is a `String` with  value `array`
-    if (form.type === 'array') {
-      return expandArray(form, bindings, context)
-    } else if (form.type === 'object') {
-      // 2.3 if `type` is a `String` with value `object`
-      return expandObject(form, bindings, context)
-    } else if (form.type === 'union') {
-      // 2.4. if `type` is a `String` with value `union`
-      return expandUnion(form, bindings, context)
-    } else if (form.type in bindings) {
-      form = expandObject(form, bindings, context.concat([form.type]))
-      form.type = expandForm(form.type, bindings, context)
+    if (typeof form.type === 'string') {
+      if (form.type === 'array') {
+        // 2.2. if `type` is a `String` with  value `array`
+        return expandArray(form, bindings, context)
+      } else if (form.type === 'object') {
+        // 2.3 if `type` is a `String` with value `object`
+        return expandObject(form, bindings, context)
+      } else if (form.type === 'union') {
+        // 2.4. if `type` is a `String` with value `union`
+        return expandUnion(form, bindings, context)
+      } else if (typeof form.type === 'string' && form.type in bindings) {
+        form = expandObject(form, bindings, context.concat([form.type]))
+        form.type = expandForm(form.type, bindings, context)
+      } else {
+        form = Object.assign(form, expandForm(form.type, bindings, context))
+      }
     } else if (Array.isArray(form.type)) {
       form.type = form.type.map(t => expandForm(t, bindings, context))
       if (form.properties !== undefined) form = expandObject(form, bindings, context)
@@ -158,7 +170,7 @@ function expandObject (form, bindings, context) {
   for (let propName in props) {
     if (!props.hasOwnProperty(propName)) continue
 
-    let expandedPropVal = expandForm(props[propName], bindings, context)
+    let expandedPropVal = expandForm(props[propName] || 'any', bindings, context)
     if (propName.endsWith('?')) {
       delete props[propName]
       propName = propName.slice(0, -1)

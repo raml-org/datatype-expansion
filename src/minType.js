@@ -207,7 +207,7 @@ function minType (sup, sub) {
     let superProps = Object.keys(sup.properties)
     let subProps = Object.keys(sub.properties)
     // 6.2. for each key in the `properties` value `sub` that is also present in the `properties` value of `super`
-    superProps.filter(p => p in sub).forEach((p) => {
+    superProps.filter(p => subProps.indexOf(p) !== -1).forEach((p) => {
       // 6.2.1. we initialize the variable `tmp` with the output of applying the algorithm to the value for the common property in `super` and in `sub`
       // 6.2.2. we assign the computed value using the name of the common property as the key in the `common-props` record
       commonProps[p] = minType(sup.properties[p], sub.properties[p])
@@ -286,7 +286,7 @@ function minType (sup, sub) {
     return consistencyCheck(sup)
   }
 
-  return sup
+  throw new Error(`incompatible types: [${subType}, ${superType}]`)
 }
 
 module.exports = minType

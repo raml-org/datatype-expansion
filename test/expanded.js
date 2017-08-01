@@ -1,6 +1,7 @@
 'use strict'
 
-/* global describe, it */
+const describe = require('mocha/lib/mocha.js').describe
+const it = require('mocha/lib/mocha.js').it
 
 const _ = require('lodash')
 const expect = require('chai').expect

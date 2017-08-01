@@ -4,6 +4,7 @@
 module.exports.types = [
   'any',
   'boolean',
+  'date-only',
   'datetime',
   'datetime-only',
   'time-only',
