@@ -469,8 +469,7 @@ module.exports = {
             },
             type: 'object',
             additionalProperties: true
-          },
-          additionalProperties: true
+          }
         },
         required: false
       },

@@ -25,14 +25,14 @@ describe('errors', function () {
   it('incompatible types should throw', function () {
     expandedForm(types['error'], types, function (err, expForm) {
       err = null
-      canonicalForm(expForm, function (err, canForm) {
+      canonicalForm(expForm, function (err) {
         expect(err).to.not.equal(null)
       })
     })
   })
 
   it('null should throw', function () {
-    expandedForm(null, {}, function (err, expForm) {
+    expandedForm(null, {}, function (err) {
       expect(err).to.not.equal(null)
     })
   })

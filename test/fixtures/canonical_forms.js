@@ -347,21 +347,18 @@ module.exports = {
       tags: {
         type: 'array',
         items: {
-          type: {
-            properties: {
-              id: {
-                type: 'integer',
-                format: 'int64',
-                required: false
-              },
-              name: {
-                type: 'string',
-                required: false
-              }
+          properties: {
+            id: {
+              type: 'integer',
+              format: 'int64',
+              required: false
             },
-            type: 'object',
-            additionalProperties: true
+            name: {
+              type: 'string',
+              required: false
+            }
           },
+          type: 'object',
           additionalProperties: true
         },
         required: false

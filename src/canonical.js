@@ -64,6 +64,9 @@ function toCanonical (form) {
       items.required = form.required
       return items
     }
+
+    node.items = items
+    return consistencyCheck(node)
   } else if (type === 'object') {
     // 4. if `type` is the string `object`
     // 4.1. we initialize the variable properties with the value of the `properties` key in `form`
