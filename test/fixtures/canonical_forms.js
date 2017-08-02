@@ -828,5 +828,40 @@ module.exports = {
     },
     type: 'object',
     additionalProperties: true
+  },
+  Entry: {
+    type: 'array',
+    items: {
+      type: 'object',
+      properties: {
+        title: {
+          type: 'string',
+          required: true
+        },
+        artist: {
+          type: 'string',
+          required: true
+        }
+      },
+      additionalProperties: true
+    }
+  },
+  AnotherEntry: {
+    type: 'array',
+    items: {
+      type: 'object',
+      properties: {
+        title: {
+          type: 'string',
+          required: true
+        },
+        artist: {
+          type: 'string',
+          required: true
+        }
+      },
+      additionalProperties: true
+    },
+    description: 'This is just another entry to simulate that you can add facets also on JSON schema defined types. Although you can only add documentation-based facets.'
   }
 }
