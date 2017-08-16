@@ -92,7 +92,7 @@ const restrictions = {
   },
   'enumValues': (sup, sub) => {
     // if sub is a subset of super
-    if (sub.filter(e => sup.indexOf(e) !== -1).length === 0) {
+    if (sub.filter(e => sup.indexOf(e) === -1).length === 0) {
       return sub
     }
     throw new Error('sub type has a weaker constraint for enum-values than base type')
@@ -204,8 +204,8 @@ function minType (sup, sub) {
   if (superType === 'object' && subType === 'object') {
     // 6.1. for initialize the variable `common-props` to the empty record
     const commonProps = {}
-    let superProps = Object.keys(sup.properties)
-    let subProps = Object.keys(sub.properties)
+    let superProps = Object.keys(sup.properties || {})
+    let subProps = Object.keys(sub.properties || {})
     // 6.2. for each key in the `properties` value `sub` that is also present in the `properties` value of `super`
     superProps.filter(p => subProps.indexOf(p) !== -1).forEach((p) => {
       // 6.2.1. we initialize the variable `tmp` with the output of applying the algorithm to the value for the common property in `super` and in `sub`

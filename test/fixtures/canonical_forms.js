@@ -863,5 +863,40 @@ module.exports = {
       additionalProperties: true
     },
     description: 'This is just another entry to simulate that you can add facets also on JSON schema defined types. Although you can only add documentation-based facets.'
+  },
+  MinTypeTest: {
+    type: 'object',
+    properties: {
+      a: {
+        type: 'string',
+        pattern: '^test1*$',
+        enumValues: [
+          'test1'
+        ],
+        required: true
+      },
+      f: {
+        type: 'integer',
+        minimum: 2,
+        maximum: 3,
+        format: 'int64',
+        required: true
+      },
+      k: {
+        type: 'array',
+        items: {
+          type: 'number'
+        },
+        required: true,
+        uniqueItems: true
+      }
+    },
+    minProperties: 2,
+    maxProperties: 3,
+    minLength: 2,
+    maxLength: 3,
+    minItems: 2,
+    maxItems: 3,
+    additionalProperties: true
   }
 }

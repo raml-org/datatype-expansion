@@ -65,13 +65,13 @@ function expandForm (form, bindings, context, topLevel) {
 
     if (form.endsWith('?')) {
       if (types.indexOf(form.replace('?', '')) !== -1) {
-        return {
+        return expandUnion({
           type: 'union',
           anyOf: [
             {type: form.replace('?', '')},
             {type: 'nil'}
           ]
-        }
+        }, bindings, context)
       }
     }
 
@@ -87,10 +87,7 @@ function expandForm (form, bindings, context, topLevel) {
     // recursively with the parsed type expression and the provided `bindings`
     if (/^[^\s|]*(?:\s*\|\s*[^\s|]*)+$/.test(form)) { // union
       const options = form.split('|').map(s => s.trim())
-      return {
-        anyOf: options.map(o => expandForm(o, bindings, context)),
-        type: 'union'
-      }
+      return expandUnion({anyOf: options, type: 'union'}, bindings, context)
     }
 
     // 1.3. if `form` is a key in `bindings`
@@ -143,6 +140,7 @@ function expandForm (form, bindings, context, topLevel) {
       // 2.5. if `type` is a `Record`
       // 2.5.1. we return the output of invoking the algorithm on the value of `type` with the current value for `bindings`
       if (form.properties !== undefined) form = expandObject(form, bindings, context)
+      if (form.anyOf !== undefined) form = expandUnion(form, bindings, context)
       form.type = expandForm(form.type, bindings, context)
     } else {
       form = Object.assign(form, expandForm(form.type, bindings, context))
