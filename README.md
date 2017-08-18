@@ -1,7 +1,11 @@
-# RAML Parsers Toolbelt
+# RAML Data Type Expansion
 
-> This repository contains helpful libraries to work with the RAML parser.
+> Often, tools need the full expansion of RAML data types where there are no references. This module gives you a utility tool to expand a given type and create a canonical form.
 
-## Current supported tools
+## Installation
 
-* RAML data type expansion - a tool that expands a given type removing references, unions, and inheritance; creating a canonical form ([tools/datatype-expansion](tools/datatype-expansion))
+### NPM
+
+```
+npm install datatype-expansion
+```
