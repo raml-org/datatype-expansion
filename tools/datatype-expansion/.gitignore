@@ -1,7 +1,0 @@
-target
-out
-resources
-browser
-.lein*
-
-*.log
