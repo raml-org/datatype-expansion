@@ -1,6 +1,6 @@
 {
   "name": "datatype-expansion",
-  "version": "0.0.1",
+  "version": "0.2.0",
   "description": "Utility tool to expand a given RAML type and create a canonical form",
   "main": "src/index.js",
   "scripts": {
