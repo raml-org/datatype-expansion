@@ -30,6 +30,15 @@ describe('errors', function () {
     } catch (err) {}
   })
 
+  it('callback errors should work', function () {
+    expandedForm(types['error'], types, function (err, expForm) {
+      err = null
+      canonicalForm(expForm, function (err) {
+        expect(err).to.not.equal(null)
+      })
+    })
+  })
+
   it('invalid types should throw', function () {
     try {
       expandedForm('nothing', {})
