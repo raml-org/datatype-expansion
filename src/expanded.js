@@ -17,14 +17,21 @@ const types = require('./util').types
 module.exports.expandedForm = function expandedForm (type, types, cb) {
   const keys = Object.keys(types)
   const typename = keys[keys.map(t => types[t]).indexOf(type)]
-  let result
-  try {
-    result = expandForm(type, types, typename ? [typename] : [])
-  } catch (e) {
-    cb(e, null)
-    return
+
+  if (cb == null) {
+    return expandForm(type, types, typename ? [typename] : [])
   }
-  cb(null, result)
+
+  setTimeout(() => {
+    let result
+    try {
+      result = expandForm(type, types, typename ? [typename] : [])
+    } catch (e) {
+      cb(e, null)
+      return
+    }
+    cb(null, result)
+  }, 0)
 }
 
 /**
