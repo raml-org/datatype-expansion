@@ -1,4 +1,6 @@
 # RAML Data Type Expansion
+[![Build Status](https://travis-ci.org/raml-org/datatype-expansion.svg?branch=master)](https://travis-ci.org/raml-org/datatype-expansion) 
+[![Coverage Status](https://coveralls.io/repos/github/raml-org/datatype-expansion/badge.svg?branch=master)](https://coveralls.io/github/raml-org/datatype-expansion?branch=master)
 
 > Often, tools need the full expansion of RAML data types where there are no references. This module gives you a utility tool to expand a given type and create a canonical form.
 
