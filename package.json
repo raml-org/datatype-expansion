@@ -9,7 +9,7 @@
   "umd:main": "dist/datatype-expansion.umd.js",
   "scripts": {
     "lint": "standard",
-    "test-cov": "istanbul --include-all-sources cover --root src node_modules/mocha/bin/_mocha --report lcovonly -- -R dot --recursive --bail test/",
+    "test-cov": "istanbul --include-all-sources cover -x index.es6.js --root src node_modules/mocha/bin/_mocha --report lcovonly -- -R dot --recursive --bail test/",
     "test-spec": "_mocha -R spec --recursive --bail test/",
     "test": "npm run lint && npm run test-cov",
     "build": "npm-run-all clean -p rollup:*",
