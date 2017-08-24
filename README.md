@@ -191,7 +191,7 @@ tools.expandedForm(typesContext['Songs.Album'], typesContext, function(err, expa
 
 Include it via unpkg ( if you don't use a bundler like webpack )
 ```html
-<script src="https://unpkg.com/datatype-expansion/dist/datatype-expansion.js"></script>
+<script src="https://unpkg.com/datatype-expansion"></script>
 ```
 
 It gets exported as `expansion`
