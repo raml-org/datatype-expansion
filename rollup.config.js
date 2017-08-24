@@ -6,9 +6,9 @@ import nodeResolve from 'rollup-plugin-node-resolve'
 let { FORMAT } = process.env
 
 export default {
-  useStrict: false,
-  sourceMap: true,
-  entry: FORMAT === 'es' ? 'src/index.es6.js' : 'src/index.js',
+  strict: true,
+  sourcemap: true,
+  input: 'src/index.js',
   plugins: [
     nodeResolve({
       jsnext: true,
@@ -16,8 +16,9 @@ export default {
     }),
     commonjs(),
     babel({
+      sourceMap: true,
       exclude: 'node_modules/**'
     }),
-    FORMAT !== 'es' && uglify()
+    uglify()
   ]
 }

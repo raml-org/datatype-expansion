@@ -187,6 +187,18 @@ tools.expandedForm(typesContext['Songs.Album'], typesContext, function(err, expa
 }
 ```
 
+## Browser usage
+
+Include it via unpkg ( if you don't use a bundler like webpack )
+```html
+<script src="https://unpkg.com/datatype-expansion/dist/datatype-expansion.js"></script>
+```
+
+It gets exported as `expansion`
+```js
+expansion.expandedForm('string', {})
+```
+
 ## Running tests
 
 Tests for the library can be run using:
