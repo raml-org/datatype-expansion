@@ -58,7 +58,7 @@ typings/
 .env
 
 # browser build
-datatype-expansion.js
+dist/
 
 # ide
 .idea
