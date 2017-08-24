@@ -3,8 +3,6 @@ import uglify from 'rollup-plugin-uglify'
 import commonjs from 'rollup-plugin-commonjs'
 import nodeResolve from 'rollup-plugin-node-resolve'
 
-let { FORMAT } = process.env
-
 export default {
   strict: true,
   sourcemap: true,
