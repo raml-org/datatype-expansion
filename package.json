@@ -4,11 +4,12 @@
   "description": "Utility tool to expand a given RAML type and create a canonical form",
   "main": "src/index.js",
   "browser": "dist/datatype-expansion.js",
+  "repository": "raml-org/datatype-expansion",
   "scripts": {
     "lint": "standard",
     "test-cov": "istanbul --include-all-sources cover -x index.es6.js --root src node_modules/mocha/bin/_mocha --report lcovonly -- -R dot --recursive --bail test/",
     "test-spec": "_mocha -R spec --recursive --bail test/",
-    "test": "npm run lint && npm run test-cov",
+    "test": "npm-run-all lint test-cov",
     "build": "npm-run-all clean rollup",
     "clean": "rimraf dist && mkdirp dist",
     "rollup": "rollup -c rollup.config.js -f iife -m dist/datatype-expansion.js.map -n expansion -o dist/datatype-expansion.js",
