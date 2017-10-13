@@ -312,8 +312,10 @@ The input of the algorithm is:
 7. if `super-type` is `union` and `sub-type` is `union`
    1. we initialize the variable `accum` to the empty sequence
    2. for each value `elem-super` in the property `of` of `super`
-      1. for each value `elem-sub` in the property `of` of `sub`
-         1. we add to `accum` the output of applying this algorithm to `elem-super` and `elem-sub`
+      1. if `sub.of` is non-empty
+         1. for each value `elem-sub` in the property `of` of `sub`
+            1. we add to `accum` the output of applying this algorithm to `elem-super` and `elem-sub`
+      2. else if `sub.of` is empty, add `elem-super` to `accum`
    3. for each restriction in `super` and `sub` we compute the narrower restriction and we assign it in `sub`
    4. for each restriction only in `super` we assign it directly to `sub`
    5. we assign the value of the key `of` in `sub` to be `accum`
@@ -354,7 +356,7 @@ The other algorithm is `consistency-check`. It just iterates through all the pos
 
 | check name | restrictions | check |
 |------------|------------|-------|
-| num-properites| `minProperties` and `maxProperties` | `minProperties` <= `maxProperties` |
+| num-properties| `minProperties` and `maxProperties` | `minProperties` <= `maxProperties` |
 | length| `minLength` and `maxLength` | `minLength` <= `maxLength` |
 | size| `minimum` and `maximum` | `minimum` <= `maximum` |
 | num-items | `minItems` and `maxItems` | `minItems` <= `maxItems` |
