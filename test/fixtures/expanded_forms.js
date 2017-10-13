@@ -170,6 +170,12 @@ module.exports = {
     ],
     type: 'union'
   },
+  ObjectInTypeArray: {
+    type: [{ type: 'object' }]
+  },
+  ArrayInTypeArray: {
+    type: [{ type: 'array' }]
+  },
   UnionInTypeArray: {
     type: [{
       anyOf: [

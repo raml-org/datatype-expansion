@@ -84,6 +84,12 @@ module.exports = {
   Deprecation: {
     type: 'nil | string'
   },
+  ObjectInTypeArray: {
+    type: ['object']
+  },
+  ArrayInTypeArray: {
+    type: ['array']
+  },
   UnionInTypeArray: {
     type: ['number | string']
   },
