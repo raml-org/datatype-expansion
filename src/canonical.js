@@ -44,7 +44,7 @@ function toCanonical (form) {
   } else if (type === 'array') {
     // 3. if `type` is the string `array`
     // 3.1. we initialize the variable `items` with the output of applying the algorithm to the value of the key `items` of the input `form` of type `Record[String]RAMLForm]`
-    const items = toCanonical(form.items)
+    const items = toCanonical(form.items || {type: 'any'})
     const node = consistencyCheck(form)
     // 3.2. we initialize the variable `items-type` with the value of the `type` property of the `items` variable
     const itemsType = items.type

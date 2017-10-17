@@ -66,7 +66,7 @@ function expandForm (form, bindings, context, topLevel) {
     }
 
     // 1.1. if `form` is a RAML built-in data type, we return `(Record "type" form)`
-    if (types.indexOf(form) !== -1) {
+    if (types.indexOf(form) !== -1 || form === 'object' || form === 'array') {
       return {type: form}
     }
 
@@ -166,7 +166,7 @@ function expandForm (form, bindings, context, topLevel) {
 }
 
 function expandArray (form, bindings, context) {
-  form.items = expandForm(form.items, bindings, context)
+  form.items = expandForm(form.items || 'any', bindings, context)
   return form
 }
 

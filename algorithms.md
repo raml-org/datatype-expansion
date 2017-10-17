@@ -133,7 +133,7 @@ The input for the algorithm is:
       3. if `form` has a `items` key defined, we initialize `type` with the value `object`
       4. otherwise we initialise `type` with the value passed in `top-level-type`
    2. if `type` is a `String` with  value `array`
-      1. we initialize the value `expanded-items` with the result of invoking the algorithm on the value in `form` for the key `items`
+      1. we initialize the value `expanded-items` with the result of invoking the algorithm on the value in `form` for the key `items` (or `any` if the key `items` is not defined)
       2. we replace the value of the key `items` in `form` by `expanded-items`
    3. if `type` is a `String` with value `object`
       1. we iterate over the `Record` associated to the key `properties` in `form`
@@ -213,7 +213,7 @@ The input of the algorithm is:
 2. if `type` is in the set `any boolean datetime datetime-only number integer string null file xml json"`
    1. we return the output of applying the `consistency-check` to the `form`
 3. if `type` is the string `array`
-   1. we initialize the variable `items` with the output of applying the algorithm to the value of the key `items` of the input `form` of type `Record[String]RAMLForm]`
+   1. we initialize the variable `items` with the output of applying the algorithm to the value of the key `items` of the input `form` (or `any` if the key `items` is not defined)
    2. we initialize the variable `items-type` with the value of the `type` property of the `items` variable
    3. if `items-type` has a value `array`
       1. we replace the property `items` in `form` with the value of `items` variable
