@@ -84,6 +84,9 @@ module.exports = {
   Deprecation: {
     type: 'nil | string'
   },
+  UnionInTypeArray: {
+    type: ['number | string']
+  },
   SimpleUnion: {
     properties: {
       a: 'string',

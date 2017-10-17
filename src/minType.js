@@ -243,10 +243,16 @@ function minType (sup, sub) {
     const accum = []
     // 7.2. for each value `elem-super` in the property `of` of `super`
     for (let elemSuper of sup.anyOf) {
-      // 7.2.1. for each value `elem-sub` in the property `of` of `sub`
-      for (let elemSub of sub.anyOf) {
-        // 7.2.1.1. we add to `accum` the output of applying this algorithm to `elem-super` and `elem-sub`
-        accum.push(minType(elemSuper, elemSub))
+      // 7.2.1. if `sub.of` is non-empty
+      if (sub.anyOf.length > 0) {
+        // 7.2.1.1. for each value `elem-sub` in the property `of` of `sub`
+        for (let elemSub of sub.anyOf) {
+          // 7.2.1.1.1. we add to `accum` the output of applying this algorithm to `elem-super` and `elem-sub`
+          accum.push(minType(elemSuper, elemSub))
+        }
+      } else {
+        // 7.2.2. else if `sub.of` is empty, add `elem-super` to `accum`
+        accum.push(elemSuper)
       }
     }
 

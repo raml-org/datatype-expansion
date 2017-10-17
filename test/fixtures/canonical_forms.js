@@ -170,6 +170,13 @@ module.exports = {
     ],
     type: 'union'
   },
+  UnionInTypeArray: {
+    anyOf: [
+      { type: 'number' },
+      { type: 'string' }
+    ],
+    type: 'union'
+  },
   SimpleUnion: {
     additionalProperties: true,
     type: 'union',
