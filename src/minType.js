@@ -204,20 +204,22 @@ function minType (sup, sub) {
   if (superType === 'object' && subType === 'object') {
     // 6.1. for initialize the variable `common-props` to the empty record
     const commonProps = {}
-    let superProps = Object.keys(sup.properties || {})
-    let subProps = Object.keys(sub.properties || {})
+    const superProps = sup.properties || {}
+    const subProps = sub.properties || {}
+    const superPropKeys = Object.keys(superProps)
+    const subPropKeys = Object.keys(subProps)
     // 6.2. for each key in the `properties` value `sub` that is also present in the `properties` value of `super`
-    superProps.filter(p => subProps.indexOf(p) !== -1).forEach((p) => {
+    superPropKeys.filter(p => p in subProps).forEach((p) => {
       // 6.2.1. we initialize the variable `tmp` with the output of applying the algorithm to the value for the common property in `super` and in `sub`
       // 6.2.2. we assign the computed value using the name of the common property as the key in the `common-props` record
       commonProps[p] = minType(sup.properties[p], sub.properties[p])
     })
 
     // 6.3. for each pair `property-name` `property-value` only in either `super` or `sub` we add it to the record `common-props`
-    superProps.filter(p => !(p in sub)).forEach((p) => {
+    superPropKeys.filter(p => !(p in subProps)).forEach((p) => {
       commonProps[p] = sup.properties[p]
     })
-    subProps.filter(p => !(p in sub)).forEach((p) => {
+    subPropKeys.filter(p => !(p in superProps)).forEach((p) => {
       commonProps[p] = sub.properties[p]
     })
 

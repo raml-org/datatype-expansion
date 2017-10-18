@@ -1054,5 +1054,35 @@ module.exports = {
     minItems: 2,
     maxItems: 3,
     additionalProperties: true
+  },
+  Named: {
+    type: 'object',
+    properties: {
+      name: {
+        type: 'string',
+        required: true
+      }
+    },
+    additionalProperties: true
+  },
+  InheritNamedWithNameAttribute: {
+    name: 'InheritNamedWithNameAttribute',
+    type: {
+      type: 'object',
+      properties: {
+        name: {
+          type: 'string',
+          required: true
+        }
+      },
+      additionalProperties: true
+    },
+    properties: {
+      other: {
+        type: 'string',
+        required: true
+      }
+    },
+    additionalProperties: true
   }
 }

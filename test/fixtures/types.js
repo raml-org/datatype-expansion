@@ -448,5 +448,17 @@ module.exports = {
     maxLength: 3,
     minItems: 2,
     maxItems: 3
+  },
+  Named: {
+    properties: {
+      name: 'string'
+    }
+  },
+  InheritNamedWithNameAttribute: {
+    name: 'InheritNamedWithNameAttribute',
+    type: 'Named',
+    properties: {
+      other: 'string'
+    }
   }
 }
