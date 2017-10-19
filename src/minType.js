@@ -1,7 +1,5 @@
 'use strict'
 
-const _ = require('lodash')
-
 const isOpaqueType = require('./util').isOpaqueType
 const consistencyCheck = require('./util').consistencyCheck
 
@@ -133,7 +131,7 @@ function minType (sup, sub) {
   // 2. if `super-type` and `sub-type` have the same value and the value is in the set `any boolean datetime datetime-only number integer string null file xml json"`
   if (superType === subType && isOpaqueType(superType)) {
     // 2.1. we initialize the variable `computed` to the record with property `type` having the common `super-type` and `sub-type` value
-    const computed = _.cloneDeep(sup)
+    const computed = Object.assign({}, sup, sub)
     for (let restriction in restrictions) {
       if (sup[restriction] !== undefined && sub[restriction] !== undefined) {
         // 2.2. for each restriction in `super` and `sub` we compute the narrower restriction and we assign it in `computed`
@@ -151,57 +149,61 @@ function minType (sup, sub) {
   if (superType === 'any' ? subType !== 'any' : subType === 'any') { // XOR
     const anytype = superType === 'any' ? sup : sub
     const other = superType === 'any' ? sub : sup
-
+    const computed = Object.assign({}, sup, sub)
+    computed.type = other.type
     for (let restriction in restrictions) {
       if (anytype[restriction] !== undefined && other[restriction] !== undefined) {
         // 3.1. for each restriction in the `any` type and in the other type, we compute the narrower restriction and we re-assign it to the other type
-        other[restriction] = restrictions[restriction](anytype[restriction], other[restriction])
+        computed[restriction] = restrictions[restriction](anytype[restriction], other[restriction])
       } else if (anytype[restriction] !== undefined) {
         // 3.2. for each restriction only in `any` we assign it directly to the other type
-        other[restriction] = anytype[restriction]
+        computed[restriction] = anytype[restriction]
       }
     }
 
     // 3.3. we return the output of computing the algorithm `consistency-check` on the other type
-    return consistencyCheck(other)
+    return consistencyCheck(computed)
   }
 
   // 4. if `super-type` is `number` and the `sub-type` is `integer`
   if (superType === 'number' && subType === 'integer') {
+    const computed = Object.assign({}, sup, sub)
     for (let restriction in restrictions) {
       if (sup[restriction] !== undefined && sub[restriction] !== undefined) {
         // 4.1. for each restriction in the `number` type and in the `integer` type, we compute the narrower restriction and we re-assign it to the `integer` type
-        sub[restriction] = restrictions[restriction](sup[restriction], sub[restriction])
+        computed[restriction] = restrictions[restriction](sup[restriction], sub[restriction])
       } else if (sup[restriction] !== undefined) {
         // 4.2. for each restriction only in `number` we assign it directly to the `integer` type
-        sub[restriction] = sup[restriction]
+        computed[restriction] = sup[restriction]
       }
     }
     // 4.3. we return the output of computing the algorithm `consistency-check` on the `integer` type
-    return consistencyCheck(sub)
+    return consistencyCheck(computed)
   }
 
   // 5. if `super-type` is `array` and `sub-type` is `array`
   if (superType === 'array' && subType === 'array') {
+    const computed = Object.assign({}, sup, sub)
     // 5.1. we initialize the variable `min-items` with the output of applying this algorithm to the values for the key `items` in `super` and `sub`
     // 5.2. we re-assign the value of the property `items` in `sub` with the value of `min-items`
-    sub.items = minType(sup.items, sub.items)
+    computed.items = minType(sup.items, sub.items)
 
     for (let restriction in restrictions) {
       if (sup[restriction] !== undefined && sub[restriction] !== undefined) {
         // 4.3. for each restriction in `super` and `sub` we compute the narrower restriction and we assign it in `sub`
-        sub[restriction] = restrictions[restriction](sup[restriction], sub[restriction])
+        computed[restriction] = restrictions[restriction](sup[restriction], sub[restriction])
       } else if (sup[restriction] !== undefined) {
         // 4.4. for each restriction only in `super` we assign it directly to `sub`
-        sub[restriction] = sup[restriction]
+        computed[restriction] = sup[restriction]
       }
     }
     // 4.5. we return the output of computing the algorithm `consistency-check` on `sub`
-    return consistencyCheck(sub)
+    return consistencyCheck(computed)
   }
 
   // 6. if `super-type` is `object` and `sub-type` is `object`
   if (superType === 'object' && subType === 'object') {
+    const computed = Object.assign({}, sup, sub)
     // 6.1. for initialize the variable `common-props` to the empty record
     const commonProps = {}
     const superProps = sup.properties || {}
@@ -226,21 +228,22 @@ function minType (sup, sub) {
     for (let restriction in restrictions) {
       if (sup[restriction] !== undefined && sub[restriction] !== undefined) {
         // 6.4. for each restriction in `super` and `sub` we compute the narrower restriction and we assign it in `sub`
-        sub[restriction] = restrictions[restriction](sup[restriction], sub[restriction])
+        computed[restriction] = restrictions[restriction](sup[restriction], sub[restriction])
       } else if (sup[restriction] !== undefined) {
         // 6.5. for each restriction only in `super` we assign it directly to `sub`
-        sub[restriction] = sup[restriction]
+        computed[restriction] = sup[restriction]
       }
     }
 
     // 6.6. we assign the value of the key `properties` in `sub` to be `common-props`
-    sub.properties = commonProps
+    computed.properties = commonProps
     // 6.7. we return the output of computing the algorithm `consistency-check` on `sub`
-    return consistencyCheck(sub)
+    return consistencyCheck(computed)
   }
 
   // 7. if `super-type` is `union` and `sub-type` is `union`
   if (superType === 'union' && subType === 'union') {
+    const computed = Object.assign({}, sup, sub)
     // 7.1. we initialize the variable `accum` to the empty sequence
     const accum = []
     // 7.2. for each value `elem-super` in the property `of` of `super`
@@ -261,37 +264,39 @@ function minType (sup, sub) {
     for (let restriction in restrictions) {
       if (sup[restriction] !== undefined && sub[restriction] !== undefined) {
         // 7.3. for each restriction in `super` and `sub` we compute the narrower restriction and we assign it in `sub`
-        sub[restriction] = restrictions[restriction](sup[restriction], sub[restriction])
+        computed[restriction] = restrictions[restriction](sup[restriction], sub[restriction])
       } else if (sup[restriction] !== undefined) {
         // 7.4. for each restriction only in `super` we assign it directly to `sub`
-        sub[restriction] = sup[restriction]
+        computed[restriction] = sup[restriction]
       }
     }
 
     // 7.5. we assign the value of the key `of` in `sub` to be `accum`
-    sub.anyOf = accum
+    computed.anyOf = accum
     // 7.6. we return the output of computing the algorithm `consistency-check` on `sub`
-    return consistencyCheck(sub)
+    return consistencyCheck(computed)
   }
 
   // 8. if `super-type` is `union` and `sub-type` is any other type
   if (superType === 'union' && subType !== 'union') {
+    const computed = Object.assign({}, sup, sub)
+    computed.type = superType
     // 8.1. for each value `i` `elem-super` in the property `of` of `super`
     // 8.1.1. we replace `i` in `of` with the output of applying this algorithm to `elem-super` and `sub`
-    sup.anyOf = sup.anyOf.map(elem => minType(elem, sub))
+    computed.anyOf = sup.anyOf.map(elem => minType(elem, sub))
 
     for (let restriction in restrictions) {
       if (sup[restriction] !== undefined && sub[restriction] !== undefined) {
         // 8.2. for each restriction in `super` and `sub` we compute the narrower restriction and we assign it in `sub`
-        sup[restriction] = restrictions[restriction](sup[restriction], sub[restriction])
+        computed[restriction] = restrictions[restriction](sup[restriction], sub[restriction])
       } else if (sub[restriction] !== undefined) {
         // 8.3. for each restriction only in `super` we assign it directly to `sub`
-        sup[restriction] = sub[restriction]
+        computed[restriction] = sub[restriction]
       }
     }
 
     // 8.4. we return the output of computing the algorithm `consistency-check` on `super`
-    return consistencyCheck(sup)
+    return consistencyCheck(computed)
   }
 
   throw new Error(`incompatible types: [${subType}, ${superType}]`)

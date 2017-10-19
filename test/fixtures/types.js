@@ -460,5 +460,113 @@ module.exports = {
     properties: {
       other: 'string'
     }
+  },
+  ExtraPropAttrsWithTypeArray: {
+    properties: {
+      name: {
+        type: ['string'],
+        displayName: 'name'
+      }
+    }
+  },
+  ExtraPropAttrsInTypeArray: {
+    properties: {
+      name: {
+        type: [{
+          type: 'string',
+          displayName: 'name'
+        }]
+      }
+    }
+  },
+  ExtraPropAttrsAnyOther: {
+    properties: {
+      prop: {
+        type: [{
+          type: 'any',
+          extra1: 'a',
+          common: 'c'
+        }, {
+          type: 'number',
+          extra2: 'b',
+          common: 'd'
+        }]
+      }
+    }
+  },
+  ExtraPropAttrsNumberInteger: {
+    properties: {
+      prop: {
+        type: [{
+          type: 'integer',
+          extra1: 'a',
+          common: 'c'
+        }, {
+          type: 'number',
+          extra2: 'b',
+          common: 'd'
+        }]
+      }
+    }
+  },
+  ExtraPropAttrsArrays: {
+    properties: {
+      prop: {
+        type: [{
+          type: 'array',
+          extra1: 'a',
+          common: 'c'
+        }, {
+          type: 'array',
+          extra2: 'b',
+          common: 'd'
+        }]
+      }
+    }
+  },
+  ExtraPropAttrsObjects: {
+    properties: {
+      prop: {
+        type: [{
+          type: 'object',
+          extra1: 'a',
+          common: 'c'
+        }, {
+          type: 'object',
+          extra2: 'b',
+          common: 'd'
+        }]
+      }
+    }
+  },
+  ExtraPropAttrsUnions: {
+    properties: {
+      prop: {
+        type: [{
+          type: 'any | integer',
+          extra1: 'a',
+          common: 'c'
+        }, {
+          type: 'any | number',
+          extra2: 'b',
+          common: 'd'
+        }]
+      }
+    }
+  },
+  ExtraPropAttrsSuperUnion: {
+    properties: {
+      prop: {
+        type: [{
+          type: 'integer',
+          extra1: 'a',
+          common: 'c'
+        }, {
+          type: 'any | number',
+          extra2: 'b',
+          common: 'd'
+        }]
+      }
+    }
   }
 }
