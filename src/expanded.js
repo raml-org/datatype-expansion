@@ -2,7 +2,7 @@
 
 const _ = require('lodash')
 
-const types = require('./util').types
+const isOpaqueType = require('./util').isOpaqueType
 
 /**
  * Accepts an in-memory JSON representation of the type, the types mapping
@@ -66,12 +66,12 @@ function expandForm (form, bindings, context, topLevel) {
     }
 
     // 1.1. if `form` is a RAML built-in data type, we return `(Record "type" form)`
-    if (types.indexOf(form) !== -1 || form === 'object' || form === 'array') {
+    if (isOpaqueType(form) || form === 'object' || form === 'array') {
       return {type: form}
     }
 
     if (form.endsWith('?')) {
-      if (types.indexOf(form.replace('?', '')) !== -1) {
+      if (isOpaqueType(form.replace('?', ''))) {
         return expandUnion({
           type: 'union',
           anyOf: [

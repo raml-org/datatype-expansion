@@ -4,7 +4,7 @@ const _ = require('lodash')
 
 const minType = require('./minType')
 const consistencyCheck = require('./util').consistencyCheck
-const types = require('./util').types
+const isOpaqueType = require('./util').isOpaqueType
 
 /**
  * Accepts a JSON in-memory representation of an expanded RAML type and a
@@ -37,7 +37,7 @@ function toCanonical (form) {
   // 1. we initialize the variable type with the value of the property `type` of `expanded-form`
   const type = form.type
 
-  if (types.indexOf(type) !== -1) {
+  if (isOpaqueType(type)) {
     // 2. if `type` is in the set `any boolean datetime datetime-only number integer string null file xml json`
     // 2.1. we return the output of applying the `consistency-check` to the `form`
     return consistencyCheck(form)
