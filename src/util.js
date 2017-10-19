@@ -1,7 +1,9 @@
 'use strict'
 
-// is this correct?
-module.exports.types = [
+const _ = require('lodash')
+
+// scalar types + [any, xml, json], excludes [array, object, union]
+const opaqueTypes = _.keyBy([
   'any',
   'boolean',
   'date-only',
@@ -15,7 +17,11 @@ module.exports.types = [
   'file',
   'xml',
   'json'
-]
+])
+
+module.exports.isOpaqueType = function isOpaqueType (type) {
+  return type in opaqueTypes
+}
 
 /**
  * Iterates through all the possible restriction constraints defined in the RAML specification and checks that the constraints hold for the provided type using custom logic.

@@ -2,7 +2,7 @@
 
 const _ = require('lodash')
 
-const types = require('./util').types
+const isOpaqueType = require('./util').isOpaqueType
 const consistencyCheck = require('./util').consistencyCheck
 
 /**
@@ -131,7 +131,7 @@ function minType (sup, sub) {
   const superType = sup.type
   const subType = sub.type
   // 2. if `super-type` and `sub-type` have the same value and the value is in the set `any boolean datetime datetime-only number integer string null file xml json"`
-  if (superType === subType && types.indexOf(superType) !== -1) {
+  if (superType === subType && isOpaqueType(superType)) {
     // 2.1. we initialize the variable `computed` to the record with property `type` having the common `super-type` and `sub-type` value
     const computed = _.cloneDeep(sup)
     for (let restriction in restrictions) {
