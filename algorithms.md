@@ -237,8 +237,9 @@ The input of the algorithm is:
          2. for each value `elem-of` in the property `of` of `tmp`
             1. for each value `elem` in `accum`
                1. we clone `elem`
-               2. we add the pair `property-name` `elem-of` to the key `properties` of the cloned`elem`
-               3. we add the cloned  `elem` to the sequence `new-new-accum`
+               2. we clone `tmp` as `new-value`, except for `of`, and assign the properties of `elem-of` to it
+               3. we add the pair `property-name` `new-value` to the key `properties` of the cloned `elem`
+               4. we add the cloned  `elem` to the sequence `new-accum`
          3. we replace `accum` with `new-accum`
       4. if `accum` contains a single element
          1. we return  the output of applying the `consistency-check` algorithm to the only element in `accum`

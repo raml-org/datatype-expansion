@@ -96,9 +96,12 @@ function toCanonical (form) {
           for (let elem of accum) {
             // 4.4.3.2.1.1. we clone `elem`
             elem = _.cloneDeep(elem)
-            // 4.4.3.2.1.2. we add the pair `property-name` `elem-of` to the key `properties` of the cloned`elem`
-            elem.properties[propName] = elemOf
-            // 4.4.3.2.1.3. we add the cloned  `elem` to the sequence `new-new-accum`
+            // 4.4.3.2.1.2. we clone `tmp` as `new-value`, except for `of`, and assign the properties of `elem-of` to it
+            const newValue = Object.assign({}, tmp, elemOf)
+            delete newValue.anyOf
+            // 4.4.3.2.1.3. we add the pair `property-name` `new-value` to the key `properties` of the cloned `elem`
+            elem.properties[propName] = newValue
+            // 4.4.3.2.1.4. we add the cloned  `elem` to the sequence `new-accum`
             newAccum.push(elem)
           }
         })

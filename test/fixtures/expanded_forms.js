@@ -1084,5 +1084,150 @@ module.exports = {
       }
     },
     additionalProperties: true
+  },
+  ExtraPropAttrsWithTypeArray: {
+    type: 'object',
+    properties: {
+      name: {
+        type: [{
+          type: 'string'
+        }],
+        required: true,
+        displayName: 'name'
+      }
+    },
+    additionalProperties: true
+  },
+  ExtraPropAttrsInTypeArray: {
+    type: 'object',
+    properties: {
+      name: {
+        type: [{
+          type: 'string',
+          displayName: 'name'
+        }],
+        required: true
+      }
+    },
+    additionalProperties: true
+  },
+  ExtraPropAttrsAnyOther: {
+    type: 'object',
+    properties: {
+      prop: {
+        type: [{
+          type: 'any',
+          extra1: 'a',
+          common: 'c'
+        }, {
+          type: 'number',
+          extra2: 'b',
+          common: 'd'
+        }],
+        required: true
+      }
+    },
+    additionalProperties: true
+  },
+  ExtraPropAttrsNumberInteger: {
+    type: 'object',
+    properties: {
+      prop: {
+        type: [{
+          type: 'integer',
+          extra1: 'a',
+          common: 'c'
+        }, {
+          type: 'number',
+          extra2: 'b',
+          common: 'd'
+        }],
+        required: true
+      }
+    },
+    additionalProperties: true
+  },
+  ExtraPropAttrsArrays: {
+    type: 'object',
+    properties: {
+      prop: {
+        type: [{
+          type: 'array',
+          items: {
+            type: 'any'
+          },
+          extra1: 'a',
+          common: 'c'
+        }, {
+          type: 'array',
+          items: {
+            type: 'any'
+          },
+          extra2: 'b',
+          common: 'd'
+        }],
+        required: true
+      }
+    },
+    additionalProperties: true
+  },
+  ExtraPropAttrsObjects: {
+    type: 'object',
+    properties: {
+      prop: {
+        type: [{
+          type: 'object',
+          additionalProperties: true,
+          extra1: 'a',
+          common: 'c'
+        }, {
+          type: 'object',
+          additionalProperties: true,
+          extra2: 'b',
+          common: 'd'
+        }],
+        required: true
+      }
+    },
+    additionalProperties: true
+  },
+  ExtraPropAttrsUnions: {
+    type: 'object',
+    properties: {
+      prop: {
+        type: [{
+          type: 'union',
+          anyOf: [{ type: 'any' }, { type: 'integer' }],
+          extra1: 'a',
+          common: 'c'
+        }, {
+          type: 'union',
+          anyOf: [{ type: 'any' }, { type: 'number' }],
+          extra2: 'b',
+          common: 'd'
+        }],
+        required: true
+      }
+    },
+    additionalProperties: true
+  },
+  ExtraPropAttrsSuperUnion: {
+    type: 'object',
+    properties: {
+      prop: {
+        type: [{
+          type: 'integer',
+          extra1: 'a',
+          common: 'c'
+        }, {
+          type: 'union',
+          anyOf: [{ type: 'any' }, { type: 'number' }],
+          extra2: 'b',
+          common: 'd'
+        }],
+        required: true
+      }
+    },
+    additionalProperties: true
   }
 }
