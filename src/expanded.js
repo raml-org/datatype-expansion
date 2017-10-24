@@ -143,11 +143,13 @@ function expandForm (form, bindings, context, topLevel) {
     } else if (Array.isArray(form.type)) {
       form.type = form.type.map(t => expandForm(t, bindings, context))
       if (form.properties !== undefined) form = expandObject(form, bindings, context)
+      if (form.items !== undefined) form = expandArray(form, bindings, context)
     } else if (typeof form.type === 'object') {
       // 2.5. if `type` is a `Record`
       // 2.5.1. we return the output of invoking the algorithm on the value of `type` with the current value for `bindings`
       if (form.properties !== undefined) form = expandObject(form, bindings, context)
       if (form.anyOf !== undefined) form = expandUnion(form, bindings, context)
+      if (form.items !== undefined) form = expandArray(form, bindings, context)
       form.type = expandForm(form.type, bindings, context)
     } else {
       form = Object.assign(form, expandForm(form.type, bindings, context))
