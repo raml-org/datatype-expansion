@@ -1229,5 +1229,39 @@ module.exports = {
       }
     },
     additionalProperties: true
+  },
+  ParserNested: {
+    type: {
+      type: [
+        {
+          type: 'object'
+        }
+      ],
+      properties: {
+        name: {
+          type: [
+            {
+              type: 'string'
+            }
+          ],
+          required: true
+        }
+      },
+      additionalProperties: true
+    },
+    properties: {
+      arr: {
+        type: [
+          {
+            type: 'array'
+          }
+        ],
+        items: {
+          type: 'string'
+        },
+        required: true
+      }
+    },
+    additionalProperties: true
   }
 }
