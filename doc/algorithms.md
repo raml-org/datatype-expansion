@@ -133,7 +133,7 @@ The input for the algorithm is:
       3. if `form` has a `items` key defined, we initialize `type` with the value `object`
       4. otherwise we initialise `type` with the value passed in `top-level-type`
    2. if `type` is a `String` with  value `array`
-      1. we initialize the value `expanded-items` with the result of invoking the algorithm on the value in `form` for the key `items`
+      1. we initialize the value `expanded-items` with the result of invoking the algorithm on the value in `form` for the key `items` (or `any` if the key `items` is not defined)
       2. we replace the value of the key `items` in `form` by `expanded-items`
    3. if `type` is a `String` with value `object`
       1. we iterate over the `Record` associated to the key `properties` in `form`
@@ -213,7 +213,7 @@ The input of the algorithm is:
 2. if `type` is in the set `any boolean datetime datetime-only number integer string null file xml json"`
    1. we return the output of applying the `consistency-check` to the `form`
 3. if `type` is the string `array`
-   1. we initialize the variable `items` with the output of applying the algorithm to the value of the key `items` of the input `form` of type `Record[String]RAMLForm]`
+   1. we initialize the variable `items` with the output of applying the algorithm to the value of the key `items` of the input `form` (or `any` if the key `items` is not defined)
    2. we initialize the variable `items-type` with the value of the `type` property of the `items` variable
    3. if `items-type` has a value `array`
       1. we replace the property `items` in `form` with the value of `items` variable
@@ -237,8 +237,9 @@ The input of the algorithm is:
          2. for each value `elem-of` in the property `of` of `tmp`
             1. for each value `elem` in `accum`
                1. we clone `elem`
-               2. we add the pair `property-name` `elem-of` to the key `properties` of the cloned`elem`
-               3. we add the cloned  `elem` to the sequence `new-new-accum`
+               2. we clone `tmp` as `new-value`, except for `of`, and assign the properties of `elem-of` to it
+               3. we add the pair `property-name` `new-value` to the key `properties` of the cloned `elem`
+               4. we add the cloned  `elem` to the sequence `new-accum`
          3. we replace `accum` with `new-accum`
       4. if `accum` contains a single element
          1. we return  the output of applying the `consistency-check` algorithm to the only element in `accum`
@@ -284,7 +285,7 @@ The input of the algorithm is:
    1. we initialize the variable `computed` to the record with property `type` having the common `super-type` and `sub-type` value
    2. for each restriction in `super` and `sub` we compute the narrower restriction and we assign it in `computed`
    3. for each restriction only in `super` or `sub` we assign it directly to `computed`
-   3. we return the output of computing the algorithm `consistency-check` on `computed`
+   4. we return the output of computing the algorithm `consistency-check` on `computed`
 3. if only one of `super-type` or `sub-type` has a value of `any`
    1. for each restriction in the `any` type and in the other type, we compute the narrower restriction and we re-assign it to the other type
    2. for each restriction only in `any` we assign it directly to the other type
@@ -299,31 +300,33 @@ The input of the algorithm is:
    3. for each restriction in `super` and `sub` we compute the narrower restriction and we assign it in `sub`
    4. for each restriction only in `super` we assign it directly to `sub`
    5. we return the output of computing the algorithm `consistency-check` on `sub`
-5. if `super-type` is `object` and `sub-type` is `object`
+6. if `super-type` is `object` and `sub-type` is `object`
    1. for initialize the variable `common-props` to the empty record
    2. for each key in the `properties` value `sub` that is also present in the `properties` value of `super`
       1. we initialize the variable `tmp` with the output of applying the algorithm to the value for the common property in `super` and in `sub`
-     2. we assign the computed value using the name of the common property as the key in the `common-props` record
+      2. we assign the computed value using the name of the common property as the key in the `common-props` record
    3. for each pair `property-name` `property-value` only in either `super` or `sub` we add it to the record `common-props`
    4. for each restriction in `super` and `sub` we compute the narrower restriction and we assign it in `sub`
    5. for each restriction only in `super` we assign it directly to `sub`
    6. we assign the value of the key `properties` in `sub` to be `common-props`
    7. we return the output of computing the algorithm `consistency-check` on `sub`
-6. if `super-type` is `union` and `sub-type` is `union`
+7. if `super-type` is `union` and `sub-type` is `union`
    1. we initialize the variable `accum` to the empty sequence
    2. for each value `elem-super` in the property `of` of `super`
-      1. for each value `elem-sub` in the property `of` of `sub`
-         1. we add to `accum` the output of applying this algorithm to `elem-super` and `elem-sub`
+      1. if `sub.of` is non-empty
+         1. for each value `elem-sub` in the property `of` of `sub`
+            1. we add to `accum` the output of applying this algorithm to `elem-super` and `elem-sub`
+      2. else if `sub.of` is empty, add `elem-super` to `accum`
    3. for each restriction in `super` and `sub` we compute the narrower restriction and we assign it in `sub`
    4. for each restriction only in `super` we assign it directly to `sub`
    5. we assign the value of the key `of` in `sub` to be `accum`
    6. we return the output of computing the algorithm `consistency-check` on `sub`
-6. if `super-type` is `union` and `sub-type` is any other type
-   2. for each value `i` `elem-super` in the property `of` of `super`
+8. if `super-type` is `union` and `sub-type` is any other type
+   1. for each value `i` `elem-super` in the property `of` of `super`
       1. we replace `i` in `of` with the output of applying this algorithm to `elem-super` and `sub`
-   3. for each restriction in `super` and `sub` we compute the narrower restriction and we assign it in `super`
-   4. for each restriction only in `sub` we assign it directly to `super`
-   6. we return the output of computing the algorithm `consistency-check` on `super`
+   2. for each restriction in `super` and `sub` we compute the narrower restriction and we assign it in `super`
+   3. for each restriction only in `sub` we assign it directly to `super`
+   4. we return the output of computing the algorithm `consistency-check` on `super`
 
 In the previous algorithm we need to define how the narrower version of a constraint is computed.
 The following table provides the details:
@@ -354,7 +357,7 @@ The other algorithm is `consistency-check`. It just iterates through all the pos
 
 | check name | restrictions | check |
 |------------|------------|-------|
-| num-properites| `minProperties` and `maxProperties` | `minProperties` <= `maxProperties` |
+| num-properties| `minProperties` and `maxProperties` | `minProperties` <= `maxProperties` |
 | length| `minLength` and `maxLength` | `minLength` <= `maxLength` |
 | size| `minimum` and `maximum` | `minimum` <= `maximum` |
 | num-items | `minItems` and `maxItems` | `minItems` <= `maxItems` |
