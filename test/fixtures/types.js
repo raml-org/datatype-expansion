@@ -584,5 +584,15 @@ module.exports = {
         items: 'string'
       }
     }
+  },
+  CanonicalItemsTypeArray: {
+    type: ['object'],
+    properties: {
+      prop: {
+        items: {
+          type: ['string']
+        }
+      }
+    }
   }
 }

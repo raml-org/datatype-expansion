@@ -1263,5 +1263,22 @@ module.exports = {
       }
     },
     additionalProperties: true
+  },
+  CanonicalItemsTypeArray: {
+    type: [{
+      type: 'object'
+    }],
+    properties: {
+      prop: {
+        type: 'array',
+        items: {
+          type: [{
+            type: 'string'
+          }]
+        },
+        required: true
+      }
+    },
+    additionalProperties: true
   }
 }
