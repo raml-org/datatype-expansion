@@ -135,7 +135,7 @@ function expandForm (form, bindings, context, topLevel) {
         // 2.4. if `type` is a `String` with value `union`
         return expandUnion(form, bindings, context)
       } else if (typeof form.type === 'string' && form.type in bindings) {
-        if (form.properties !== undefined) form = expandObject(form, bindings, context.concat([form.type]))
+        if (form.properties !== undefined) form = expandObject(form, bindings, context)
         form.type = expandForm(form.type, bindings, context)
       } else {
         form = Object.assign(form, expandForm(form.type, bindings, context))

@@ -233,7 +233,45 @@ module.exports = {
         required: true
       },
       device: {
-        type: '$recur',
+        anyOf: [
+          {
+            properties: {
+              manufacturer: {
+                type: 'string',
+                required: true
+              },
+              numberOfSIMCards: {
+                type: 'number',
+                required: true
+              },
+              kind: {
+                type: 'string',
+                required: true
+              }
+            },
+            additionalProperties: true,
+            type: 'object'
+          },
+          {
+            properties: {
+              manufacturer: {
+                type: 'string',
+                required: true
+              },
+              numberOfUSBPorts: {
+                type: 'number',
+                required: true
+              },
+              kind: {
+                type: 'string',
+                required: true
+              }
+            },
+            additionalProperties: true,
+            type: 'object'
+          }
+        ],
+        type: 'union',
         required: true
       }
     },
