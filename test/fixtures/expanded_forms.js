@@ -233,7 +233,45 @@ module.exports = {
         required: true
       },
       device: {
-        type: '$recur',
+        anyOf: [
+          {
+            properties: {
+              manufacturer: {
+                type: 'string',
+                required: true
+              },
+              numberOfSIMCards: {
+                type: 'number',
+                required: true
+              },
+              kind: {
+                type: 'string',
+                required: true
+              }
+            },
+            additionalProperties: true,
+            type: 'object'
+          },
+          {
+            properties: {
+              manufacturer: {
+                type: 'string',
+                required: true
+              },
+              numberOfUSBPorts: {
+                type: 'number',
+                required: true
+              },
+              kind: {
+                type: 'string',
+                required: true
+              }
+            },
+            additionalProperties: true,
+            type: 'object'
+          }
+        ],
+        type: 'union',
         required: true
       }
     },
@@ -1225,6 +1263,57 @@ module.exports = {
           extra2: 'b',
           common: 'd'
         }],
+        required: true
+      }
+    },
+    additionalProperties: true
+  },
+  ParserNested: {
+    type: {
+      type: [
+        {
+          type: 'object'
+        }
+      ],
+      properties: {
+        name: {
+          type: [
+            {
+              type: 'string'
+            }
+          ],
+          required: true
+        }
+      },
+      additionalProperties: true
+    },
+    properties: {
+      arr: {
+        type: [
+          {
+            type: 'array'
+          }
+        ],
+        items: {
+          type: 'string'
+        },
+        required: true
+      }
+    },
+    additionalProperties: true
+  },
+  CanonicalItemsTypeArray: {
+    type: [{
+      type: 'object'
+    }],
+    properties: {
+      prop: {
+        type: 'array',
+        items: {
+          type: [{
+            type: 'string'
+          }]
+        },
         required: true
       }
     },

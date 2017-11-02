@@ -1099,5 +1099,35 @@ module.exports = {
       additionalProperties: true
     }],
     additionalProperties: true
+  },
+  ParserNested: {
+    type: 'object',
+    properties: {
+      name: {
+        type: 'string',
+        required: true
+      },
+      arr: {
+        type: 'array',
+        items: {
+          type: 'string'
+        },
+        required: true
+      }
+    },
+    additionalProperties: true
+  },
+  CanonicalItemsTypeArray: {
+    type: 'object',
+    properties: {
+      prop: {
+        type: 'array',
+        items: {
+          type: 'string'
+        },
+        required: true
+      }
+    },
+    additionalProperties: true
   }
 }

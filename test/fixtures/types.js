@@ -568,5 +568,31 @@ module.exports = {
         }]
       }
     }
+  },
+  ParserNested: {
+    type: {
+      type: ['object'],
+      properties: {
+        name: {
+          type: ['string']
+        }
+      }
+    },
+    properties: {
+      arr: {
+        type: ['array'],
+        items: 'string'
+      }
+    }
+  },
+  CanonicalItemsTypeArray: {
+    type: ['object'],
+    properties: {
+      prop: {
+        items: {
+          type: ['string']
+        }
+      }
+    }
   }
 }
