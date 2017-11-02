@@ -256,7 +256,7 @@ The input of the algorithm is:
       4. we initialize the variable `canonical-super-type` to the output of applying the algorithm to the value for the property  `type` in `form`
       5. we set the `type` property of `form` to `super-type-name`
    2. we initialize the variable `tmp` with the output of invoking the algorithm `min-type` to the inputs `canonical-super-type` and `form`
-   3. we run `canonical-type` on the output of applying the `consistency-check` algorithm to the modified value of `tmp`
+   3. we return the output of recursively applying the algorithm to the modified value of `tmp`
 6. if `type` is `Seq[RAMLForm]`
    1. we initialize the variable `super-type-name` to the first value of type string in the chain of nested records for the value `type` starting with the one assigned to `type` in `form`
       1. if `super-type-name` has a value `array` we transform `form` adding the property `items` pointing a record `(Record "type" "any")`
@@ -267,7 +267,7 @@ The input of the algorithm is:
    2. for each value `elem` in `super-types`
       1. we initialize the variable `tmp` with the output of computing the result of invoking the algorithm `min-type` to `elem` and `form`
       2. we re-assign `form` to the value computed in `tmp`
-   3. we run `canonical-type` on the output of applying the `consistency-check` algorithm to the modified value of `tmp`
+   3. we return the output of recursively applying the algorithm to the modified value of `tmp`
 
 In the previous algorithm we have used two auxiliary algorithms `min-type` and `consistency-check`.
 
