@@ -67,7 +67,9 @@ function toCanonical (form) {
         // 3.4.1.4. we return the output of applying the `consistency-check` algorithm to `items-type`
         return unionArray
       })
-      items.required = form.required
+      if (typeof form.required === 'boolean') {
+        items.required = form.required
+      }
       return items
     }
 

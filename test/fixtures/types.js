@@ -594,5 +594,12 @@ module.exports = {
         }
       }
     }
+  },
+  UnionArray: {
+    type: 'array',
+    items: {
+      type: 'union',
+      anyOf: ['string', 'number']
+    }
   }
 }
