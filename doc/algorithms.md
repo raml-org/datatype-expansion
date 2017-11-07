@@ -245,7 +245,7 @@ The input of the algorithm is:
          1. we return  the output of applying the `consistency-check` algorithm to the only element in `accum`
       5. if `accum` contains more than one element
          1. we replace the `type` of `form` with `union`
-         2. we remove the key `properties`
+         2. we remove the keys `properties` and `additionalProperties`
          3. we add the key `of` with the value of `accum`
          4. we return  the output of applying the `consistency-check` algorithm to the modified value of `form`
 5. if `type` is a `Record[String][RAMLForm]`

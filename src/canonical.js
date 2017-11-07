@@ -124,8 +124,9 @@ function toCanonical (form) {
       // 4.4.5. if `accum` contains more than one element
       // 4.4.5.1. we replace the `type` of `form` with `union`
       form.type = 'union'
-      // 4.4.5.2. we remove the key `properties`
+      // 4.4.5.2. we remove the keys `properties` and `additionalProperties`
       delete form.properties
+      delete form.additionalProperties
       // 4.4.5.3. we add the key `of` with the value of `accum`
       form.anyOf = accum
       // 4.4.5.4. we return  the output of applying the `consistency-check` algorithm to the modified value of `form`
