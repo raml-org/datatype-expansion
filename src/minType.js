@@ -279,8 +279,7 @@ function minType (sup, sub) {
 
   // 8. if `super-type` is `union` and `sub-type` is any other type
   if (superType === 'union' && subType !== 'union') {
-    const computed = Object.assign({}, sup, sub)
-    computed.type = superType
+    const computed = Object.assign({}, sup)
     // 8.1. for each value `i` `elem-super` in the property `of` of `super`
     // 8.1.1. we replace `i` in `of` with the output of applying this algorithm to `elem-super` and `sub`
     computed.anyOf = sup.anyOf.map(elem => minType(elem, sub))
