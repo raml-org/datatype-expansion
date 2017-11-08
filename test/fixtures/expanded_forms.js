@@ -1318,5 +1318,12 @@ module.exports = {
       }
     },
     additionalProperties: true
+  },
+  UnionArray: {
+    type: 'array',
+    items: {
+      type: 'union',
+      anyOf: [{ type: 'string' }, { type: 'number' }]
+    }
   }
 }

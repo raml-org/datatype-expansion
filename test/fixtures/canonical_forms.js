@@ -1129,5 +1129,19 @@ module.exports = {
       }
     },
     additionalProperties: true
+  },
+  UnionArray: {
+    type: 'union',
+    anyOf: [{
+      type: 'array',
+      items: {
+        type: 'string'
+      }
+    }, {
+      type: 'array',
+      items: {
+        type: 'number'
+      }
+    }]
   }
 }
