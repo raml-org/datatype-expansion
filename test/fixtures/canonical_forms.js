@@ -186,7 +186,6 @@ module.exports = {
     type: 'union'
   },
   SimpleUnion: {
-    additionalProperties: true,
     type: 'union',
     anyOf: [
       {
@@ -239,7 +238,6 @@ module.exports = {
     description: 'A single data entry(row) with any number of field-name, field-value pairs',
     type: 'union',
     example: '{\n "temp": 20.5,\n "time": 12565\n}\n',
-    additionalProperties: true,
     anyOf: [
       {
         description: 'A single data entry(row) with any number of field-name, field-value pairs',
@@ -526,7 +524,6 @@ module.exports = {
   },
   'Songs.Musician': {
     type: 'union',
-    additionalProperties: true,
     anyOf: [
       {
         properties: {
@@ -674,7 +671,6 @@ module.exports = {
   },
   'Songs.Cell': {
     type: 'union',
-    additionalProperties: true,
     anyOf: [
       {
         properties: {
@@ -715,7 +711,6 @@ module.exports = {
   },
   'Songs.List': {
     type: 'union',
-    additionalProperties: true,
     anyOf: [
       {
         properties: {
@@ -802,7 +797,6 @@ module.exports = {
   },
   Cat: {
     type: 'union',
-    additionalProperties: true,
     anyOf: [
       {
         type: 'object',
@@ -1068,8 +1062,7 @@ module.exports = {
         }
       },
       additionalProperties: true
-    }],
-    additionalProperties: true
+    }]
   },
   ExtraPropAttrsSuperUnion: {
     type: 'union',
@@ -1097,8 +1090,7 @@ module.exports = {
         }
       },
       additionalProperties: true
-    }],
-    additionalProperties: true
+    }]
   },
   ParserNested: {
     type: 'object',
