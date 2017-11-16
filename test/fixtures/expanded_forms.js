@@ -1325,5 +1325,61 @@ module.exports = {
       type: 'union',
       anyOf: [{ type: 'string' }, { type: 'number' }]
     }
+  },
+  Payment: {
+    type: 'object',
+    properties: {
+      amount: {
+        type: 'union',
+        anyOf: [{ type: 'number' }, { type: 'string' }],
+        required: true
+      }
+    },
+    additionalProperties: true
+  },
+  Payments: {
+    type: 'array',
+    items: {
+      type: {
+        type: 'object',
+        properties: {
+          amount: {
+            type: 'union',
+            anyOf: [{ type: 'number' }, { type: 'string' }],
+            required: true
+          }
+        },
+        additionalProperties: true
+      }
+    }
+  },
+  PaymentsPage: {
+    type: 'object',
+    properties: {
+      count: {
+        type: 'integer',
+        required: true
+      },
+      results: {
+        type: {
+          type: 'array',
+          items: {
+            type: {
+              type: 'object',
+              properties: {
+                amount: {
+                  type: 'union',
+                  anyOf: [{ type: 'number' }, { type: 'string' }],
+                  required: true
+                }
+              },
+              additionalProperties: true
+            }
+          }
+        },
+        required: true
+      }
+    },
+    additionalProperties: true
   }
 }
