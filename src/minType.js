@@ -299,6 +299,22 @@ function minType (sup, sub) {
     return consistencyCheck(computed)
   }
 
+  if (subType === 'union' && superType !== 'union') {
+    let anyOf = sub.anyOf
+    let unionResult = sub
+    unionResult.anyOf = []
+    for (let i = 0; i < anyOf.length; i++) {
+      let result = minType(anyOf[i], sup)
+      if (result.type === 'union') {
+        unionResult.anyOf.concat(result.anyOf)
+      } else {
+        unionResult.anyOf.push(result)
+      }
+    }
+        // minType should always return a canonical type
+        // so a union of canonical types is canonical
+    return unionResult
+  }
   throw new Error(`incompatible types: [${subType}, ${superType}]`)
 }
 

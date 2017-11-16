@@ -158,8 +158,8 @@ function toCanonical (form) {
 
     if (Array.isArray(type)) {
       const superTypes = _.cloneDeep(type).map(t => toCanonical(t))
-      subType = superTypes.reduce((acc, val) => minType(val, acc), subType)
-      return toCanonical(subType)
+      subType = superTypes.reduce((acc, val) => minType(val, acc), toCanonical(subType))
+      return subType
     } else {
       const superType = toCanonical(type)
       const res = minType(superType, subType)
