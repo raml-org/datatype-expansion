@@ -304,7 +304,7 @@ function minType (sup, sub) {
     let unionResult = sub
     unionResult.anyOf = []
     for (let i = 0; i < anyOf.length; i++) {
-      let result = minType(anyOf[i], sup)
+      let result = minType(sup, anyOf[i])
       if (result.type === 'union') {
         unionResult.anyOf.concat(result.anyOf)
       } else {
