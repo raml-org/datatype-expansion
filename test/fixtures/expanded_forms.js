@@ -1018,8 +1018,8 @@ module.exports = {
   },
   Optional: {
     anyOf: [
-      {type: 'string'},
-      {type: 'nil'}
+            { type: 'string' },
+            { type: 'nil' }
     ],
     type: 'union'
   },
@@ -1325,5 +1325,35 @@ module.exports = {
       type: 'union',
       anyOf: [{ type: 'string' }, { type: 'number' }]
     }
+  },
+  UnionInheritance: {
+    'type': {
+      'type': 'object',
+      'properties': {
+        'a': {
+          'type': 'union',
+          'anyOf': [
+            {
+              'type': 'string',
+              'minLength': 2
+            },
+            {
+              'type': 'string',
+              'minLength': 3
+            }
+          ],
+          'required': true
+        }
+      },
+      'additionalProperties': true
+    },
+    'properties': {
+      'a': {
+        'type': 'string',
+        'minLength': 4,
+        'required': true
+      }
+    },
+    'additionalProperties': true
   }
 }

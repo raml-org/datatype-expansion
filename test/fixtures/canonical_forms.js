@@ -180,8 +180,8 @@ module.exports = {
   },
   UnionInTypeArray: {
     anyOf: [
-      { type: 'number' },
-      { type: 'string' }
+            { type: 'number' },
+            { type: 'string' }
     ],
     type: 'union'
   },
@@ -1135,5 +1135,40 @@ module.exports = {
         type: 'number'
       }
     }]
+  },
+  UnionInheritance: {
+    'type': 'union',
+    'anyOf': [
+      {
+        'type': 'object',
+        'properties': {
+          'a': {
+            'type': 'string',
+            'required': true,
+            'minLength': 4
+          }
+        },
+        'additionalProperties': true
+      },
+      {
+        'type': 'object',
+        'properties': {
+          'a': {
+            'type': 'string',
+            'required': true,
+            'minLength': 4
+          }
+        },
+        'additionalProperties': true
+      }
+    ],
+    'properties': {
+      'a': {
+        'type': 'string',
+        'minLength': 4,
+        'required': true
+      }
+    },
+    'additionalProperties': true
   }
 }

@@ -601,5 +601,31 @@ module.exports = {
       type: 'union',
       anyOf: ['string', 'number']
     }
+  },
+  UnionInheritance: {
+    type: {
+      type: 'object',
+      properties: {
+        'a': {
+          type: 'union',
+          anyOf: [
+            {
+              type: 'string',
+              minLength: 2
+            },
+            {
+              type: 'string',
+              minLength: 3
+            }
+          ]
+        }
+      }
+    },
+    properties: {
+      'a': {
+        type: 'string',
+        minLength: 4
+      }
+    }
   }
 }
