@@ -162,7 +162,7 @@ function toCanonical (form) {
       return subType
     } else {
       const superType = toCanonical(type)
-      const res = minType(superType, subType)
+      const res = minType(superType, toCanonical(subType))
       return toCanonical(res)
     }
   }

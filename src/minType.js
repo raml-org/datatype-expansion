@@ -283,6 +283,7 @@ function minType (sup, sub) {
     computed.type = superType
     // 8.1. for each value `i` `elem-super` in the property `of` of `super`
     // 8.1.1. we replace `i` in `of` with the output of applying this algorithm to `elem-super` and `sub`
+
     computed.anyOf = sup.anyOf.map(elem => minType(elem, sub))
 
     for (let restriction in restrictions) {
@@ -300,7 +301,7 @@ function minType (sup, sub) {
   }
 
   if (subType === 'union' && superType !== 'union') {
-    const computed = Object.assign({}, sup)
+    const computed = Object.assign({}, sub)
     let anyOf = sub.anyOf
     computed.anyOf = []
     for (let i = 0; i < anyOf.length; i++) {

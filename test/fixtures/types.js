@@ -627,5 +627,41 @@ module.exports = {
         minLength: 4
       }
     }
+  },
+  UnionInheritance2: {
+    type: {
+      type: 'object',
+      properties: {
+        'a': {
+          type: 'union',
+          anyOf: [
+            {
+              type: 'string',
+              minLength: 2,
+              maxLength: 10
+            },
+            {
+              type: 'string',
+              minLength: 3
+            }
+          ]
+        }
+      }
+    },
+    properties: {
+      'a': {
+        type: 'union',
+        anyOf: [
+          {
+            type: 'string',
+            minLength: 5
+          },
+          {
+            type: 'string',
+            minLength: 6
+          }
+        ]
+      }
+    }
   }
 }

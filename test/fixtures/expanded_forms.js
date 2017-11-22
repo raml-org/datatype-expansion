@@ -1355,5 +1355,45 @@ module.exports = {
       }
     },
     'additionalProperties': true
+  },
+  UnionInheritance2: {
+    'type': {
+      'type': 'object',
+      'properties': {
+        'a': {
+          'type': 'union',
+          'anyOf': [
+            {
+              'type': 'string',
+              'minLength': 2,
+              'maxLength': 10
+            },
+            {
+              'type': 'string',
+              'minLength': 3
+            }
+          ],
+          'required': true
+        }
+      },
+      'additionalProperties': true
+    },
+    'properties': {
+      'a': {
+        'type': 'union',
+        'anyOf': [
+          {
+            'type': 'string',
+            'minLength': 5
+          },
+          {
+            'type': 'string',
+            'minLength': 6
+          }
+        ],
+        'required': true
+      }
+    },
+    'additionalProperties': true
   }
 }

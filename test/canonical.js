@@ -18,6 +18,7 @@ describe('canonicalForm()', function () {
 
       const expForm = expandedForm(types[name], types)
       const canForm = canonicalForm(expForm)
+
       expect(canForm).to.deep.equal(forms[name])
     })
   })
