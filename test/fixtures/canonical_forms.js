@@ -1221,5 +1221,55 @@ module.exports = {
         'additionalProperties': true
       }
     ]
+  },
+  Payment: {
+    type: 'union',
+    anyOf: [{
+      type: 'object',
+      properties: {
+        amount: {
+          type: 'number',
+          required: true
+        }
+      },
+      additionalProperties: true
+    }, {
+      type: 'object',
+      properties: {
+        amount: {
+          type: 'string',
+          required: true
+        }
+      },
+      additionalProperties: true
+    }]
+  },
+  Payments: {
+    type: 'union',
+    anyOf: [{
+      type: 'array',
+      items: {
+        type: 'object',
+        properties: {
+          amount: {
+            type: 'number',
+            required: true
+          }
+        },
+        additionalProperties: true
+      }
+    }, {
+      type: 'array',
+      items: {
+        type: 'object',
+        properties: {
+          amount: {
+            type: 'string',
+            required: true
+          }
+        },
+        additionalProperties: true
+      }
+    }]
   }
 }

@@ -663,5 +663,24 @@ module.exports = {
         ]
       }
     }
+  },
+  Payment: {
+    properties: {
+      amount: 'number | string'
+    }
+  },
+  Payments: {
+    type: 'array',
+    items: {
+      type: 'Payment'
+    }
+  },
+  PaymentsPage: {
+    properties: {
+      count: 'integer',
+      results: {
+        type: 'Payments'
+      }
+    }
   }
 }
