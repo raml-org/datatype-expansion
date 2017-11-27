@@ -1162,13 +1162,6 @@ module.exports = {
         'additionalProperties': true
       }
     ],
-    'properties': {
-      'a': {
-        'type': 'string',
-        'minLength': 4,
-        'required': true
-      }
-    },
     'additionalProperties': true
   },
   UnionInheritance2: {
