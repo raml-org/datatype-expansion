@@ -243,64 +243,79 @@ function minType (sup, sub) {
 
   // 7. if `super-type` is `union` or `sub-type` is `union`
   if (superType === 'union' || subType === 'union') {
+    // 7.1. initialize `computed` to the empty record
     const computed = {}
     let supAnyOf, subAnyOf
+    // 7.2. if `super-type` is `union`
     if (superType === 'union') {
+      // 7.2.1. assign its properties to `computed`
       Object.assign(computed, sup)
+      // 7.2.2. set `sup-of` to `of` of `sup`
       supAnyOf = sup.anyOf
     } else {
+      // 7.3. else set `sup-of` to a single element array of `sup`
       supAnyOf = [sup]
     }
+    // 7.4. if `sub-type` is `union`
     if (subType === 'union') {
+      // 7.4.1. assign its properties to `computed`
       Object.assign(computed, sub)
+      // 7.4.2. set `sub-of` to `of` of `sub`
       subAnyOf = sub.anyOf
     } else {
+      // 7.5. else set `sub-of` to a single element array of `sub`
       subAnyOf = [sub]
     }
+    // 7.6. initialize `of` of `computed` to the empty array
     computed.anyOf = []
+    // 7.7. if `sup-of` is non-empty
     if (supAnyOf.length > 0) {
-      // 7.2.1. if `sub.of` is non-empty
+      // 7.7.1. if `sub-of` is non-empty
       if (subAnyOf.length > 0) {
-        // 7.2. for each value `elem-super` in the property `of` of `super`
+        // 7.7.1.1. for each value `elem-super` in `sup-of`
         for (const elemSuper of supAnyOf) {
-          // 7.2.1.1. for each value `elem-sub` in the property `of` of `sub`
+          // 7.7.1.1.1. for each value `elem-sub` in `sub-of`
           for (const elemSub of subAnyOf) {
-            // 7.2.1.1.1. we add to `computed.anyOf` the output of applying this algorithm to `elem-super` and `elem-sub`
+            // 7.7.1.1.1.1. set `result` to the output of applying this algorithm to `elem-super` and `elem-sub`
             const result = minType(elemSuper, elemSub)
+            // 7.7.1.1.1.2. if `result` is a `union`, concatenate its `of` to `of` of `computed`
             if (result.type === 'union') {
               computed.anyOf.concat(result.anyOf)
             } else {
+              // 7.7.1.1.1.3. else append `result` to `of` of `computed`
               computed.anyOf.push(result)
             }
           }
         }
       } else {
-        // 7.2.2. else if `sub.of` is empty, add `elem-super` to `computed.anyOf`
+        // 7.7.2. else if `sub-of` is empty, assign `of` of `computed` to `sup-of`
         computed.anyOf = supAnyOf
       }
     } else {
+      // 7.8. else if `sup-of` is empty, assign `of` of `computed` to `sup-of`
       computed.anyOf = subAnyOf
     }
 
     for (const restriction in restrictions) {
       if (sup[restriction] !== undefined && superType === 'union') {
         if (sub[restriction] !== undefined && subType === 'union') {
-          // 7.3. for each restriction in `super` and `sub` we compute the narrower restriction and we assign it in `computed`
+          // 7.9. for each restriction in unions `super` and `sub` we compute the narrower restriction and we assign it in `computed`
           computed[restriction] = restrictions[restriction](sup[restriction], sub[restriction])
         } else {
-          // 7.4. for each restriction only in `super` we assign it directly to `computed`
+          // 7.10. for each restriction only in union `super` we assign it directly to `computed`
           computed[restriction] = sup[restriction]
         }
       } else if (sub[restriction] !== undefined && subType === 'union') {
-        // 8.3. for each restriction only in `sub` we assign it directly to `computed`
+        // 7.11. for each restriction only in union `sub` we assign it directly to `computed`
         computed[restriction] = sub[restriction]
       }
     }
 
-    // 8.4. we return the output of computing the algorithm `consistency-check` on `computed`
+    // 7.12. we return the output of computing the algorithm `consistency-check` on `computed`
     return consistencyCheck(computed)
   }
 
+  // 8. else fail the algorithm due to incompatible types
   throw new Error(`incompatible types: [${subType}, ${superType}]`)
 }
 

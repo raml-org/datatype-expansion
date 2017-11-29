@@ -310,23 +310,31 @@ The input of the algorithm is:
    5. for each restriction only in `super` we assign it directly to `sub`
    6. we assign the value of the key `properties` in `sub` to be `common-props`
    7. we return the output of computing the algorithm `consistency-check` on `sub`
-7. if `super-type` is `union` and `sub-type` is `union`
-   1. we initialize the variable `accum` to the empty sequence
-   2. for each value `elem-super` in the property `of` of `super`
-      1. if `sub.of` is non-empty
-         1. for each value `elem-sub` in the property `of` of `sub`
-            1. we add to `accum` the output of applying this algorithm to `elem-super` and `elem-sub`
-      2. else if `sub.of` is empty, add `elem-super` to `accum`
-   3. for each restriction in `super` and `sub` we compute the narrower restriction and we assign it in `sub`
-   4. for each restriction only in `super` we assign it directly to `sub`
-   5. we assign the value of the key `of` in `sub` to be `accum`
-   6. we return the output of computing the algorithm `consistency-check` on `sub`
-8. if `super-type` is `union` and `sub-type` is any other type
-   1. for each value `i` `elem-super` in the property `of` of `super`
-      1. we replace `i` in `of` with the output of applying this algorithm to `elem-super` and `sub`
-   2. for each restriction in `super` and `sub` we compute the narrower restriction and we assign it in `super`
-   3. for each restriction only in `sub` we assign it directly to `super`
-   4. we return the output of computing the algorithm `consistency-check` on `super`
+7. if `super-type` is `union` or `sub-type` is `union`
+   1. initialize `computed` to the empty record
+   2. if `super-type` is `union`
+      1. assign its properties to `computed`
+      2. set `sup-of` to `of` of `sup`
+   3. else set `sup-of` to a single element array of `sup`
+   4. if `sub-type` is `union`
+       1. assign its properties to `computed`
+       2. set `sub-of` to `of` of `sub`
+   5. else set `sub-of` to a single element array of `sub`
+   6. initialize `of` of `computed` to the empty array
+   7. if `sup-of` is non-empty
+      1. if `sub-of` is non-empty
+         1. for each value `elem-super` in `sup-of`
+            1. for each value `elem-sub` in `sub-of`
+               1. set `result` to the output of applying this algorithm to `elem-super` and `elem-sub`
+               2. if `result` is a `union`, concatenate its `of` to `of` of `computed`
+               3. else append `result` to `of` of `computed`
+      2. else if `sub-of` is empty, assign `of` of `computed` to `sup-of`
+   8. else if `sup-of` is empty, assign `of` of `computed` to `sup-of`
+   9. for each restriction in unions `super` and `sub` we compute the narrower restriction and we assign it in `computed`
+   10. for each restriction only in union `super` we assign it directly to `computed`
+   11. for each restriction only in union `sub` we assign it directly to `computed`
+   12. we return the output of computing the algorithm `consistency-check` on `computed`
+8. else fail the algorithm due to incompatible types
 
 In the previous algorithm we need to define how the narrower version of a constraint is computed.
 The following table provides the details:
