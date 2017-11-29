@@ -1161,8 +1161,7 @@ module.exports = {
         },
         'additionalProperties': true
       }
-    ],
-    'additionalProperties': true
+    ]
   },
   UnionInheritance2: {
     'type': 'union',
