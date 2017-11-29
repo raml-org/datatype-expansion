@@ -241,80 +241,66 @@ function minType (sup, sub) {
     return consistencyCheck(computed)
   }
 
-  // 7. if `super-type` is `union` and `sub-type` is `union`
-  if (superType === 'union' && subType === 'union') {
-    const computed = Object.assign({}, sup, sub)
-    // 7.1. we initialize the variable `accum` to the empty sequence
-    const accum = []
-    // 7.2. for each value `elem-super` in the property `of` of `super`
-    for (let elemSuper of sup.anyOf) {
+  // 7. if `super-type` is `union` or `sub-type` is `union`
+  if (superType === 'union' || subType === 'union') {
+    const computed = {}
+    let supAnyOf, subAnyOf
+    if (superType === 'union') {
+      Object.assign(computed, sup)
+      supAnyOf = sup.anyOf
+    } else {
+      supAnyOf = [sup]
+    }
+    if (subType === 'union') {
+      Object.assign(computed, sub)
+      subAnyOf = sub.anyOf
+    } else {
+      subAnyOf = [sub]
+    }
+    computed.anyOf = []
+    if (supAnyOf.length > 0) {
       // 7.2.1. if `sub.of` is non-empty
-      if (sub.anyOf.length > 0) {
-        // 7.2.1.1. for each value `elem-sub` in the property `of` of `sub`
-        for (let elemSub of sub.anyOf) {
-          // 7.2.1.1.1. we add to `accum` the output of applying this algorithm to `elem-super` and `elem-sub`
-          accum.push(minType(elemSuper, elemSub))
+      if (subAnyOf.length > 0) {
+        // 7.2. for each value `elem-super` in the property `of` of `super`
+        for (const elemSuper of supAnyOf) {
+          // 7.2.1.1. for each value `elem-sub` in the property `of` of `sub`
+          for (const elemSub of subAnyOf) {
+            // 7.2.1.1.1. we add to `computed.anyOf` the output of applying this algorithm to `elem-super` and `elem-sub`
+            const result = minType(elemSuper, elemSub)
+            if (result.type === 'union') {
+              computed.anyOf.concat(result.anyOf)
+            } else {
+              computed.anyOf.push(result)
+            }
+          }
         }
       } else {
-        // 7.2.2. else if `sub.of` is empty, add `elem-super` to `accum`
-        accum.push(elemSuper)
+        // 7.2.2. else if `sub.of` is empty, add `elem-super` to `computed.anyOf`
+        computed.anyOf = supAnyOf
       }
+    } else {
+      computed.anyOf = subAnyOf
     }
 
-    for (let restriction in restrictions) {
-      if (sup[restriction] !== undefined && sub[restriction] !== undefined) {
-        // 7.3. for each restriction in `super` and `sub` we compute the narrower restriction and we assign it in `sub`
-        computed[restriction] = restrictions[restriction](sup[restriction], sub[restriction])
-      } else if (sup[restriction] !== undefined) {
-        // 7.4. for each restriction only in `super` we assign it directly to `sub`
-        computed[restriction] = sup[restriction]
-      }
-    }
-
-    // 7.5. we assign the value of the key `of` in `sub` to be `accum`
-    computed.anyOf = accum
-    // 7.6. we return the output of computing the algorithm `consistency-check` on `sub`
-    return consistencyCheck(computed)
-  }
-
-  // 8. if `super-type` is `union` and `sub-type` is any other type
-  if (superType === 'union' && subType !== 'union') {
-    const computed = Object.assign({}, sup)
-    // 8.1. for each value `i` `elem-super` in the property `of` of `super`
-    // 8.1.1. we replace `i` in `of` with the output of applying this algorithm to `elem-super` and `sub`
-
-    computed.anyOf = sup.anyOf.map(elem => minType(elem, sub))
-
-    for (let restriction in restrictions) {
-      if (sup[restriction] !== undefined && sub[restriction] !== undefined) {
-        // 8.2. for each restriction in `super` and `sub` we compute the narrower restriction and we assign it in `sub`
-        computed[restriction] = restrictions[restriction](sup[restriction], sub[restriction])
-      } else if (sub[restriction] !== undefined) {
-        // 8.3. for each restriction only in `super` we assign it directly to `sub`
+    for (const restriction in restrictions) {
+      if (sup[restriction] !== undefined && superType === 'union') {
+        if (sub[restriction] !== undefined && subType === 'union') {
+          // 7.3. for each restriction in `super` and `sub` we compute the narrower restriction and we assign it in `computed`
+          computed[restriction] = restrictions[restriction](sup[restriction], sub[restriction])
+        } else {
+          // 7.4. for each restriction only in `super` we assign it directly to `computed`
+          computed[restriction] = sup[restriction]
+        }
+      } else if (sub[restriction] !== undefined && subType === 'union') {
+        // 8.3. for each restriction only in `sub` we assign it directly to `computed`
         computed[restriction] = sub[restriction]
       }
     }
 
-    // 8.4. we return the output of computing the algorithm `consistency-check` on `super`
+    // 8.4. we return the output of computing the algorithm `consistency-check` on `computed`
     return consistencyCheck(computed)
   }
 
-  if (subType === 'union' && superType !== 'union') {
-    const computed = Object.assign({}, sub)
-    let anyOf = sub.anyOf
-    computed.anyOf = []
-    for (let i = 0; i < anyOf.length; i++) {
-      let result = minType(sup, anyOf[i])
-      if (result.type === 'union') {
-        computed.anyOf.concat(result.anyOf)
-      } else {
-        computed.anyOf.push(result)
-      }
-    }
-      // minType should always return a canonical type
-      // so a union of canonical types is canonical
-    return computed
-  }
   throw new Error(`incompatible types: [${subType}, ${superType}]`)
 }
 
