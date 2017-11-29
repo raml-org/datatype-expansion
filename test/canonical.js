@@ -13,12 +13,11 @@ const canonicalForm = require('..').canonicalForm
 describe('canonicalForm()', function () {
   _.each(types, function (type, name) {
     it('should generate canonical form of type ' + name, function () {
-            // don't run tests for forms that don't exist
+      // don't run tests for forms that don't exist
       if (forms[name] == null) return
 
       const expForm = expandedForm(types[name], types)
       const canForm = canonicalForm(expForm)
-
       expect(canForm).to.deep.equal(forms[name])
     })
   })
