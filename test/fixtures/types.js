@@ -682,5 +682,12 @@ module.exports = {
         type: 'Payments'
       }
     }
+  },
+  Invoice: {
+    properties: {
+      subtotal: 'number | string',
+      tax: 'number | string',
+      total: 'number | string'
+    }
   }
 }
