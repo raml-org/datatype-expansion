@@ -21,4 +21,11 @@ describe('canonicalForm()', function () {
       expect(canForm).to.deep.equal(forms[name])
     })
   })
+  for (const name of ['Invoice', 'DiscountedInvoice']) {
+    it('should generate canonical form of type ' + name + ' with union hoisting disabled', function () {
+      const expForm = expandedForm(types[name], types)
+      const canForm = canonicalForm(expForm, { hoistUnions: false })
+      expect(canForm).to.deep.equal(forms[name + '_HoistUnionsFalse'])
+    })
+  }
 })

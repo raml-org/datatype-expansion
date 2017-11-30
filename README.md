@@ -110,7 +110,10 @@ The canonical form computes inheritance and pushes unions to the top level of th
 ### Usage
 
 The Node.js version of the canonical form function is defined in the `canonicalForm` function of the library module.
-It accepts a JSON in-memory representation of an expanded RAML type and a callback function. It returns the canonical form or an exception:
+It accepts a JSON in-memory representation of an expanded RAML type and an optional callback function or options object. It returns the canonical form or an exception. The following options are supported:
+
+* `callback`: Provides a callback function via the options object.
+* `hoistUnions` (default: `true`): Controls whether canonicalization should hoist unions to the top level of the type form. When enabled, `union` can only appear as the top-level type, and the associated type alternatives are the permutation of any nested unions in the input type. When disabled, unions remain nested.
 
 #### Sync API
 ```js

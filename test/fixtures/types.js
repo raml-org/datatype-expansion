@@ -689,5 +689,11 @@ module.exports = {
       tax: 'number | string',
       total: 'number | string'
     }
+  },
+  DiscountedInvoice: {
+    type: 'Invoice',
+    properties: {
+      discount: 'number | string'
+    }
   }
 }

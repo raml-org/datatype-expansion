@@ -1338,5 +1338,52 @@ module.exports = {
       type: 'object',
       additionalProperties: true
     }]
+  },
+  Invoice_HoistUnionsFalse: {
+    type: 'object',
+    properties: {
+      subtotal: {
+        type: 'union',
+        anyOf: [{ type: 'number' }, { type: 'string' }],
+        required: true
+      },
+      tax: {
+        type: 'union',
+        anyOf: [{ type: 'number' }, { type: 'string' }],
+        required: true
+      },
+      total: {
+        type: 'union',
+        anyOf: [{ type: 'number' }, { type: 'string' }],
+        required: true
+      }
+    },
+    additionalProperties: true
+  },
+  DiscountedInvoice_HoistUnionsFalse: {
+    type: 'object',
+    properties: {
+      subtotal: {
+        type: 'union',
+        anyOf: [{ type: 'number' }, { type: 'string' }],
+        required: true
+      },
+      tax: {
+        type: 'union',
+        anyOf: [{ type: 'number' }, { type: 'string' }],
+        required: true
+      },
+      total: {
+        type: 'union',
+        anyOf: [{ type: 'number' }, { type: 'string' }],
+        required: true
+      },
+      discount: {
+        type: 'union',
+        anyOf: [{ type: 'number' }, { type: 'string' }],
+        required: true
+      }
+    },
+    additionalProperties: true
   }
 }
