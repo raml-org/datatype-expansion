@@ -1339,7 +1339,7 @@ module.exports = {
       additionalProperties: true
     }]
   },
-  Invoice_HoistUnionsFalse: {
+  Invoice_unhoisted: {
     type: 'object',
     properties: {
       subtotal: {
@@ -1360,7 +1360,7 @@ module.exports = {
     },
     additionalProperties: true
   },
-  DiscountedInvoice_HoistUnionsFalse: {
+  DiscountedInvoice_unhoisted: {
     type: 'object',
     properties: {
       subtotal: {
