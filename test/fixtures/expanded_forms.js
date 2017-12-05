@@ -1451,5 +1451,57 @@ module.exports = {
       }
     },
     additionalProperties: true
+  },
+  Invoice: {
+    type: 'object',
+    properties: {
+      subtotal: {
+        type: 'union',
+        anyOf: [{ type: 'number' }, { type: 'string' }],
+        required: true
+      },
+      tax: {
+        type: 'union',
+        anyOf: [{ type: 'number' }, { type: 'string' }],
+        required: true
+      },
+      total: {
+        type: 'union',
+        anyOf: [{ type: 'number' }, { type: 'string' }],
+        required: true
+      }
+    },
+    additionalProperties: true
+  },
+  DiscountedInvoice: {
+    type: {
+      type: 'object',
+      properties: {
+        subtotal: {
+          type: 'union',
+          anyOf: [{ type: 'number' }, { type: 'string' }],
+          required: true
+        },
+        tax: {
+          type: 'union',
+          anyOf: [{ type: 'number' }, { type: 'string' }],
+          required: true
+        },
+        total: {
+          type: 'union',
+          anyOf: [{ type: 'number' }, { type: 'string' }],
+          required: true
+        }
+      },
+      additionalProperties: true
+    },
+    properties: {
+      discount: {
+        type: 'union',
+        anyOf: [{ type: 'number' }, { type: 'string' }],
+        required: true
+      }
+    },
+    additionalProperties: true
   }
 }

@@ -12,17 +12,22 @@ const isOpaqueType = require('./util').isOpaqueType
  * and canonical form object.
  *
  * @param expForm {object} the (previously) expanded form
- * @param cb {Function} callback
+ * @param cb {Function|object} callback or options
  */
 module.exports.canonicalForm = function canonicalForm (expForm, cb) {
+  let options = {}
+  if (typeof cb === 'object') {
+    options = cb
+    cb = options.callback
+  }
   if (cb == null) {
-    return toCanonical(expForm)
+    return toCanonical(expForm, options)
   }
 
   setTimeout(() => {
     let result
     try {
-      result = toCanonical(expForm)
+      result = toCanonical(expForm, options)
     } catch (e) {
       cb(e, null)
       return
@@ -31,7 +36,7 @@ module.exports.canonicalForm = function canonicalForm (expForm, cb) {
   }, 0)
 }
 
-function toCanonical (form) {
+function toCanonical (form, options) {
   form = _.cloneDeep(form) // just to be on the safe side
 
   // 1. we initialize the variable type with the value of the property `type` of `expanded-form`
@@ -44,7 +49,7 @@ function toCanonical (form) {
   } else if (type === 'array') {
     // 3. if `type` is the string `array`
     // 3.1. we initialize the variable `items` with the output of applying the algorithm to the value of the key `items` of the input `form` of type `Record[String]RAMLForm]`
-    const items = toCanonical(form.items || {type: 'any'})
+    const items = toCanonical(form.items || {type: 'any'}, options)
     const node = consistencyCheck(form)
     // 3.2. we initialize the variable `items-type` with the value of the `type` property of the `items` variable
     const itemsType = items.type
@@ -86,9 +91,9 @@ function toCanonical (form) {
     // 4.4. for each pair `property-name` and `property-value` in the variable `properties`
     _.each(properties, (propValue, propName) => {
       // 4.4.1. we initialize the variable `tmp` with the output of invoking the algorithm over the value in `property-value`
-      const tmp = toCanonical(propValue)
-      if (tmp.type === 'union') {
-        // 4.4.3. if the property `type` of `tmp` has the value `union`
+      const tmp = toCanonical(propValue, options)
+      if (tmp.type === 'union' && options.hoistUnions !== false) {
+        // 4.4.3. if the property `type` of `tmp` has the value `union` and union hoisting is not disabled
         // 4.4.3.1. we initialize the variable `new-accum` to the empty sequence
         const newAccum = []
         // 4.4.3.2. for each value `elem-of` in the property `of` of `tmp`
@@ -159,12 +164,12 @@ function toCanonical (form) {
     }
 
     if (Array.isArray(type)) {
-      const superTypes = _.cloneDeep(type).map(t => toCanonical(t))
-      subType = superTypes.reduce((acc, val) => minType(val, acc), toCanonical(subType))
+      const superTypes = _.cloneDeep(type).map(t => toCanonical(t, options))
+      subType = superTypes.reduce((acc, val) => minType(val, acc), toCanonical(subType, options))
       return subType
     } else {
-      const superType = toCanonical(type)
-      const res = minType(superType, toCanonical(subType))
+      const superType = toCanonical(type, options)
+      const res = minType(superType, toCanonical(subType, options))
       return res
     }
   }

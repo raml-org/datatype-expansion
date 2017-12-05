@@ -166,17 +166,17 @@ An example Clojure implementation of this algorithm can be found in the `api-mod
 
 A RAML type expressed in canonical form has all the properties of RAML type in expanded form plus the following:
 
-- Unions can only appear at the top level of the type form
-- All inheritance relationships have been resolved
 - All `type` properties have a `String` value
+- All inheritance relationships have been resolved
 - All the constraints defined for the type are valid
+- Unions can only appear at the top level of the type form ("union hoisting", which can be disabled)
 
 The canonical form can be used to represent a RAML type in a unique way. It can also be used to perform validation since inheritance and union types have been resolved.
 
 In order to work with inheritance over RAML types we will consider standard set inclusion semantics, where saying that type `A` is a sub-type of `B` means that all instances of `A` are included in the domain of the type `B`.
 
 The algorithm we show in the following section computes the canonical form for a RAML type.
-It takes as input a RAML type in expanded form and produces the canonical form as output or throws an error if an inconsistency structurally or in a constraint is found
+It takes as input a RAML type in expanded form and produces the canonical form as output or throws an error if an inconsistency structurally or in a constraint is found.
 
 For example, provided the following (not expanded) RAML type:
 
@@ -232,7 +232,7 @@ The input of the algorithm is:
       1. we initialize the variable `tmp` with the output of invoking the algorithm over the value in `property-value`
       2. if the property `type` of `tmp` has the value `object`
          1. we add the pair `property-name` `tmp` to the `properties` keys in each record in `accum`
-      3. if the property `type` of `tmp` has the value `union`
+      3. if the property `type` of `tmp` has the value `union` and union hoisting is not disabled
          1. we initialize the variable `new-accum` to the empty sequence
          2. for each value `elem-of` in the property `of` of `tmp`
             1. for each value `elem` in `accum`

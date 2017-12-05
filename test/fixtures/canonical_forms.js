@@ -1263,5 +1263,127 @@ module.exports = {
         additionalProperties: true
       }
     }]
+  },
+  Invoice: {
+    type: 'union',
+    anyOf: [{
+      properties: {
+        subtotal: { type: 'number', required: true },
+        tax: { type: 'number', required: true },
+        total: { type: 'number', required: true }
+      },
+      type: 'object',
+      additionalProperties: true
+    },
+    {
+      properties: {
+        subtotal: { type: 'string', required: true },
+        tax: { type: 'number', required: true },
+        total: { type: 'number', required: true }
+      },
+      type: 'object',
+      additionalProperties: true
+    },
+    {
+      properties: {
+        subtotal: { type: 'number', required: true },
+        tax: { type: 'string', required: true },
+        total: { type: 'number', required: true }
+      },
+      type: 'object',
+      additionalProperties: true
+    },
+    {
+      properties: {
+        subtotal: { type: 'string', required: true },
+        tax: { type: 'string', required: true },
+        total: { type: 'number', required: true }
+      },
+      type: 'object',
+      additionalProperties: true
+    },
+    {
+      properties: {
+        subtotal: { type: 'number', required: true },
+        tax: { type: 'number', required: true },
+        total: { type: 'string', required: true }
+      },
+      type: 'object',
+      additionalProperties: true
+    },
+    {
+      properties: {
+        subtotal: { type: 'string', required: true },
+        tax: { type: 'number', required: true },
+        total: { type: 'string', required: true }
+      },
+      type: 'object',
+      additionalProperties: true
+    },
+    {
+      properties: {
+        subtotal: { type: 'number', required: true },
+        tax: { type: 'string', required: true },
+        total: { type: 'string', required: true }
+      },
+      type: 'object',
+      additionalProperties: true
+    },
+    {
+      properties: {
+        subtotal: { type: 'string', required: true },
+        tax: { type: 'string', required: true },
+        total: { type: 'string', required: true }
+      },
+      type: 'object',
+      additionalProperties: true
+    }]
+  },
+  Invoice_unhoisted: {
+    type: 'object',
+    properties: {
+      subtotal: {
+        type: 'union',
+        anyOf: [{ type: 'number' }, { type: 'string' }],
+        required: true
+      },
+      tax: {
+        type: 'union',
+        anyOf: [{ type: 'number' }, { type: 'string' }],
+        required: true
+      },
+      total: {
+        type: 'union',
+        anyOf: [{ type: 'number' }, { type: 'string' }],
+        required: true
+      }
+    },
+    additionalProperties: true
+  },
+  DiscountedInvoice_unhoisted: {
+    type: 'object',
+    properties: {
+      subtotal: {
+        type: 'union',
+        anyOf: [{ type: 'number' }, { type: 'string' }],
+        required: true
+      },
+      tax: {
+        type: 'union',
+        anyOf: [{ type: 'number' }, { type: 'string' }],
+        required: true
+      },
+      total: {
+        type: 'union',
+        anyOf: [{ type: 'number' }, { type: 'string' }],
+        required: true
+      },
+      discount: {
+        type: 'union',
+        anyOf: [{ type: 'number' }, { type: 'string' }],
+        required: true
+      }
+    },
+    additionalProperties: true
   }
 }
