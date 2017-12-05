@@ -1,5 +1,5 @@
-// var datexp = require('datatype-expansion')
-var datexp = require('../..')
+var datexp = require('datatype-expansion')
+// var datexp = require('../..')
 
 var types = {
   'SimpleUnion': {

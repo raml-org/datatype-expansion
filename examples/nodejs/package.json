@@ -1,5 +1,5 @@
 {
-  "name": "datatype-converter",
+  "name": "datatype-expansion-example",
   "version": "0.0.1",
   "description": "",
   "main": "index.js",
@@ -14,6 +14,6 @@
   "author": "Mulesoft",
   "license": "Apache-2.0",
   "dependencies": {
-    "datatype-expansion": "0.0.1"
+    "datatype-expansion": "0.2.x"
   }
 }

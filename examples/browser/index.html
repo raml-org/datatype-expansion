@@ -2,8 +2,8 @@
 <html>
 <head>
     <title>datatype-expansion example</title>
-  <!-- datatype-expansion.js is generated via "npm run-script browserify" -->
-  <script type="text/javascript" src="../../datatype-expansion.js"></script>
+  <!-- datatype-expansion.js is generated via "npm run rollup" -->
+  <script type="text/javascript" src="../../dist/datatype-expansion.js"></script>
   <script type="text/javascript">
       var types = {
         'SimpleUnion': {
@@ -16,14 +16,14 @@
       var name = 'SimpleUnion'
       console.log('Type name:', name)
 
-      datexp.expandedForm(types[name], types, function (err, expForm) {
+      expansion.expandedForm(types[name], types, function (err, expForm) {
         if (err !== null) {
           console.log('Expanded form error:', err)
           return
         }
         console.log('Expanded form:', JSON.stringify(expForm, null, 2))
 
-        datexp.canonicalForm(expForm, function (err, canForm) {
+        expansion.canonicalForm(expForm, function (err, canForm) {
           if (err !== null) {
             console.log('Canonical form error:', err)
             return
