@@ -601,5 +601,86 @@ module.exports = {
       type: 'union',
       anyOf: ['string', 'number']
     }
+  },
+  UnionInheritance: {
+    type: {
+      type: 'object',
+      properties: {
+        'a': {
+          type: 'union',
+          anyOf: [
+            {
+              type: 'string',
+              minLength: 2
+            },
+            {
+              type: 'string',
+              minLength: 3
+            }
+          ]
+        }
+      }
+    },
+    properties: {
+      'a': {
+        type: 'string',
+        minLength: 4
+      }
+    }
+  },
+  UnionInheritance2: {
+    type: {
+      type: 'object',
+      properties: {
+        'a': {
+          type: 'union',
+          anyOf: [
+            {
+              type: 'string',
+              minLength: 2,
+              maxLength: 10
+            },
+            {
+              type: 'string',
+              minLength: 3
+            }
+          ]
+        }
+      }
+    },
+    properties: {
+      'a': {
+        type: 'union',
+        anyOf: [
+          {
+            type: 'string',
+            minLength: 5
+          },
+          {
+            type: 'string',
+            minLength: 6
+          }
+        ]
+      }
+    }
+  },
+  Payment: {
+    properties: {
+      amount: 'number | string'
+    }
+  },
+  Payments: {
+    type: 'array',
+    items: {
+      type: 'Payment'
+    }
+  },
+  PaymentsPage: {
+    properties: {
+      count: 'integer',
+      results: {
+        type: 'Payments'
+      }
+    }
   }
 }

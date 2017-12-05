@@ -94,7 +94,9 @@ function toCanonical (form) {
         // 4.4.3.2. for each value `elem-of` in the property `of` of `tmp`
         tmp.anyOf.forEach((elemOf) => {
           // 4.4.3.2.1. for each value `elem` in `accum`
-          elemOf.required = tmp.required
+          if (typeof form.required === 'boolean') {
+            elemOf.required = tmp.required
+          }
           for (let elem of accum) {
             // 4.4.3.2.1.1. we clone `elem`
             elem = _.cloneDeep(elem)
@@ -158,12 +160,12 @@ function toCanonical (form) {
 
     if (Array.isArray(type)) {
       const superTypes = _.cloneDeep(type).map(t => toCanonical(t))
-      subType = superTypes.reduce((acc, val) => minType(val, acc), subType)
-      return toCanonical(subType)
+      subType = superTypes.reduce((acc, val) => minType(val, acc), toCanonical(subType))
+      return subType
     } else {
       const superType = toCanonical(type)
-      const res = minType(superType, subType)
-      return toCanonical(res)
+      const res = minType(superType, toCanonical(subType))
+      return res
     }
   }
 

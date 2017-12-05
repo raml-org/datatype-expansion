@@ -180,8 +180,8 @@ module.exports = {
   },
   UnionInTypeArray: {
     anyOf: [
-      { type: 'number' },
-      { type: 'string' }
+            { type: 'number' },
+            { type: 'string' }
     ],
     type: 'union'
   },
@@ -1133,6 +1133,134 @@ module.exports = {
       type: 'array',
       items: {
         type: 'number'
+      }
+    }]
+  },
+  UnionInheritance: {
+    'type': 'union',
+    'anyOf': [
+      {
+        'type': 'object',
+        'properties': {
+          'a': {
+            'type': 'string',
+            'required': true,
+            'minLength': 4
+          }
+        },
+        'additionalProperties': true
+      },
+      {
+        'type': 'object',
+        'properties': {
+          'a': {
+            'type': 'string',
+            'required': true,
+            'minLength': 4
+          }
+        },
+        'additionalProperties': true
+      }
+    ]
+  },
+  UnionInheritance2: {
+    'type': 'union',
+    'anyOf': [
+      {
+        'type': 'object',
+        'properties': {
+          'a': {
+            'type': 'string',
+            'required': true,
+            'minLength': 5,
+            'maxLength': 10
+          }
+        },
+        'additionalProperties': true
+      },
+      {
+        'type': 'object',
+        'properties': {
+          'a': {
+            'type': 'string',
+            'required': true,
+            'minLength': 6,
+            'maxLength': 10
+          }
+        },
+        'additionalProperties': true
+      },
+      {
+        'type': 'object',
+        'properties': {
+          'a': {
+            'type': 'string',
+            'required': true,
+            'minLength': 5
+          }
+        },
+        'additionalProperties': true
+      },
+      {
+        'type': 'object',
+        'properties': {
+          'a': {
+            'type': 'string',
+            'required': true,
+            'minLength': 6
+          }
+        },
+        'additionalProperties': true
+      }
+    ]
+  },
+  Payment: {
+    type: 'union',
+    anyOf: [{
+      type: 'object',
+      properties: {
+        amount: {
+          type: 'number',
+          required: true
+        }
+      },
+      additionalProperties: true
+    }, {
+      type: 'object',
+      properties: {
+        amount: {
+          type: 'string',
+          required: true
+        }
+      },
+      additionalProperties: true
+    }]
+  },
+  Payments: {
+    type: 'union',
+    anyOf: [{
+      type: 'array',
+      items: {
+        type: 'object',
+        properties: {
+          amount: {
+            type: 'number',
+            required: true
+          }
+        },
+        additionalProperties: true
+      }
+    }, {
+      type: 'array',
+      items: {
+        type: 'object',
+        properties: {
+          amount: {
+            type: 'string',
+            required: true
+          }
+        },
+        additionalProperties: true
       }
     }]
   }
