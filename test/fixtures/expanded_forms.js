@@ -1500,6 +1500,18 @@ module.exports = {
         type: 'union',
         anyOf: [{ type: 'number' }, { type: 'string' }],
         required: true
+      },
+      discounts: {
+        type: 'array',
+        items: {
+          type: 'union',
+          anyOf: [{
+            type: 'number'
+          }, {
+            type: 'string'
+          }]
+        },
+        required: true
       }
     },
     additionalProperties: true
