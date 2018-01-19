@@ -141,8 +141,14 @@ function toCanonical (form, options) {
       // 4.4.5.4. we return  the output of applying the `consistency-check` algorithm to the modified value of `form`
       return consistencyCheck(form)
     }
+  } else if (type === 'union') {
+    // 5. if `type` is the string `union`
+    // 1. we recursively canonicalize forms nested within `of` in `form`
+    form.anyOf = form.anyOf.map(alt => toCanonical('type' in alt ? alt : { type: alt }, options))
+    // 2. we return the output of applying the `consistency-check` algorithm to the modified value of `form`
+    return consistencyCheck(form)
   } else if (typeof type === 'object') {
-    // 5. & 6.
+    // 6. & 7.
     // 1. we initialize the variable `super-type-name` to the first value of type string in the chain of nested records for the value `type` starting with the one assigned to `type` in `form`
     const superTypeName = findClass(form)
     let subType = _.cloneDeep(form)
