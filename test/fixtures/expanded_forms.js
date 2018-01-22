@@ -1505,37 +1505,73 @@ module.exports = {
     additionalProperties: true
   },
   T1: {
+    displayName: 'T1',
     type: 'object',
     additionalProperties: true
   },
   T2: {
+    displayName: 'T2',
     type: {
+      displayName: 'T1',
       type: 'object',
       additionalProperties: true
     }
   },
   T3: {
+    displayName: 'T3',
     type: 'union',
     anyOf: [{
+      displayName: 'T2',
       type: {
+        displayName: 'T1',
         type: 'object',
         additionalProperties: true
       }
     }]
   },
   T4: {
+    displayName: 'T4',
     type: {
+      displayName: 'T3',
       type: 'union',
       anyOf: [{
+        displayName: 'T2',
         type: {
+          displayName: 'T1',
           type: 'object',
           additionalProperties: true
         }
       }]
     },
     anyOf: [{
+      displayName: 'T1',
       type: 'object',
       additionalProperties: true
     }]
+  },
+  T5: {
+    displayName: 'T5',
+    type: [{
+      type: 'union',
+      anyOf: [{
+        displayName: 'T1',
+        type: 'object',
+        additionalProperties: true
+      }, {
+        displayName: 'T2',
+        type: {
+          displayName: 'T1',
+          type: 'object',
+          additionalProperties: true
+        }
+      }]
+    }],
+    properties: {
+      kind: {
+        type: 'string',
+        required: true
+      }
+    },
+    additionalProperties: true
   }
 }
