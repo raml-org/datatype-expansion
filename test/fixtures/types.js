@@ -695,19 +695,5 @@ module.exports = {
     properties: {
       discount: 'number | string'
     }
-  },
-  T1: {
-    type: 'object'
-  },
-  T2: {
-    type: 'T1'
-  },
-  T3: {
-    type: 'union',
-    anyOf: ['T2']
-  },
-  T4: {
-    type: 'T3',
-    anyOf: ['T1']
   }
 }
