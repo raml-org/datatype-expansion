@@ -10,22 +10,33 @@ const isOpaqueType = require('./util').isOpaqueType
  * expanded form as an argument to the provided callback function.
  *
  * @param type {(Object|String)} The form being expanded
- * @param types {Array} A `Record` from `String` into `RAMLForm` holding a mapping from
- *                      user defined RAML type names to RAML type forms.
- * @param cb {Function} Callback
+ * @param types {object} An object with entries mapping from user
+ *                   defined RAML type names to RAML type forms
+ * @param cb {Function|object} Callback or options
  */
 module.exports.expandedForm = function expandedForm (type, types, cb) {
-  const keys = Object.keys(types)
-  const typename = keys[keys.map(t => types[t]).indexOf(type)]
+  let options = {}
+  if (typeof cb === 'object') {
+    options = cb
+    cb = options.callback
+  }
+
+  const visited = {}
+  for (const key in types) {
+    if (types[key] === type) {
+      visited[key] = true
+      break
+    }
+  }
 
   if (cb == null) {
-    return expandForm(type, types, typename ? [typename] : [])
+    return expandForm(type, types, visited, options)
   }
 
   setTimeout(() => {
     let result
     try {
-      result = expandForm(type, types, typename ? [typename] : [])
+      result = expandForm(type, types, visited, options)
     } catch (e) {
       cb(e, null)
       return
@@ -36,20 +47,16 @@ module.exports.expandedForm = function expandedForm (type, types, cb) {
 
 /**
  * @param form {*} The form being expanded
- * @param bindings {Array} A `Record` from `String` into `RAMLForm` holding a mapping from user
- *                   defined RAML type names to RAML type forms.
- * @param context {Array} Context of already 'visited' types
- * @param topLevel {String=} a `String` with the default RAML type whose base type is not
- *                   explicit and cannot be inferred, it can be `any` or `string`
- *                   depending if the the type comes from the `body` of RAML service
+ * @param bindings {object} An object with entries mapping from user
+ *                   defined RAML type names to RAML type forms
+ * @param visited {object} An object with properties indicating already 'visited' type names
+ * @param options {object} Expansion options
  * @returns {object} - expanded form
  */
-function expandForm (form, bindings, context, topLevel) {
-  topLevel = topLevel || 'any'
-  form = _.cloneDeep(form)
-
-  // apparently they want this
+function expandForm (form, bindings, visited, options) {
+  // 1. if `form` is a `String
   if (typeof form === 'string') {
+    // apparently they want this
     try {
       JSON.parse(form)
       form = {
@@ -57,10 +64,8 @@ function expandForm (form, bindings, context, topLevel) {
         content: form
       }
     } catch (e) {}
-  }
 
-  // 1. if `form` is a `String
-  if (typeof form === 'string') {
+    // strip parentheses around entire form
     if (/^\(.+\)$/.test(form)) {
       form = form.match(/^\((.+)\)$/)[1]
     }
@@ -78,7 +83,7 @@ function expandForm (form, bindings, context, topLevel) {
             {type: form.replace('?', '')},
             {type: 'nil'}
           ]
-        }, bindings, context)
+        }, bindings, visited, options)
       }
     }
 
@@ -86,21 +91,21 @@ function expandForm (form, bindings, context, topLevel) {
       const match = form.match(/^(.+)\[]$/)[1]
       return {
         type: 'array',
-        items: expandForm(match, bindings, context)
+        items: expandForm(match, bindings, visited, options)
       }
     }
 
     // 1.2. if `form` is a Type Expression, we return the output of calling the algorithm
     // recursively with the parsed type expression and the provided `bindings`
     if (/^[^\s|]*(?:\s*\|\s*[^\s|]*)+$/.test(form)) { // union
-      const options = form.split('|').map(s => s.trim())
-      return expandUnion({anyOf: options, type: 'union'}, bindings, context)
+      const alternatives = form.split('|').map(s => s.trim())
+      return expandUnion({anyOf: alternatives, type: 'union'}, bindings, visited, options)
     }
 
     // 1.3. if `form` is a key in `bindings`
     if (form in bindings) {
       // 1.3.2. If the type has been traversed
-      if (context.indexOf(form) !== -1) {
+      if (form in visited) {
         // 1.3.2.1. We mark the value for the current form as a fixpoint recursion: `$recur`
         // 1.3.2.2. We find the container form matching the recursion type and we wrap it into a `(fixpoint RAMLForm)` form.
         // not sure what that means
@@ -109,53 +114,65 @@ function expandForm (form, bindings, context, topLevel) {
         // 1.3.1. If the type hasn't been traversed yet, we return the output of invoking
         // the algorithm recursively with the value for `form` found in `bindings` and the
         // `bindings` mapping and we add the type to the current traverse path
-        return expandForm(bindings[form], bindings, context.concat([form]))
+        visited = Object.assign({ [form]: true }, visited)
+        let type = bindings[form]
+        if (options.trackOriginalType) {
+          const trackedType = {originalType: form}
+          if (typeof type === 'object') {
+            Object.assign(trackedType, type)
+          } else {
+            trackedType.type = type
+          }
+          type = trackedType
+        }
+        return expandForm(type, bindings, visited, options)
       }
     }
 
     // 1.4. else we return an error
     throw new Error('could not resolve: ' + form)
   } else if (typeof form === 'object') {
+    form = _.cloneDeep(form)
     // 2. if `form` is a `Record`
     // 2.1. we initialize a variable `type`
     // 2.1.1. if `type` has a defined value in `form` we initialize `type` with that value
     // 2.1.2. if `form` has a `properties` key defined, we initialize `type` with the value `object`
     // 2.1.3. if `form` has a `items` key defined, we initialize `type` with the value `object`
     // 2.1.4. otherwise we initialise `type` with the value passed in `top-level-type`
-    form.type = form.type || (form.properties && 'object') || (form.items && 'array') || topLevel
+    form.type = form.type || (form.properties && 'object') || (form.items && 'array') || options.topLevel || 'any'
 
     if (typeof form.type === 'string') {
       if (form.type === 'array') {
         // 2.2. if `type` is a `String` with  value `array`
-        return expandArray(form, bindings, context)
+        return expandArray(form, bindings, visited, options)
       } else if (form.type === 'object') {
         // 2.3 if `type` is a `String` with value `object`
-        return expandObject(form, bindings, context)
+        return expandObject(form, bindings, visited, options)
       } else if (form.type === 'union') {
         // 2.4. if `type` is a `String` with value `union`
-        return expandUnion(form, bindings, context)
+        return expandUnion(form, bindings, visited, options)
       } else if (form.type in bindings) {
         // 2.5. if `type` is a `String` with value in `bindings`
-        form = expandNested(form, bindings, context)
-        form.type = expandForm(form.type, bindings, context)
+        form = expandNested(form, bindings, visited, options)
+        form.type = expandForm(form.type, bindings, visited, options)
       } else {
-        form = Object.assign(form, expandForm(form.type, bindings, context))
+        form = Object.assign(form, expandForm(form.type, bindings, visited, options))
       }
     } else if (Array.isArray(form.type)) {
       // 2.7. if `type` is a `Seq[RAMLForm]`
-      form = expandNested(form, bindings, context)
-      form.type = form.type.map(t => expandForm(t, bindings, context))
+      form = expandNested(form, bindings, visited, options)
+      form.type = form.type.map(t => expandForm(t, bindings, visited, options))
     } else if (typeof form.type === 'object') {
       // 2.6. if `type` is a `Record`
-      form = expandNested(form, bindings, context)
-      form.type = expandForm(form.type, bindings, context)
+      form = expandNested(form, bindings, visited, options)
+      form.type = expandForm(form.type, bindings, visited, options)
     } else {
-      form = Object.assign(form, expandForm(form.type, bindings, context))
+      form = Object.assign(form, expandForm(form.type, bindings, visited, options))
     }
 
     if (form.facets != null) {
       _.each(form.facets, (propValue, propName) => {
-        form.facets[propName] = expandForm(propValue, bindings, context)
+        form.facets[propName] = expandForm(propValue, bindings, visited, options)
       })
     }
 
@@ -165,24 +182,24 @@ function expandForm (form, bindings, context, topLevel) {
   throw new Error('form can only be a string or an object')
 }
 
-function expandNested (form, bindings, context) {
-  if (form.properties !== undefined) form = expandObject(form, bindings, context)
-  if (form.anyOf !== undefined) form = expandUnion(form, bindings, context)
-  if (form.items !== undefined) form = expandArray(form, bindings, context)
+function expandNested (form, bindings, visited, options) {
+  if (form.properties !== undefined) form = expandObject(form, bindings, visited, options)
+  if (form.anyOf !== undefined) form = expandUnion(form, bindings, visited, options)
+  if (form.items !== undefined) form = expandArray(form, bindings, visited, options)
   return form
 }
 
-function expandArray (form, bindings, context) {
-  form.items = expandForm(form.items || 'any', bindings, context)
+function expandArray (form, bindings, visited, options) {
+  form.items = expandForm(form.items || 'any', bindings, visited, options)
   return form
 }
 
-function expandObject (form, bindings, context) {
+function expandObject (form, bindings, visited, options) {
   const props = form.properties
   for (let propName in props) {
     if (!props.hasOwnProperty(propName)) continue
 
-    let expandedPropVal = expandForm(props[propName] || 'any', bindings, context)
+    let expandedPropVal = expandForm(props[propName] || 'any', bindings, visited, options)
     if (propName.endsWith('?')) {
       delete props[propName]
       propName = propName.slice(0, -1)
@@ -199,7 +216,7 @@ function expandObject (form, bindings, context) {
   return form
 }
 
-function expandUnion (form, bindings, context) {
-  form.anyOf = form.anyOf.map(elem => expandForm(elem, bindings, context))
+function expandUnion (form, bindings, visited, options) {
+  form.anyOf = form.anyOf.map(elem => expandForm(elem, bindings, visited, options))
   return form
 }

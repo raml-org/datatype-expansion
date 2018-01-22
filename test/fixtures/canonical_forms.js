@@ -1264,6 +1264,10 @@ module.exports = {
       }
     }]
   },
+  BigNumber: {
+    type: 'union',
+    anyOf: [{ type: 'number' }, { type: 'string' }]
+  },
   Invoice: {
     type: 'union',
     anyOf: [{
@@ -1381,6 +1385,32 @@ module.exports = {
       discount: {
         type: 'union',
         anyOf: [{ type: 'number' }, { type: 'string' }],
+        required: true
+      }
+    },
+    additionalProperties: true
+  },
+  ComplexTracked_unhoisted: {
+    type: 'object',
+    properties: {
+      amounts: {
+        type: 'union',
+        anyOf: [
+          {
+            type: 'union',
+            anyOf: [{ type: 'number' }, { type: 'string' }]
+          },
+          {
+            type: 'union',
+            anyOf: [{
+              type: 'array',
+              items: { type: 'number' }
+            }, {
+              type: 'array',
+              items: { type: 'string' }
+            }]
+          }
+        ],
         required: true
       }
     },

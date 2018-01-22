@@ -683,17 +683,23 @@ module.exports = {
       }
     }
   },
+  BigNumber: 'number | string',
   Invoice: {
     properties: {
-      subtotal: 'number | string',
-      tax: 'number | string',
-      total: 'number | string'
+      subtotal: 'BigNumber',
+      tax: 'BigNumber',
+      total: 'BigNumber'
     }
   },
   DiscountedInvoice: {
     type: 'Invoice',
     properties: {
-      discount: 'number | string'
+      discount: 'BigNumber'
+    }
+  },
+  ComplexTracked: {
+    properties: {
+      amounts: 'BigNumber | (BigNumber[])'
     }
   },
   T1: {
