@@ -693,7 +693,11 @@ module.exports = {
   DiscountedInvoice: {
     type: 'Invoice',
     properties: {
-      discount: 'number | string'
+      discount: 'number | string',
+      discounts: {
+        type: 'array',
+        items: 'number | string'
+      }
     }
   },
   T1: {

@@ -61,7 +61,7 @@ function toCanonical (form, options) {
       return consistencyCheck(node)
     }
     // 3.4. if `items-type` has a value `union`
-    if (itemsType === 'union') {
+    if (itemsType === 'union' && options.hoistUnions !== false) {
       // 3.4.1. for each value `elem` in position `i` of the property `of` in `items-type`
       // 3.4.1.3. we replace the element `i` in the property `of` in `items-type` with the modified value in `union-array`
       items.anyOf = items.anyOf.map((elem) => {
