@@ -134,20 +134,22 @@ function expandForm (form, bindings, context, topLevel) {
       } else if (form.type === 'union') {
         // 2.4. if `type` is a `String` with value `union`
         return expandUnion(form, bindings, context)
-      } else if (form.type in bindings) {
-        // 2.5. if `type` is a `String` with value in `bindings`
-        form = expandNested(form, bindings, context)
+      } else if (typeof form.type === 'string' && form.type in bindings) {
+        if (form.properties !== undefined) form = expandObject(form, bindings, context)
         form.type = expandForm(form.type, bindings, context)
       } else {
         form = Object.assign(form, expandForm(form.type, bindings, context))
       }
     } else if (Array.isArray(form.type)) {
-      // 2.7. if `type` is a `Seq[RAMLForm]`
-      form = expandNested(form, bindings, context)
       form.type = form.type.map(t => expandForm(t, bindings, context))
+      if (form.properties !== undefined) form = expandObject(form, bindings, context)
+      if (form.items !== undefined) form = expandArray(form, bindings, context)
     } else if (typeof form.type === 'object') {
-      // 2.6. if `type` is a `Record`
-      form = expandNested(form, bindings, context)
+      // 2.5. if `type` is a `Record`
+      // 2.5.1. we return the output of invoking the algorithm on the value of `type` with the current value for `bindings`
+      if (form.properties !== undefined) form = expandObject(form, bindings, context)
+      if (form.anyOf !== undefined) form = expandUnion(form, bindings, context)
+      if (form.items !== undefined) form = expandArray(form, bindings, context)
       form.type = expandForm(form.type, bindings, context)
     } else {
       form = Object.assign(form, expandForm(form.type, bindings, context))
@@ -163,13 +165,6 @@ function expandForm (form, bindings, context, topLevel) {
   }
 
   throw new Error('form can only be a string or an object')
-}
-
-function expandNested (form, bindings, context) {
-  if (form.properties !== undefined) form = expandObject(form, bindings, context)
-  if (form.anyOf !== undefined) form = expandUnion(form, bindings, context)
-  if (form.items !== undefined) form = expandArray(form, bindings, context)
-  return form
 }
 
 function expandArray (form, bindings, context) {

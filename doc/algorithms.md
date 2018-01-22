@@ -151,19 +151,14 @@ The input for the algorithm is:
          1. we initialize the variable `i` with the position of the value we are iterating and `elem` with the current value
          2. we initialize the variable `expanded-elem` with the output of invoking the algorithm with input arguments `elem` and the provided map of bindings
          3. we replace the value at position `i` in the sequence `of` by the the computed `expanded-elem`
-   5. if `type` is a `String` with value in `bindings`
-      1. we recursively expand forms nested within `properties`, `of`, or `items` in `form`
-      2. we return the output of invoking the algorithm on the value of `type` with the current value for `bindings`
-   6. if `type` is a `Record`
-      1. we recursively expand forms nested within `properties`, `of`, or `items` in `form`
-      2. we return the output of invoking the algorithm on the value of `type` with the current value for `bindings`
-   7. if `type` is a `Seq[RAMLForm]`
-      1. we recursively expand forms nested within `properties`, `of`, or `items` in `form`
-      2. we iterate through all the values in `type`
+   5. if `type` is a `Record`
+      1. we return the output of invoking the algorithm on the value of `type` with the current value for `bindings`
+   6. if `type` is a `Seq[RAMLForm]`
+      1. we iterate through all the values in `type`
          1. for initialise the variable `i` with the position of the value we are iterating and `elem` with the current value
          2. we initialise the variable `expanded-type` with the output of invoking the algorithm on `elem` with `bindings`
          3. we replace the element `i` in `type` with the computed `expanded-type`
-   8. we return the new value for `form`
+   7. we return the new value for `form`
 
 An example Clojure implementation of this algorithm can be found in the `api-model.parsers.raml.expanded-form` namespace in this project.
 
@@ -247,16 +242,13 @@ The input of the algorithm is:
                4. we add the cloned  `elem` to the sequence `new-accum`
          3. we replace `accum` with `new-accum`
       4. if `accum` contains a single element
-         1. we return the output of applying the `consistency-check` algorithm to the only element in `accum`
+         1. we return  the output of applying the `consistency-check` algorithm to the only element in `accum`
       5. if `accum` contains more than one element
          1. we replace the `type` of `form` with `union`
          2. we remove the keys `properties` and `additionalProperties`
          3. we add the key `of` with the value of `accum`
-         4. we return the output of applying the `consistency-check` algorithm to the modified value of `form`
-5. if `type` is the string `union`
-   1. we recursively canonicalize forms nested within `of` in `form`
-   2. we return the output of applying the `consistency-check` algorithm to the modified value of `form`
-6. if `type` is a `Record[String][RAMLForm]`
+         4. we return  the output of applying the `consistency-check` algorithm to the modified value of `form`
+5. if `type` is a `Record[String][RAMLForm]`
    1. we initialize the variable `super-type-name` to the first value of type string in the chain of nested records for the value `type` starting with the one assigned to `type` in `form`
       1. if `super-type-name` has a value `array` we transform `form` adding the property `items` pointing a record `(Record "type" "any")`
       2. if `super-type-name` has a value `object` we transform `form` adding the property `properties` with the empty record `(Record)`
@@ -265,7 +257,7 @@ The input of the algorithm is:
       5. we set the `type` property of `form` to `super-type-name`
    2. we initialize the variable `tmp` with the output of invoking the algorithm `min-type` to the inputs `canonical-super-type` and `form`
    3. we return the output of recursively applying the algorithm to the modified value of `tmp`
-7. if `type` is `Seq[RAMLForm]`
+6. if `type` is `Seq[RAMLForm]`
    1. we initialize the variable `super-type-name` to the first value of type string in the chain of nested records for the value `type` starting with the one assigned to `type` in `form`
       1. if `super-type-name` has a value `array` we transform `form` adding the property `items` pointing a record `(Record "type" "any")`
       2. if `super-type-name` has a value `object` we transform `form` adding the property `properties` with the empty record `(Record)`
