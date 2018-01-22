@@ -1385,5 +1385,31 @@ module.exports = {
       }
     },
     additionalProperties: true
+  },
+  T1: {
+    type: 'object',
+    properties: {},
+    additionalProperties: true
+  },
+  T2: {
+    type: 'object',
+    properties: {},
+    additionalProperties: true
+  },
+  T3: {
+    type: 'union',
+    anyOf: [{
+      type: 'object',
+      properties: {},
+      additionalProperties: true
+    }]
+  },
+  T4: {
+    type: 'union',
+    anyOf: [{
+      type: 'object',
+      properties: {},
+      additionalProperties: true
+    }]
   }
 }
