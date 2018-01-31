@@ -112,8 +112,14 @@ The pseudo-code for the transformation is the following:
 
 The input for the algorithm is:
   - `form` The form being expanded
-  - `bindings` A `Record` from `String` into `RAMLForm` holding a mapping from user defined RAML type names to RAML type forms.
-  - `top-level-type` a `String` with the default RAML type whose base type is not explicit and cannot be inferred, it can be `any` or `string` depending if the the type comes from the `body` of RAML service definition or any other node.
+  - `bindings` An object holding a mapping from user-defined RAML type names to RAML type forms
+  - `options` An object holding a mapping of algorithm option names to their values:
+    - `topLevel` A string with the default RAML type whose base type is not explicit and cannot be inferred.
+      It can be `any` or `string`, depending if the the type comes from the `body` of RAML service definition or any other node.
+      The default value is `any`.
+    - `trackOriginalType` Indicates whether to track original user-defined RAML type names in the `originalType` key whenever they are expanded.
+      The default value is `false`.
+    - `callback` The callback function to be called when performing expansion asynchronously. The default is synchronous expansion.
 
 *Algorithm*
 
@@ -121,7 +127,10 @@ The input for the algorithm is:
    1. if `form` is a RAML built-in data type, we return `(Record "type" form)`
    2. if `form` is a Type Expression, we return the output of calling the algorithm recursively with the parsed type expression and the provided `bindings`
    3. if `form` is a key in `bindings`:
-      1. If the type hasn't been traversed yet, we return the output of invoking the algorithm recursively with the value for `form` found in `bindings` and the `bindings` mapping and we add the type to the current traverse path
+      1. If the type hasn't been traversed yet:
+         1. We return the output of invoking the algorithm recursively with the value for `form` found in `bindings` and the `bindings` mapping and we add the type to the current traverse path
+         2. If `trackOriginalType` is `true` in `options`, the key `originalType` in the returned type should be set to the
+         value for `form`
       2. If the type has been traversed:
          1. We mark the value for the current form as a fixpoint recursion: `$recur`
          2. We find the container form matching the recursion type and we wrap it into a `(fixpoint RAMLForm)` form.
@@ -131,7 +140,7 @@ The input for the algorithm is:
       1. if `type` has a defined value in `form` we initialize `type` with that value
       2. if `form` has a `properties` key defined, we initialize `type` with the value `object`
       3. if `form` has a `items` key defined, we initialize `type` with the value `object`
-      4. otherwise we initialise `type` with the value passed in `top-level-type`
+      4. otherwise we initialise `type` with the value of `topLevel` in `options`
    2. if `type` is a `String` with  value `array`
       1. we initialize the value `expanded-items` with the result of invoking the algorithm on the value in `form` for the key `items` (or `any` if the key `items` is not defined)
       2. we replace the value of the key `items` in `form` by `expanded-items`
