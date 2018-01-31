@@ -523,17 +523,17 @@ module.exports = {
     additionalProperties: true
   },
   'Songs.Musician': {
-    type: 'union',
-    anyOf: [
-      {
-        properties: {
-          name: {
-            type: 'string',
-            required: true
-          },
-          discography: {
-            type: 'array',
-            items: {
+    properties: {
+      name: {
+        type: 'string',
+        required: true
+      },
+      discography: {
+        type: 'array',
+        items: {
+          type: 'union',
+          anyOf: [
+            {
               properties: {
                 title: {
                   type: 'string',
@@ -547,21 +547,7 @@ module.exports = {
               type: 'object',
               additionalProperties: true
             },
-            required: true
-          }
-        },
-        type: 'object',
-        additionalProperties: true
-      },
-      {
-        properties: {
-          name: {
-            type: 'string',
-            required: true
-          },
-          discography: {
-            type: 'array',
-            items: {
+            {
               properties: {
                 title: {
                   type: 'string',
@@ -588,14 +574,14 @@ module.exports = {
               },
               type: 'object',
               additionalProperties: true
-            },
-            required: true
-          }
+            }
+          ]
         },
-        type: 'object',
-        additionalProperties: true
+        required: true
       }
-    ]
+    },
+    type: 'object',
+    additionalProperties: true
   },
   'Songs.C': {
     type: 'object',
@@ -1123,18 +1109,15 @@ module.exports = {
     additionalProperties: true
   },
   UnionArray: {
-    type: 'union',
-    anyOf: [{
-      type: 'array',
-      items: {
+    type: 'array',
+    items: {
+      type: 'union',
+      anyOf: [{
         type: 'string'
-      }
-    }, {
-      type: 'array',
-      items: {
+      }, {
         type: 'number'
-      }
-    }]
+      }]
+    }
   },
   UnionInheritance: {
     'type': 'union',
@@ -1237,10 +1220,10 @@ module.exports = {
     }]
   },
   Payments: {
-    type: 'union',
-    anyOf: [{
-      type: 'array',
-      items: {
+    type: 'array',
+    items: {
+      type: 'union',
+      anyOf: [{
         type: 'object',
         properties: {
           amount: {
@@ -1249,10 +1232,7 @@ module.exports = {
           }
         },
         additionalProperties: true
-      }
-    }, {
-      type: 'array',
-      items: {
+      }, {
         type: 'object',
         properties: {
           amount: {
@@ -1261,8 +1241,8 @@ module.exports = {
           }
         },
         additionalProperties: true
-      }
-    }]
+      }]
+    }
   },
   Invoice: {
     type: 'union',
