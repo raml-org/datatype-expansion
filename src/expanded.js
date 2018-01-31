@@ -54,9 +54,8 @@ module.exports.expandedForm = function expandedForm (type, types, cb) {
  * @returns {object} - expanded form
  */
 function expandForm (form, bindings, visited, options) {
-  // 1. if `form` is a `String
+  // apparently they want this
   if (typeof form === 'string') {
-    // apparently they want this
     try {
       JSON.parse(form)
       form = {
@@ -64,7 +63,10 @@ function expandForm (form, bindings, visited, options) {
         content: form
       }
     } catch (e) {}
+  }
 
+  // 1. if `form` is a `String
+  if (typeof form === 'string') {
     // strip parentheses around entire form
     if (/^\(.+\)$/.test(form)) {
       form = form.match(/^\((.+)\)$/)[1]
