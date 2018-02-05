@@ -118,16 +118,15 @@ function expandForm (form, bindings, visited, options) {
         // `bindings` mapping and we add the type to the current traverse path
         visited = Object.assign({ [form]: true }, visited)
         let type = bindings[form]
-        if (options.trackOriginalType) {
-          const trackedType = {originalType: form}
-          if (typeof type === 'object') {
-            Object.assign(trackedType, type)
-          } else {
-            trackedType.type = type
-          }
-          type = trackedType
+        if (options.trackOriginalType && !(typeof type === 'object')) {
+          type = { type } // ensure type is in object form
         }
-        return expandForm(type, bindings, visited, options)
+        type = expandForm(type, bindings, visited, options)
+        // set originalType after recursive expansion to retain first type expanded
+        if (options.trackOriginalType) {
+          type.originalType = form
+        }
+        return type
       }
     }
 
