@@ -227,17 +227,8 @@ The input of the algorithm is:
 2. if `type` is in the set `any boolean datetime datetime-only number integer string null file xml json"`
    1. we return the output of applying the `consistency-check` to the `form`
 3. if `type` is the string `array`
-   1. we initialize the variable `items` with the output of applying the algorithm to the value of the key `items` of the input `form` (or `any` if the key `items` is not defined)
-   2. we initialize the variable `items-type` with the value of the `type` property of the `items` variable
-   3. if `items-type` has a value `array`
-      1. we replace the property `items` in `form` with the value of `items` variable
-      2. we return the output of applying the `consistency-check` algorithm to the new value of `form`
-   4. if `items-type` has a value `union`
-      1. for each value `elem` in position `i` of the property `of` in `items-type`
-         1. we initialize the variable `union-array` cloning the value of `form`
-         2. we replace the property `items` of the cloned value in `union-array` with `elem`
-         3. we replace the element `i` in the property `of` in `items-type` with the modified value in `union-array`
-         4. we return the output of applying the `consistency-check` algorithm to `items-type`
+   1. we replace the property `items` in `form` with the output of applying the algorithm to the value of the key `items` of the input `form` (or `any` if the key `items` is not defined)
+   2. we return the output of applying the `consistency-check` algorithm to the new value of `form`
 4. if `type` is the string `object`
    1. we initialize the variable properties with the value of the `properties` key in `form`
    2. we initialize the variable `accum` with the cloned value of `form`
