@@ -321,13 +321,17 @@ The input of the algorithm is:
 7. if `super-type` is `union` or `sub-type` is `union`
    1. initialize `computed` to the empty record
    2. if `super-type` is `union`
-      1. assign its properties to `computed`
+      1. assign its facets to `computed`
       2. set `sup-of` to `of` of `sup`
-   3. else set `sup-of` to a single element array of `sup`
+   3. else
+      1. assign the non-functional facets of `sup` to `computed` and retain only the functional facets in `sup`
+      2. set `sup-of` to a single element array of `sup`
    4. if `sub-type` is `union`
-       1. assign its properties to `computed`
-       2. set `sub-of` to `of` of `sub`
-   5. else set `sub-of` to a single element array of `sub`
+      1. assign its facets to `computed`
+      2. set `sub-of` to `of` of `sub`
+   5. else
+      1. assign the non-functional facets of `sub` to `computed` and retain only the functional facets in `sub`
+      2. set `sub-of` to a single element array of `sub`
    6. initialize `of` of `computed` to the empty array
    7. if `sup-of` is non-empty
       1. if `sub-of` is non-empty
@@ -368,6 +372,7 @@ The following table provides the details:
 
 If the valid condition in the previous table is not met, the `min-type` algorithm will fail throwing an error.
 
+Functional facets are those in the table above, as well as `type`, `properties`, `items`, and `anyOf`.
 
 The other algorithm is `consistency-check`. It just iterates through all the possible restriction constraints defined in the RAML specification and checks that the constraints hold for the provided type using custom logic. The check functions are:
 

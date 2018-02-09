@@ -703,17 +703,28 @@ module.exports = {
     }
   },
   T1: {
+    displayName: 'T1',
     type: 'object'
   },
   T2: {
+    displayName: 'T2',
     type: 'T1'
   },
   T3: {
+    displayName: 'T3',
     type: 'union',
     anyOf: ['T2']
   },
   T4: {
+    displayName: 'T4',
     type: 'T3',
     anyOf: ['T1']
+  },
+  T5: {
+    displayName: 'T5',
+    type: ['T1|T2'],
+    properties: {
+      kind: 'string'
+    }
   }
 }
