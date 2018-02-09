@@ -248,22 +248,26 @@ function minType (sup, sub) {
     let supAnyOf, subAnyOf
     // 7.2. if `super-type` is `union`
     if (superType === 'union') {
-      // 7.2.1. assign its properties to `computed`
+      // 7.2.1. assign its facets to `computed`
       Object.assign(computed, sup)
       // 7.2.2. set `sup-of` to `of` of `sup`
       supAnyOf = sup.anyOf
     } else {
-      // 7.3. else set `sup-of` to a single element array of `sup`
+      // 7.3.1. assign the non-functional facets of `sup` to `computed` and retain only the functional facets in `sup`
+      sup = splitFacets(computed, sup)
+      // 7.3.2 set `sup-of` to a single element array of `sup`
       supAnyOf = [sup]
     }
     // 7.4. if `sub-type` is `union`
     if (subType === 'union') {
-      // 7.4.1. assign its properties to `computed`
+      // 7.4.1. assign its facets to `computed`
       Object.assign(computed, sub)
       // 7.4.2. set `sub-of` to `of` of `sub`
       subAnyOf = sub.anyOf
     } else {
-      // 7.5. else set `sub-of` to a single element array of `sub`
+      // 7.5.1. assign the non-functional facets of `sub` to `computed` and retain only the functional facets in `sub`
+      sub = splitFacets(computed, sub)
+      // 7.5.2. else set `sub-of` to a single element array of `sub`
       subAnyOf = [sub]
     }
     // 7.6. initialize `of` of `computed` to the empty array
@@ -317,6 +321,26 @@ function minType (sup, sub) {
 
   // 8. else fail the algorithm due to incompatible types
   throw new Error(`incompatible types: [${subType}, ${superType}]`)
+}
+
+// functional type facets not included in "restrictions"
+const functionalFacets = {
+  'type': true,
+  'properties': true,
+  'items': true,
+  'anyOf': true
+}
+
+function splitFacets (nonfunctional, source) {
+  const functional = {}
+  for (const key of Object.keys(source)) {
+    if (key in functionalFacets || key in restrictions) {
+      functional[key] = source[key]
+    } else {
+      nonfunctional[key] = source[key]
+    }
+  }
+  return functional
 }
 
 module.exports = minType

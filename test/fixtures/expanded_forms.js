@@ -159,6 +159,49 @@ module.exports = {
     ],
     type: 'union'
   },
+  Device_tracked: {
+    anyOf: [
+      {
+        properties: {
+          manufacturer: {
+            type: 'string',
+            required: true
+          },
+          numberOfSIMCards: {
+            type: 'number',
+            required: true
+          },
+          kind: {
+            type: 'string',
+            required: true
+          }
+        },
+        additionalProperties: true,
+        type: 'object',
+        originalType: 'Phone'
+      },
+      {
+        properties: {
+          manufacturer: {
+            type: 'string',
+            required: true
+          },
+          numberOfUSBPorts: {
+            type: 'number',
+            required: true
+          },
+          kind: {
+            type: 'string',
+            required: true
+          }
+        },
+        additionalProperties: true,
+        type: 'object',
+        originalType: 'Notebook'
+      }
+    ],
+    type: 'union'
+  },
   Deprecation: {
     anyOf: [
       {
@@ -1452,6 +1495,41 @@ module.exports = {
     },
     additionalProperties: true
   },
+  PaymentsPage_tracked: {
+    type: 'object',
+    properties: {
+      count: {
+        type: 'integer',
+        required: true
+      },
+      results: {
+        type: {
+          type: 'array',
+          originalType: 'Payments',
+          items: {
+            type: {
+              type: 'object',
+              originalType: 'Payment',
+              properties: {
+                amount: {
+                  type: 'union',
+                  anyOf: [{ type: 'number' }, { type: 'string' }],
+                  required: true
+                }
+              },
+              additionalProperties: true
+            }
+          }
+        },
+        required: true
+      }
+    },
+    additionalProperties: true
+  },
+  BigNumber: {
+    type: 'union',
+    anyOf: [{ type: 'number' }, { type: 'string' }]
+  },
   Invoice: {
     type: 'object',
     properties: {
@@ -1499,6 +1577,137 @@ module.exports = {
       discount: {
         type: 'union',
         anyOf: [{ type: 'number' }, { type: 'string' }],
+        required: true
+      }
+    },
+    additionalProperties: true
+  },
+  DiscountedInvoice_tracked: {
+    type: {
+      type: 'object',
+      originalType: 'Invoice',
+      properties: {
+        subtotal: {
+          type: 'union',
+          originalType: 'BigNumber',
+          anyOf: [{ type: 'number' }, { type: 'string' }],
+          required: true
+        },
+        tax: {
+          type: 'union',
+          originalType: 'BigNumber',
+          anyOf: [{ type: 'number' }, { type: 'string' }],
+          required: true
+        },
+        total: {
+          type: 'union',
+          originalType: 'BigNumber',
+          anyOf: [{ type: 'number' }, { type: 'string' }],
+          required: true
+        }
+      },
+      additionalProperties: true
+    },
+    properties: {
+      discount: {
+        type: 'union',
+        originalType: 'BigNumber',
+        anyOf: [{ type: 'number' }, { type: 'string' }],
+        required: true
+      }
+    },
+    additionalProperties: true
+  },
+  ComplexTracked_tracked: {
+    type: 'object',
+    properties: {
+      amounts: {
+        type: 'union',
+        anyOf: [
+          {
+            type: 'union',
+            originalType: 'BigNumber',
+            anyOf: [{ type: 'number' }, { type: 'string' }]
+          },
+          {
+            type: 'array',
+            items: {
+              type: 'union',
+              originalType: 'BigNumber',
+              anyOf: [{ type: 'number' }, { type: 'string' }]
+            }
+          }
+        ],
+        required: true
+      }
+    },
+    additionalProperties: true
+  },
+  T1: {
+    displayName: 'T1',
+    type: 'object',
+    additionalProperties: true
+  },
+  T2: {
+    displayName: 'T2',
+    type: {
+      displayName: 'T1',
+      type: 'object',
+      additionalProperties: true
+    }
+  },
+  T3: {
+    displayName: 'T3',
+    type: 'union',
+    anyOf: [{
+      displayName: 'T2',
+      type: {
+        displayName: 'T1',
+        type: 'object',
+        additionalProperties: true
+      }
+    }]
+  },
+  T4: {
+    displayName: 'T4',
+    type: {
+      displayName: 'T3',
+      type: 'union',
+      anyOf: [{
+        displayName: 'T2',
+        type: {
+          displayName: 'T1',
+          type: 'object',
+          additionalProperties: true
+        }
+      }]
+    },
+    anyOf: [{
+      displayName: 'T1',
+      type: 'object',
+      additionalProperties: true
+    }]
+  },
+  T5: {
+    displayName: 'T5',
+    type: [{
+      type: 'union',
+      anyOf: [{
+        displayName: 'T1',
+        type: 'object',
+        additionalProperties: true
+      }, {
+        displayName: 'T2',
+        type: {
+          displayName: 'T1',
+          type: 'object',
+          additionalProperties: true
+        }
+      }]
+    }],
+    properties: {
+      kind: {
+        type: 'string',
         required: true
       }
     },

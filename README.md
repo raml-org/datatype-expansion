@@ -20,8 +20,13 @@ The form and the algorithm to compute is [documented here](doc/algorithms.md).
 ### Usage
 
 The Node.js interface for the library offers the `expandedForm` function to compute the expanded form.
-It accepts an in-memory JSON representation of the type, the types mapping and a callback function.
-If the invocation succeeds, it will return the expanded form as an argument to the provided callback function.
+It accepts an in-memory JSON representation of the type, the types mapping and an optional callback function or options object.
+It returns the canonical form or an exception. The following options are supported:
+
+* `callback`: Provides a callback function via the options object.
+* `topLevel` (default: `any`): The default RAML type to use when base type is not explicit and cannot be inferred.
+It can be `any` or `string`, depending on whether the type comes from the `body` of a RAML service.
+* `trackOriginalType` (default: `false`): Controls whether expansion should track the original type in a property called `originalType` when expanding a type reference.
 
 #### Sync API
 ```js
