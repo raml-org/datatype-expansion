@@ -48,38 +48,11 @@ function toCanonical (form, options) {
     return consistencyCheck(form)
   } else if (type === 'array') {
     // 3. if `type` is the string `array`
-    // 3.1. we initialize the variable `items` with the output of applying the algorithm to the value of the key `items` of the input `form` of type `Record[String]RAMLForm]`
-    const items = toCanonical(form.items || {type: 'any'}, options)
-    const node = consistencyCheck(form)
-    // 3.2. we initialize the variable `items-type` with the value of the `type` property of the `items` variable
-    const itemsType = items.type
-    // 3.3. if `items-type` has a value `array`
-    if (itemsType === 'array') {
-      // 3.3.1. we replace the property `items` in `form` with the value of `items` variable
-      node.items = items
-      // 3.3.2. we return the output of applying the `consistency-check` algorithm to the new value of `form`
-      return consistencyCheck(node)
-    }
-    // 3.4. if `items-type` has a value `union`
-    if (itemsType === 'union') {
-      // 3.4.1. for each value `elem` in position `i` of the property `of` in `items-type`
-      // 3.4.1.3. we replace the element `i` in the property `of` in `items-type` with the modified value in `union-array`
-      items.anyOf = items.anyOf.map((elem) => {
-        // 3.4.1.1. we initialize the variable `union-array` cloning the value of `form`
-        const unionArray = _.cloneDeep(node)
-        // 3.4.1.2. we replace the property `items` of the cloned value in `union-array` with `elem`
-        unionArray.items = elem
-        // 3.4.1.4. we return the output of applying the `consistency-check` algorithm to `items-type`
-        return unionArray
-      })
-      if (typeof form.required === 'boolean') {
-        items.required = form.required
-      }
-      return items
-    }
-
-    node.items = items
-    return consistencyCheck(node)
+    // 3.1. we replace the property `items` in `form` with the output of applying the algorithm to
+    // the value of the key `items` of the input `form` (or `any` if the key `items` is not defined)
+    form.items = toCanonical(form.items || {type: 'any'}, options)
+    // 3.2. we return the output of applying the `consistency-check` algorithm to the new value of `form`
+    return consistencyCheck(form)
   } else if (type === 'object') {
     // 4. if `type` is the string `object`
     // 4.1. we initialize the variable properties with the value of the `properties` key in `form`
@@ -141,8 +114,14 @@ function toCanonical (form, options) {
       // 4.4.5.4. we return  the output of applying the `consistency-check` algorithm to the modified value of `form`
       return consistencyCheck(form)
     }
+  } else if (type === 'union') {
+    // 5. if `type` is the string `union`
+    // 1. we recursively canonicalize forms nested within `of` in `form`
+    form.anyOf = form.anyOf.map(alt => toCanonical('type' in alt ? alt : { type: alt }, options))
+    // 2. we return the output of applying the `consistency-check` algorithm to the modified value of `form`
+    return consistencyCheck(form)
   } else if (typeof type === 'object') {
-    // 5. & 6.
+    // 6. & 7.
     // 1. we initialize the variable `super-type-name` to the first value of type string in the chain of nested records for the value `type` starting with the one assigned to `type` in `form`
     const superTypeName = findClass(form)
     let subType = _.cloneDeep(form)

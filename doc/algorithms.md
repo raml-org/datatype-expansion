@@ -112,8 +112,14 @@ The pseudo-code for the transformation is the following:
 
 The input for the algorithm is:
   - `form` The form being expanded
-  - `bindings` A `Record` from `String` into `RAMLForm` holding a mapping from user defined RAML type names to RAML type forms.
-  - `top-level-type` a `String` with the default RAML type whose base type is not explicit and cannot be inferred, it can be `any` or `string` depending if the the type comes from the `body` of RAML service definition or any other node.
+  - `bindings` An object holding a mapping from user-defined RAML type names to RAML type forms
+  - `options` An object holding a mapping of algorithm option names to their values:
+    - `topLevel` A string with the default RAML type whose base type is not explicit and cannot be inferred.
+      It can be `any` or `string`, depending if the the type comes from the `body` of RAML service definition or any other node.
+      The default value is `any`.
+    - `trackOriginalType` Indicates whether to track original user-defined RAML type names in the `originalType` key whenever they are expanded.
+      The default value is `false`.
+    - `callback` The callback function to be called when performing expansion asynchronously. The default is synchronous expansion.
 
 *Algorithm*
 
@@ -121,7 +127,10 @@ The input for the algorithm is:
    1. if `form` is a RAML built-in data type, we return `(Record "type" form)`
    2. if `form` is a Type Expression, we return the output of calling the algorithm recursively with the parsed type expression and the provided `bindings`
    3. if `form` is a key in `bindings`:
-      1. If the type hasn't been traversed yet, we return the output of invoking the algorithm recursively with the value for `form` found in `bindings` and the `bindings` mapping and we add the type to the current traverse path
+      1. If the type hasn't been traversed yet:
+         1. We return the output of invoking the algorithm recursively with the value for `form` found in `bindings` and the `bindings` mapping and we add the type to the current traverse path
+         2. If `trackOriginalType` is `true` in `options`, the key `originalType` in the returned type should be set to the
+         value for `form`
       2. If the type has been traversed:
          1. We mark the value for the current form as a fixpoint recursion: `$recur`
          2. We find the container form matching the recursion type and we wrap it into a `(fixpoint RAMLForm)` form.
@@ -131,7 +140,7 @@ The input for the algorithm is:
       1. if `type` has a defined value in `form` we initialize `type` with that value
       2. if `form` has a `properties` key defined, we initialize `type` with the value `object`
       3. if `form` has a `items` key defined, we initialize `type` with the value `object`
-      4. otherwise we initialise `type` with the value passed in `top-level-type`
+      4. otherwise we initialise `type` with the value of `topLevel` in `options`
    2. if `type` is a `String` with  value `array`
       1. we initialize the value `expanded-items` with the result of invoking the algorithm on the value in `form` for the key `items` (or `any` if the key `items` is not defined)
       2. we replace the value of the key `items` in `form` by `expanded-items`
@@ -151,14 +160,19 @@ The input for the algorithm is:
          1. we initialize the variable `i` with the position of the value we are iterating and `elem` with the current value
          2. we initialize the variable `expanded-elem` with the output of invoking the algorithm with input arguments `elem` and the provided map of bindings
          3. we replace the value at position `i` in the sequence `of` by the the computed `expanded-elem`
-   5. if `type` is a `Record`
-      1. we return the output of invoking the algorithm on the value of `type` with the current value for `bindings`
-   6. if `type` is a `Seq[RAMLForm]`
-      1. we iterate through all the values in `type`
+   5. if `type` is a `String` with value in `bindings`
+      1. we recursively expand forms nested within `properties`, `of`, or `items` in `form`
+      2. we return the output of invoking the algorithm on the value of `type` with the current value for `bindings`
+   6. if `type` is a `Record`
+      1. we recursively expand forms nested within `properties`, `of`, or `items` in `form`
+      2. we return the output of invoking the algorithm on the value of `type` with the current value for `bindings`
+   7. if `type` is a `Seq[RAMLForm]`
+      1. we recursively expand forms nested within `properties`, `of`, or `items` in `form`
+      2. we iterate through all the values in `type`
          1. for initialise the variable `i` with the position of the value we are iterating and `elem` with the current value
          2. we initialise the variable `expanded-type` with the output of invoking the algorithm on `elem` with `bindings`
          3. we replace the element `i` in `type` with the computed `expanded-type`
-   7. we return the new value for `form`
+   8. we return the new value for `form`
 
 An example Clojure implementation of this algorithm can be found in the `api-model.parsers.raml.expanded-form` namespace in this project.
 
@@ -213,17 +227,8 @@ The input of the algorithm is:
 2. if `type` is in the set `any boolean datetime datetime-only number integer string null file xml json"`
    1. we return the output of applying the `consistency-check` to the `form`
 3. if `type` is the string `array`
-   1. we initialize the variable `items` with the output of applying the algorithm to the value of the key `items` of the input `form` (or `any` if the key `items` is not defined)
-   2. we initialize the variable `items-type` with the value of the `type` property of the `items` variable
-   3. if `items-type` has a value `array`
-      1. we replace the property `items` in `form` with the value of `items` variable
-      2. we return the output of applying the `consistency-check` algorithm to the new value of `form`
-   4. if `items-type` has a value `union`
-      1. for each value `elem` in position `i` of the property `of` in `items-type`
-         1. we initialize the variable `union-array` cloning the value of `form`
-         2. we replace the property `items` of the cloned value in `union-array` with `elem`
-         3. we replace the element `i` in the property `of` in `items-type` with the modified value in `union-array`
-         4. we return the output of applying the `consistency-check` algorithm to `items-type`
+   1. we replace the property `items` in `form` with the output of applying the algorithm to the value of the key `items` of the input `form` (or `any` if the key `items` is not defined)
+   2. we return the output of applying the `consistency-check` algorithm to the new value of `form`
 4. if `type` is the string `object`
    1. we initialize the variable properties with the value of the `properties` key in `form`
    2. we initialize the variable `accum` with the cloned value of `form`
@@ -242,13 +247,16 @@ The input of the algorithm is:
                4. we add the cloned  `elem` to the sequence `new-accum`
          3. we replace `accum` with `new-accum`
       4. if `accum` contains a single element
-         1. we return  the output of applying the `consistency-check` algorithm to the only element in `accum`
+         1. we return the output of applying the `consistency-check` algorithm to the only element in `accum`
       5. if `accum` contains more than one element
          1. we replace the `type` of `form` with `union`
          2. we remove the keys `properties` and `additionalProperties`
          3. we add the key `of` with the value of `accum`
-         4. we return  the output of applying the `consistency-check` algorithm to the modified value of `form`
-5. if `type` is a `Record[String][RAMLForm]`
+         4. we return the output of applying the `consistency-check` algorithm to the modified value of `form`
+5. if `type` is the string `union`
+   1. we recursively canonicalize forms nested within `of` in `form`
+   2. we return the output of applying the `consistency-check` algorithm to the modified value of `form`
+6. if `type` is a `Record[String][RAMLForm]`
    1. we initialize the variable `super-type-name` to the first value of type string in the chain of nested records for the value `type` starting with the one assigned to `type` in `form`
       1. if `super-type-name` has a value `array` we transform `form` adding the property `items` pointing a record `(Record "type" "any")`
       2. if `super-type-name` has a value `object` we transform `form` adding the property `properties` with the empty record `(Record)`
@@ -257,7 +265,7 @@ The input of the algorithm is:
       5. we set the `type` property of `form` to `super-type-name`
    2. we initialize the variable `tmp` with the output of invoking the algorithm `min-type` to the inputs `canonical-super-type` and `form`
    3. we return the output of recursively applying the algorithm to the modified value of `tmp`
-6. if `type` is `Seq[RAMLForm]`
+7. if `type` is `Seq[RAMLForm]`
    1. we initialize the variable `super-type-name` to the first value of type string in the chain of nested records for the value `type` starting with the one assigned to `type` in `form`
       1. if `super-type-name` has a value `array` we transform `form` adding the property `items` pointing a record `(Record "type" "any")`
       2. if `super-type-name` has a value `object` we transform `form` adding the property `properties` with the empty record `(Record)`
@@ -313,13 +321,17 @@ The input of the algorithm is:
 7. if `super-type` is `union` or `sub-type` is `union`
    1. initialize `computed` to the empty record
    2. if `super-type` is `union`
-      1. assign its properties to `computed`
+      1. assign its facets to `computed`
       2. set `sup-of` to `of` of `sup`
-   3. else set `sup-of` to a single element array of `sup`
+   3. else
+      1. assign the non-functional facets of `sup` to `computed` and retain only the functional facets in `sup`
+      2. set `sup-of` to a single element array of `sup`
    4. if `sub-type` is `union`
-       1. assign its properties to `computed`
-       2. set `sub-of` to `of` of `sub`
-   5. else set `sub-of` to a single element array of `sub`
+      1. assign its facets to `computed`
+      2. set `sub-of` to `of` of `sub`
+   5. else
+      1. assign the non-functional facets of `sub` to `computed` and retain only the functional facets in `sub`
+      2. set `sub-of` to a single element array of `sub`
    6. initialize `of` of `computed` to the empty array
    7. if `sup-of` is non-empty
       1. if `sub-of` is non-empty
@@ -360,6 +372,7 @@ The following table provides the details:
 
 If the valid condition in the previous table is not met, the `min-type` algorithm will fail throwing an error.
 
+Functional facets are those in the table above, as well as `type`, `properties`, `items`, and `anyOf`.
 
 The other algorithm is `consistency-check`. It just iterates through all the possible restriction constraints defined in the RAML specification and checks that the constraints hold for the provided type using custom logic. The check functions are:
 

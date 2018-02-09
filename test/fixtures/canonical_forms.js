@@ -523,17 +523,17 @@ module.exports = {
     additionalProperties: true
   },
   'Songs.Musician': {
-    type: 'union',
-    anyOf: [
-      {
-        properties: {
-          name: {
-            type: 'string',
-            required: true
-          },
-          discography: {
-            type: 'array',
-            items: {
+    properties: {
+      name: {
+        type: 'string',
+        required: true
+      },
+      discography: {
+        type: 'array',
+        items: {
+          type: 'union',
+          anyOf: [
+            {
               properties: {
                 title: {
                   type: 'string',
@@ -547,21 +547,7 @@ module.exports = {
               type: 'object',
               additionalProperties: true
             },
-            required: true
-          }
-        },
-        type: 'object',
-        additionalProperties: true
-      },
-      {
-        properties: {
-          name: {
-            type: 'string',
-            required: true
-          },
-          discography: {
-            type: 'array',
-            items: {
+            {
               properties: {
                 title: {
                   type: 'string',
@@ -588,14 +574,14 @@ module.exports = {
               },
               type: 'object',
               additionalProperties: true
-            },
-            required: true
-          }
+            }
+          ]
         },
-        type: 'object',
-        additionalProperties: true
+        required: true
       }
-    ]
+    },
+    type: 'object',
+    additionalProperties: true
   },
   'Songs.C': {
     type: 'object',
@@ -1123,18 +1109,15 @@ module.exports = {
     additionalProperties: true
   },
   UnionArray: {
-    type: 'union',
-    anyOf: [{
-      type: 'array',
-      items: {
+    type: 'array',
+    items: {
+      type: 'union',
+      anyOf: [{
         type: 'string'
-      }
-    }, {
-      type: 'array',
-      items: {
+      }, {
         type: 'number'
-      }
-    }]
+      }]
+    }
   },
   UnionInheritance: {
     'type': 'union',
@@ -1237,10 +1220,10 @@ module.exports = {
     }]
   },
   Payments: {
-    type: 'union',
-    anyOf: [{
-      type: 'array',
-      items: {
+    type: 'array',
+    items: {
+      type: 'union',
+      anyOf: [{
         type: 'object',
         properties: {
           amount: {
@@ -1249,10 +1232,7 @@ module.exports = {
           }
         },
         additionalProperties: true
-      }
-    }, {
-      type: 'array',
-      items: {
+      }, {
         type: 'object',
         properties: {
           amount: {
@@ -1261,8 +1241,12 @@ module.exports = {
           }
         },
         additionalProperties: true
-      }
-    }]
+      }]
+    }
+  },
+  BigNumber: {
+    type: 'union',
+    anyOf: [{ type: 'number' }, { type: 'string' }]
   },
   Invoice: {
     type: 'union',
@@ -1385,5 +1369,85 @@ module.exports = {
       }
     },
     additionalProperties: true
+  },
+  ComplexTracked_unhoisted: {
+    type: 'object',
+    properties: {
+      amounts: {
+        type: 'union',
+        anyOf: [
+          {
+            type: 'union',
+            anyOf: [{ type: 'number' }, { type: 'string' }]
+          },
+          {
+            type: 'array',
+            items: {
+              type: 'union',
+              anyOf: [{ type: 'number' }, { type: 'string' }]
+            }
+          }
+        ],
+        required: true
+      }
+    },
+    additionalProperties: true
+  },
+  T1: {
+    displayName: 'T1',
+    type: 'object',
+    properties: {},
+    additionalProperties: true
+  },
+  T2: {
+    displayName: 'T2',
+    type: 'object',
+    properties: {},
+    additionalProperties: true
+  },
+  T3: {
+    displayName: 'T3',
+    type: 'union',
+    anyOf: [{
+      displayName: 'T2',
+      type: 'object',
+      properties: {},
+      additionalProperties: true
+    }]
+  },
+  T4: {
+    displayName: 'T4',
+    type: 'union',
+    anyOf: [{
+      displayName: 'T1',
+      type: 'object',
+      properties: {},
+      additionalProperties: true
+    }]
+  },
+  T5: {
+    displayName: 'T5',
+    type: 'union',
+    anyOf: [{
+      displayName: 'T1',
+      type: 'object',
+      properties: {
+        kind: {
+          type: 'string',
+          required: true
+        }
+      },
+      additionalProperties: true
+    }, {
+      displayName: 'T2',
+      type: 'object',
+      properties: {
+        kind: {
+          type: 'string',
+          required: true
+        }
+      },
+      additionalProperties: true
+    }]
   }
 }
