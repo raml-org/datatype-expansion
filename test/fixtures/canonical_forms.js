@@ -1381,14 +1381,11 @@ module.exports = {
             anyOf: [{ type: 'number' }, { type: 'string' }]
           },
           {
-            type: 'union',
-            anyOf: [{
-              type: 'array',
-              items: { type: 'number' }
-            }, {
-              type: 'array',
-              items: { type: 'string' }
-            }]
+            type: 'array',
+            items: {
+              type: 'union',
+              anyOf: [{ type: 'number' }, { type: 'string' }]
+            }
           }
         ],
         required: true
