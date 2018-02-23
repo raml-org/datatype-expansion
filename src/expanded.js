@@ -99,7 +99,7 @@ function expandForm (form, bindings, visited, options) {
 
     // 1.2. if `form` is a Type Expression, we return the output of calling the algorithm
     // recursively with the parsed type expression and the provided `bindings`
-    if (/^[^\s|]*(?:\s*\|\s*[^\s|]*)+$/.test(form)) { // union
+    if (/^[^|\s]+(?:\|[^|\s]+)+$/.test(form.replace(/\s+/g, ''))) { // union
       const alternatives = form.split('|').map(s => s.trim())
       return expandUnion({anyOf: alternatives, type: 'union'}, bindings, visited, options)
     }
