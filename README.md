@@ -1,4 +1,6 @@
 # RAML Data Type Expansion
+
+[![Greenkeeper badge](https://badges.greenkeeper.io/raml-org/datatype-expansion.svg)](https://greenkeeper.io/)
 [![Build Status](https://travis-ci.org/raml-org/datatype-expansion.svg?branch=master)](https://travis-ci.org/raml-org/datatype-expansion) 
 [![Coverage Status](https://coveralls.io/repos/github/raml-org/datatype-expansion/badge.svg?branch=master)](https://coveralls.io/github/raml-org/datatype-expansion?branch=master)
 

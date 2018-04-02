@@ -180,8 +180,8 @@ module.exports = {
   },
   UnionInTypeArray: {
     anyOf: [
-            { type: 'number' },
-            { type: 'string' }
+      { type: 'number' },
+      { type: 'string' }
     ],
     type: 'union'
   },
