@@ -1061,8 +1061,8 @@ module.exports = {
   },
   Optional: {
     anyOf: [
-            { type: 'string' },
-            { type: 'nil' }
+      { type: 'string' },
+      { type: 'nil' }
     ],
     type: 'union'
   },
