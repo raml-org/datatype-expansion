@@ -1449,5 +1449,46 @@ module.exports = {
       },
       additionalProperties: true
     }]
+  },
+  HomeAnimalMI: {
+    anyOf: [
+      {
+        type: 'object',
+        properties: {
+          name: {
+            type: 'string',
+            required: true
+          },
+          fangs: {
+            type: 'string',
+            required: true
+          },
+          homeAddress: {
+            type: 'string',
+            required: true
+          }
+        },
+        additionalProperties: true
+      },
+      {
+        type: 'object',
+        properties: {
+          name: {
+            type: 'string',
+            required: true
+          },
+          color: {
+            type: 'string',
+            required: true
+          },
+          homeAddress: {
+            type: 'string',
+            required: true
+          }
+        },
+        additionalProperties: true
+      }
+    ],
+    type: 'union'
   }
 }

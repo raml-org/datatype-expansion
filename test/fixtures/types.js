@@ -726,5 +726,26 @@ module.exports = {
     properties: {
       kind: 'string'
     }
-  }
+  },
+  HasHomeMI: {
+    type: 'object',
+    properties: {
+      homeAddress: 'string'
+    }
+  },
+  CatMI: {
+    type: 'object',
+    properties: {
+      name: 'string',
+      color: 'string'
+    }
+  },
+  DogMI: {
+    type: 'object',
+    properties: {
+      name: 'string',
+      fangs: 'string'
+    }
+  },
+  HomeAnimalMI: [ 'HasHomeMI', 'DogMI | CatMI' ]
 }
