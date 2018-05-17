@@ -134,6 +134,11 @@ function expandForm (form, bindings, visited, options) {
     throw new Error('could not resolve: ' + form)
   } else if (typeof form === 'object') {
     form = _.cloneDeep(form)
+    if (Array.isArray(form)) {
+      form = {
+        type: form
+      }
+    }
     // 2. if `form` is a `Record`
     // 2.1. we initialize a variable `type`
     // 2.1.1. if `type` has a defined value in `form` we initialize `type` with that value
