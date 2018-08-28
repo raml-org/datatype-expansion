@@ -42,7 +42,7 @@
     "npm-run-all": "^4.0.2",
     "rimraf": "^2.6.1",
     "rollup": "^0.59.1",
-    "rollup-plugin-babel": "^3.0.2",
+    "rollup-plugin-babel": "^4.0.1",
     "rollup-plugin-commonjs": "^9.0.0",
     "rollup-plugin-node-resolve": "^3.0.0",
     "rollup-plugin-uglify": "^3.0.0",
