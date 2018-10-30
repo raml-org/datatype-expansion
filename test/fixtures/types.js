@@ -297,11 +297,11 @@ module.exports = {
   },
   'Songs.LP': {
     type: 'Songs.Song',
-    properties: {duration: 'string'}
+    properties: { duration: 'string' }
   },
   'Songs.Publication': {
     type: ['Songs.Album', 'Songs.LP', 'Songs.C'],
-    properties: {date: 'string'}
+    properties: { date: 'string' }
   },
   'Songs.Musician': {
     properties: {
@@ -309,8 +309,8 @@ module.exports = {
       discography: '(Songs.Song | Songs.Album)[]'
     }
   },
-  'Songs.C': {type: 'object', properties: {other: 'integer'}},
-  'Songs.Constrained': {type: 'array', items: 'string', minItems: 10},
+  'Songs.C': { type: 'object', properties: { other: 'integer' } },
+  'Songs.Constrained': { type: 'array', items: 'string', minItems: 10 },
   'Songs.ExemplarSong': {
     properties: {
       title: {
@@ -337,8 +337,8 @@ module.exports = {
       }
     }
   },
-  'Songs.Cell': {properties: {car: 'any', cdr: 'Songs.List | nil'}},
-  'Songs.List': {properties: {cell: 'Songs.Cell'}},
+  'Songs.Cell': { properties: { car: 'any', cdr: 'Songs.List | nil' } },
+  'Songs.List': { properties: { cell: 'Songs.Cell' } },
   missingFacets: {
     type: 'object',
     properties: {
@@ -346,7 +346,7 @@ module.exports = {
         description: 'Cat name',
         displayName: 'name',
         type: 'string',
-        facets: {amazing: 'boolean'},
+        facets: { amazing: 'boolean' },
         amazing: true
       }
     }
@@ -386,8 +386,8 @@ module.exports = {
     items: {
       type: 'object',
       properties: {
-        title: {type: 'string'},
-        artist: {type: 'string'}
+        title: { type: 'string' },
+        artist: { type: 'string' }
       }
     }
   },

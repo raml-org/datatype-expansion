@@ -74,7 +74,7 @@ function expandForm (form, bindings, visited, options) {
 
     // 1.1. if `form` is a RAML built-in data type, we return `(Record "type" form)`
     if (isOpaqueType(form) || form === 'object' || form === 'array') {
-      return {type: form}
+      return { type: form }
     }
 
     if (form.endsWith('?')) {
@@ -82,8 +82,8 @@ function expandForm (form, bindings, visited, options) {
         return expandUnion({
           type: 'union',
           anyOf: [
-            {type: form.replace('?', '')},
-            {type: 'nil'}
+            { type: form.replace('?', '') },
+            { type: 'nil' }
           ]
         }, bindings, visited, options)
       }
@@ -101,7 +101,7 @@ function expandForm (form, bindings, visited, options) {
     // recursively with the parsed type expression and the provided `bindings`
     if (/^[^|\s]+(?:\|[^|\s]+)+$/.test(form.replace(/\s+/g, ''))) { // union
       const alternatives = form.split('|').map(s => s.trim())
-      return expandUnion({anyOf: alternatives, type: 'union'}, bindings, visited, options)
+      return expandUnion({ anyOf: alternatives, type: 'union' }, bindings, visited, options)
     }
 
     // 1.3. if `form` is a key in `bindings`
@@ -111,7 +111,7 @@ function expandForm (form, bindings, visited, options) {
         // 1.3.2.1. We mark the value for the current form as a fixpoint recursion: `$recur`
         // 1.3.2.2. We find the container form matching the recursion type and we wrap it into a `(fixpoint RAMLForm)` form.
         // not sure what that means
-        return {type: '$recur'}
+        return { type: '$recur' }
       } else {
         // 1.3.1. If the type hasn't been traversed yet, we return the output of invoking
         // the algorithm recursively with the value for `form` found in `bindings` and the

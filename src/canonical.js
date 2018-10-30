@@ -50,7 +50,7 @@ function toCanonical (form, options) {
     // 3. if `type` is the string `array`
     // 3.1. we replace the property `items` in `form` with the output of applying the algorithm to
     // the value of the key `items` of the input `form` (or `any` if the key `items` is not defined)
-    form.items = toCanonical(form.items || {type: 'any'}, options)
+    form.items = toCanonical(form.items || { type: 'any' }, options)
     // 3.2. we return the output of applying the `consistency-check` algorithm to the new value of `form`
     return consistencyCheck(form)
   } else if (type === 'object') {
@@ -134,7 +134,7 @@ function toCanonical (form, options) {
         break
       case 'array':
         // 1.1. if `super-type-name` has a value `array` we transform `form` adding the property `items` pointing a record `(Record "type" "any")`
-        subType.items = subType.items || {type: 'any'}
+        subType.items = subType.items || { type: 'any' }
         break
       case 'union':
         // 1.3. if `super-type-name` has a value `union` we transform `form` adding the property `of` with the empty sequence `(Seq)`
