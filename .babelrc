@@ -1,6 +1,17 @@
 {
   "presets": [
-    ["env", {"modules": false, "targets": {"browsers": ["last 2 versions"]}}]
+    [
+      "@babel/preset-env",
+      {
+        "modules": false,
+        "targets": {
+          "browsers": ["last 2 versions"]
+        }
+      }
+    ]
   ],
-  "plugins": ["external-helpers", "lodash"]
+  "plugins": [
+    "@babel/plugin-external-helpers",
+    "lodash"
+  ]
 }
