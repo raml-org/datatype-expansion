@@ -16,7 +16,8 @@ const opaqueTypes = _.keyBy([
   'nil',
   'file',
   'xml',
-  'json'
+  'json',
+  '$recur'
 ])
 
 module.exports.isOpaqueType = function isOpaqueType (type) {
