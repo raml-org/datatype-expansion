@@ -1120,80 +1120,80 @@ module.exports = {
     }
   },
   UnionInheritance: {
-    'type': 'union',
-    'anyOf': [
+    type: 'union',
+    anyOf: [
       {
-        'type': 'object',
-        'properties': {
-          'a': {
-            'type': 'string',
-            'required': true,
-            'minLength': 4
+        type: 'object',
+        properties: {
+          a: {
+            type: 'string',
+            required: true,
+            minLength: 4
           }
         },
-        'additionalProperties': true
+        additionalProperties: true
       },
       {
-        'type': 'object',
-        'properties': {
-          'a': {
-            'type': 'string',
-            'required': true,
-            'minLength': 4
+        type: 'object',
+        properties: {
+          a: {
+            type: 'string',
+            required: true,
+            minLength: 4
           }
         },
-        'additionalProperties': true
+        additionalProperties: true
       }
     ]
   },
   UnionInheritance2: {
-    'type': 'union',
-    'anyOf': [
+    type: 'union',
+    anyOf: [
       {
-        'type': 'object',
-        'properties': {
-          'a': {
-            'type': 'string',
-            'required': true,
-            'minLength': 5,
-            'maxLength': 10
+        type: 'object',
+        properties: {
+          a: {
+            type: 'string',
+            required: true,
+            minLength: 5,
+            maxLength: 10
           }
         },
-        'additionalProperties': true
+        additionalProperties: true
       },
       {
-        'type': 'object',
-        'properties': {
-          'a': {
-            'type': 'string',
-            'required': true,
-            'minLength': 6,
-            'maxLength': 10
+        type: 'object',
+        properties: {
+          a: {
+            type: 'string',
+            required: true,
+            minLength: 6,
+            maxLength: 10
           }
         },
-        'additionalProperties': true
+        additionalProperties: true
       },
       {
-        'type': 'object',
-        'properties': {
-          'a': {
-            'type': 'string',
-            'required': true,
-            'minLength': 5
+        type: 'object',
+        properties: {
+          a: {
+            type: 'string',
+            required: true,
+            minLength: 5
           }
         },
-        'additionalProperties': true
+        additionalProperties: true
       },
       {
-        'type': 'object',
-        'properties': {
-          'a': {
-            'type': 'string',
-            'required': true,
-            'minLength': 6
+        type: 'object',
+        properties: {
+          a: {
+            type: 'string',
+            required: true,
+            minLength: 6
           }
         },
-        'additionalProperties': true
+        additionalProperties: true
       }
     ]
   },

@@ -2,10 +2,10 @@ var datexp = require('datatype-expansion')
 // var datexp = require('../..')
 
 var types = {
-  'SimpleUnion': {
-    'properties': {
-      'a': 'string',
-      'b': 'number | string'
+  SimpleUnion: {
+    properties: {
+      a: 'string',
+      b: 'number | string'
     }
   }
 }

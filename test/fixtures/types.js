@@ -606,7 +606,7 @@ module.exports = {
     type: {
       type: 'object',
       properties: {
-        'a': {
+        a: {
           type: 'union',
           anyOf: [
             {
@@ -622,7 +622,7 @@ module.exports = {
       }
     },
     properties: {
-      'a': {
+      a: {
         type: 'string',
         minLength: 4
       }
@@ -632,7 +632,7 @@ module.exports = {
     type: {
       type: 'object',
       properties: {
-        'a': {
+        a: {
           type: 'union',
           anyOf: [
             {
@@ -649,7 +649,7 @@ module.exports = {
       }
     },
     properties: {
-      'a': {
+      a: {
         type: 'union',
         anyOf: [
           {
@@ -747,5 +747,5 @@ module.exports = {
       fangs: 'string'
     }
   },
-  HomeAnimalMI: [ 'HasHomeMI', 'DogMI | CatMI' ]
+  HomeAnimalMI: ['HasHomeMI', 'DogMI | CatMI']
 }

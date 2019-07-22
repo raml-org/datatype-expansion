@@ -16,98 +16,98 @@ const consistencyCheck = require('./util').consistencyCheck
  * Throw an error if invalid
  */
 const restrictions = {
-  'minProperties': (sup, sub) => {
+  minProperties: (sup, sub) => {
     if (sup <= sub) {
       return Math.max(sup, sub)
     }
     throw new Error('sub type has a weaker constraint for min-properties than base type')
   },
-  'maxProperties': (sup, sub) => {
+  maxProperties: (sup, sub) => {
     if (sup >= sub) {
       return Math.min(sup, sub)
     }
     throw new Error('sub type has a weaker constraint for max-properties than base type')
   },
-  'minLength': (sup, sub) => {
+  minLength: (sup, sub) => {
     if (sup <= sub) {
       return Math.max(sup, sub)
     }
     throw new Error('sub type has a weaker constraint for min-length than base type')
   },
-  'maxLength': (sup, sub) => {
+  maxLength: (sup, sub) => {
     if (sup >= sub) {
       return Math.min(sup, sub)
     }
     throw new Error('sub type has a weaker constraint for max-length than base type')
   },
-  'minimum': (sup, sub) => {
+  minimum: (sup, sub) => {
     if (sup <= sub) {
       return Math.max(sup, sub)
     }
     throw new Error('sub type has a weaker constraint for minimum than base type')
   },
-  'maximum': (sup, sub) => {
+  maximum: (sup, sub) => {
     if (sup >= sub) {
       return Math.min(sup, sub)
     }
     throw new Error('sub type has a weaker constraint for maximum than base type')
   },
-  'minItems': (sup, sub) => {
+  minItems: (sup, sub) => {
     if (sup <= sub) {
       return Math.max(sup, sub)
     }
     throw new Error('sub type has a weaker constraint for min-items than base type')
   },
-  'maxItems': (sup, sub) => {
+  maxItems: (sup, sub) => {
     if (sup >= sub) {
       return Math.min(sup, sub)
     }
     throw new Error('sub type has a weaker constraint for max-items than base type')
   },
-  'format': (sup, sub) => {
+  format: (sup, sub) => {
     if (sup === null || sup === sub) {
       return sup || sub
     }
     throw new Error(`Different values for format constraint [${sup} ${sub}]`)
   },
-  'pattern': (sup, sub) => {
+  pattern: (sup, sub) => {
     if (sup === null || sup === sub) {
       return sup || sub
     }
     throw new Error(`Different values for pattern constraint [${sup} ${sub}]`)
   },
-  'discriminator': (sup, sub) => {
+  discriminator: (sup, sub) => {
     if (sup === null || sup === sub) {
       return sup || sub
     }
     throw new Error(`Different values for discriminator constraint [${sup} ${sub}]`)
   },
-  'discriminatorValue': (sup, sub) => {
+  discriminatorValue: (sup, sub) => {
     if (sup === null || sup === sub) {
       return sup || sub
     }
     throw new Error(`Different values for discriminator-value constraint [${sup} ${sub}]`)
   },
-  'enumValues': (sup, sub) => {
+  enumValues: (sup, sub) => {
     // if sub is a subset of super
     if (sub.filter(e => sup.indexOf(e) === -1).length === 0) {
       return sub
     }
     throw new Error('sub type has a weaker constraint for enum-values than base type')
   },
-  'uniqueItems': (sup, sub) => {
+  uniqueItems: (sup, sub) => {
     if (!sup || sup === sub) {
       return sup && sub
     }
     throw new Error('sub type has a weaker constraint for unique-items than base type')
   },
-  'required': (sup, sub) => {
+  required: (sup, sub) => {
     if (!sup || sup === sub) {
       return sup || sub
     }
     throw new Error('Error in required property, making optional base class required property')
   },
-  'additionalProperties': (sup, sub) => {
+  additionalProperties: (sup, sub) => {
     if (!sup || sup === sub) {
       return sup && sub
     }
@@ -132,7 +132,7 @@ function minType (sup, sub) {
   if (superType === subType && isOpaqueType(superType)) {
     // 2.1. we initialize the variable `computed` to the record with property `type` having the common `super-type` and `sub-type` value
     const computed = Object.assign({}, sup, sub)
-    for (let restriction in restrictions) {
+    for (const restriction in restrictions) {
       if (sup[restriction] !== undefined && sub[restriction] !== undefined) {
         // 2.2. for each restriction in `super` and `sub` we compute the narrower restriction and we assign it in `computed`
         computed[restriction] = restrictions[restriction](sup[restriction], sub[restriction])
@@ -151,7 +151,7 @@ function minType (sup, sub) {
     const other = superType === 'any' ? sub : sup
     const computed = Object.assign({}, sup, sub)
     computed.type = other.type
-    for (let restriction in restrictions) {
+    for (const restriction in restrictions) {
       if (anytype[restriction] !== undefined && other[restriction] !== undefined) {
         // 3.1. for each restriction in the `any` type and in the other type, we compute the narrower restriction and we re-assign it to the other type
         computed[restriction] = restrictions[restriction](anytype[restriction], other[restriction])
@@ -168,7 +168,7 @@ function minType (sup, sub) {
   // 4. if `super-type` is `number` and the `sub-type` is `integer`
   if (superType === 'number' && subType === 'integer') {
     const computed = Object.assign({}, sup, sub)
-    for (let restriction in restrictions) {
+    for (const restriction in restrictions) {
       if (sup[restriction] !== undefined && sub[restriction] !== undefined) {
         // 4.1. for each restriction in the `number` type and in the `integer` type, we compute the narrower restriction and we re-assign it to the `integer` type
         computed[restriction] = restrictions[restriction](sup[restriction], sub[restriction])
@@ -188,7 +188,7 @@ function minType (sup, sub) {
     // 5.2. we re-assign the value of the property `items` in `sub` with the value of `min-items`
     computed.items = minType(sup.items, sub.items)
 
-    for (let restriction in restrictions) {
+    for (const restriction in restrictions) {
       if (sup[restriction] !== undefined && sub[restriction] !== undefined) {
         // 4.3. for each restriction in `super` and `sub` we compute the narrower restriction and we assign it in `sub`
         computed[restriction] = restrictions[restriction](sup[restriction], sub[restriction])
@@ -225,7 +225,7 @@ function minType (sup, sub) {
       commonProps[p] = sub.properties[p]
     })
 
-    for (let restriction in restrictions) {
+    for (const restriction in restrictions) {
       if (sup[restriction] !== undefined && sub[restriction] !== undefined) {
         // 6.4. for each restriction in `super` and `sub` we compute the narrower restriction and we assign it in `sub`
         computed[restriction] = restrictions[restriction](sup[restriction], sub[restriction])
@@ -325,10 +325,10 @@ function minType (sup, sub) {
 
 // functional type facets not included in "restrictions"
 const functionalFacets = {
-  'type': true,
-  'properties': true,
-  'items': true,
-  'anyOf': true
+  type: true,
+  properties: true,
+  items: true,
+  anyOf: true
 }
 
 function splitFacets (nonfunctional, source) {

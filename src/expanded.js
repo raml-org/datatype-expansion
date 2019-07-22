@@ -203,9 +203,9 @@ function expandArray (form, bindings, visited, options) {
 function expandObject (form, bindings, visited, options) {
   const props = form.properties
   for (let propName in props) {
-    if (!props.hasOwnProperty(propName)) continue
+    if (!Object.prototype.hasOwnProperty.call(props, propName)) continue
 
-    let expandedPropVal = expandForm(props[propName] || 'any', bindings, visited, options)
+    const expandedPropVal = expandForm(props[propName] || 'any', bindings, visited, options)
     if (propName.endsWith('?')) {
       delete props[propName]
       propName = propName.slice(0, -1)

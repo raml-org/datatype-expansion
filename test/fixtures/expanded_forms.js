@@ -1370,74 +1370,74 @@ module.exports = {
     }
   },
   UnionInheritance: {
-    'type': {
-      'type': 'object',
-      'properties': {
-        'a': {
-          'type': 'union',
-          'anyOf': [
+    type: {
+      type: 'object',
+      properties: {
+        a: {
+          type: 'union',
+          anyOf: [
             {
-              'type': 'string',
-              'minLength': 2
+              type: 'string',
+              minLength: 2
             },
             {
-              'type': 'string',
-              'minLength': 3
+              type: 'string',
+              minLength: 3
             }
           ],
-          'required': true
+          required: true
         }
       },
-      'additionalProperties': true
+      additionalProperties: true
     },
-    'properties': {
-      'a': {
-        'type': 'string',
-        'minLength': 4,
-        'required': true
+    properties: {
+      a: {
+        type: 'string',
+        minLength: 4,
+        required: true
       }
     },
-    'additionalProperties': true
+    additionalProperties: true
   },
   UnionInheritance2: {
-    'type': {
-      'type': 'object',
-      'properties': {
-        'a': {
-          'type': 'union',
-          'anyOf': [
+    type: {
+      type: 'object',
+      properties: {
+        a: {
+          type: 'union',
+          anyOf: [
             {
-              'type': 'string',
-              'minLength': 2,
-              'maxLength': 10
+              type: 'string',
+              minLength: 2,
+              maxLength: 10
             },
             {
-              'type': 'string',
-              'minLength': 3
+              type: 'string',
+              minLength: 3
             }
           ],
-          'required': true
+          required: true
         }
       },
-      'additionalProperties': true
+      additionalProperties: true
     },
-    'properties': {
-      'a': {
-        'type': 'union',
-        'anyOf': [
+    properties: {
+      a: {
+        type: 'union',
+        anyOf: [
           {
-            'type': 'string',
-            'minLength': 5
+            type: 'string',
+            minLength: 5
           },
           {
-            'type': 'string',
-            'minLength': 6
+            type: 'string',
+            minLength: 6
           }
         ],
-        'required': true
+        required: true
       }
     },
-    'additionalProperties': true
+    additionalProperties: true
   },
   Payment: {
     type: 'object',
