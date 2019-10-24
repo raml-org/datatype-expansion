@@ -24,14 +24,14 @@ const types = {
 describe('errors', function () {
   it('incompatible types should throw', function () {
     try {
-      const expForm = expandedForm(types['error'], types)
+      const expForm = expandedForm(types.error, types)
       canonicalForm(expForm)
       expect.fail()
     } catch (err) {}
   })
 
   it('callback errors should work', function () {
-    expandedForm(types['error'], types, function (err, expForm) {
+    expandedForm(types.error, types, function (err, expForm) {
       err = null
       canonicalForm(expForm, function (err) {
         expect(err).to.not.equal(null)
