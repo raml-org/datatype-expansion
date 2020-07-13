@@ -1,6 +1,6 @@
 {
   "name": "datatype-expansion",
-  "version": "0.4.0",
+  "version": "0.4.1",
   "description": "Utility tool to expand a given RAML type and create a canonical form",
   "main": "src/index.js",
   "browser": "dist/datatype-expansion.js",
@@ -31,24 +31,24 @@
   "author": "Mulesoft",
   "license": "Apache-2.0",
   "devDependencies": {
-    "@babel/core": "^7.7.5",
-    "@babel/preset-env": "^7.7.6",
+    "@babel/core": "^7.10.4",
+    "@babel/preset-env": "^7.10.4",
     "babel-plugin-lodash": "^3.3.4",
     "chai": "^4.1.1",
     "mkdirp": "^1.0.4",
-    "mocha": "^7.1.2",
+    "mocha": "^8.0.1",
     "npm-run-all": "^4.1.5",
-    "nyc": "^15.0.1",
+    "nyc": "^15.1.0",
     "rimraf": "^3.0.0",
-    "rollup": "^2.7.3",
+    "rollup": "^2.21.0",
     "rollup-plugin-babel": "^4.3.3",
     "rollup-plugin-commonjs": "^10.1.0",
     "rollup-plugin-node-resolve": "^5.0.1",
     "rollup-plugin-uglify": "^6.0.4",
-    "standard": "^14.3.1"
+    "standard": "^14.3.4"
   },
   "dependencies": {
-    "lodash": "^4.17.4"
+    "lodash": "^4.17.19"
   },
   "files": [
     "src/**",
